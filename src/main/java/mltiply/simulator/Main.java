@@ -7,10 +7,20 @@ import mltiply.schedulers.Slaq;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Logger;
 
 public class Main {
 
+  private static Logger LOG = Logger.getLogger(Main.class.getName());
+
+  public static void runSimulator() {
+    Simulator simulator = new Simulator();
+    simulator.simulate();
+  }
+
   public static void main(String[] args) {
+    // runSimulator();
+
     int numJobs = 10;
     double ticksMax = 100000;
     double ticksCurr = 0;
@@ -44,6 +54,5 @@ public class Main {
     
     System.out.println("End Simulation!");
   }
-
 
 }
