@@ -4,6 +4,7 @@ import mltiply.apps.Job;
 import mltiply.resources.Cluster;
 import mltiply.schedulers.InterJobScheduler;
 
+import java.util.LinkedList;
 import java.util.Queue;
 
 public class Simulator {
@@ -38,7 +39,6 @@ public class Simulator {
   public InterJobScheduler interJobScheduler;
 
   public Simulator() {
-    CURRENT_TIME = 0;
 
     switch (runMode) {
       case Default:
@@ -63,9 +63,15 @@ public class Simulator {
         System.err.println("Unknown Run Mode");
     }
 
+    CURRENT_TIME = 0;
+    runnableJobs = new LinkedList<Job>();
+    runningJobs = new LinkedList<Job>();
+    completedJobs = new LinkedList<Job>();
+    // cluster = new Cluster(NUM_MACHINES, MACHINE_MAX_RESOURCE, NUM_DIMENSIONS);
+
   }
 
-  public static void simulate() {
+  public void simulate() {
 
   }
 
