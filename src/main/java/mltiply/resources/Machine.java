@@ -1,18 +1,21 @@
 package mltiply.resources;
 
+import mltiply.apps.Task;
+
+import java.util.Map;
+import java.util.TreeMap;
+
 public class Machine {
-  public double cpu;
-  public double mem;
-  public int mid;
+  int machineId;
+  Map<Task, Double> runningTasks;
 
-  public Machine(int mid, double cpu) {
-    this.mid = mid;
-    this.cpu = cpu;
-  }
+  Resources maxResAlloc;
+  Resources totalResAlloc;
 
-  public Machine(int mid, double cpu, double mem) {
-    this.mid = mid;
-    this.cpu = cpu;
-    this.mem = mem;
+  public Machine(int machineId, Resources size) {
+    this.machineId = machineId;
+    runningTasks = new TreeMap<Task, Double>();
+    maxResAlloc = Resources.clone(size);
+    totalResAlloc = new Resources(size.dimension);
   }
 }

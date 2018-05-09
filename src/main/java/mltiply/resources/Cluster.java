@@ -1,20 +1,15 @@
 package mltiply.resources;
 
+import java.util.Map;
+import java.util.TreeMap;
+
 public class Cluster {
-  public Machine[] machines;
+  public Map<Integer, Machine> machines;
 
-  public Cluster(int machines, int cpu) {
-    this.machines = new Machine[machines];
-    for (int i = 0; i < machines; i++) {
-      this.machines[i] = new Machine(i, cpu);
+  public Cluster(int num_machines, Resources size) {
+    machines = new TreeMap<Integer, Machine>();
+    for (int i = 0; i < num_machines; i++) {
+      machines.put(i, new Machine(i, size));
     }
-  }
-
-  public int getNumCores() {
-    int numCores = 0;
-    for (Machine m: machines) {
-      numCores += m.cpu;
-    }
-    return numCores;
   }
 }
