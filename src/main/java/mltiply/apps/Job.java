@@ -6,17 +6,23 @@ import mltiply.utils.Interval;
 import mltiply.utils.SublinearFunction;
 import mltiply.utils.SuperlinearFunction;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class Job {
   public int jobId;
   public int numIterations;
   public int currIterationNum;
-  public int numWorkers;
+  public int resQuota;
+  public int currResUse;
   public double serialIterationDuration;
   public Stage currIteration;
   public Function lossFunction;
   public int numTasksUntilNow;
+  public List<Task> runnableTasks;
+  public List<Task> runningTasks;
+  public List<Task> completedTasks;
 
   public Job(int jobId, int numIterations) {
     this.jobId = jobId;
@@ -29,16 +35,25 @@ public class Job {
     } else {
       lossFunction = SuperlinearFunction.getRandomSuperlinearFunction(numIterations);
     }
-    numWorkers = 0;
+    resQuota = 0;
+    currResUse = 0;
     numTasksUntilNow = 0;
     serialIterationDuration = r.nextInt(91) + 10;
+    runnableTasks = new ArrayList<Task>();
+    runningTasks = new ArrayList<Task>();
+    completedTasks = new ArrayList<Task>();
   }
 
   public void initNextIteration() {
     currIterationNum += 1;
-    currIteration = new Stage(jobId, currIterationNum, serialIterationDuration/numWorkers,
-        1, new Interval(numTasksUntilNow, numTasksUntilNow+numWorkers-1));
-    numTasksUntilNow = numTasksUntilNow + numWorkers;
+    // currIteration = new Stage(jobId, currIterationNum, serialIterationDuration/resQuota,
+    //     1, new Interval(numTasksUntilNow, numTasksUntilNow+resQuota-1));
+    // numTasksUntilNow = numTasksUntilNow + resQuota;
+    for (int i = 0; i < resQuota; i++) {
+      runnableTasks.add(new Task(jobId, currIterationNum, numTasksUntilNow, serialIterationDuration/resQuota, 1));
+      numTasksUntilNow += 1;
+    }
+    completedTasks.clear();
   }
 
   public boolean isFinished() {
@@ -47,7 +62,11 @@ public class Job {
     else
       return true;
   }
-  
+
+  public boolean isIterationOver() {
+    return runnableTasks.isEmpty() && runningTasks.isEmpty();
+  }
+
   // public int jid; // unique job id
   // public int workers; // number of workers currently assigned to this job
   // public Function loss; // loss as a function of iteration

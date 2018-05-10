@@ -8,7 +8,7 @@ public class Task {
   public int stageId;
   public int jobId;
   public double duration;
-  public Resources demands;
+  public int demands;
 
   public Task(int jobId, int stageId, int taskId) {
     this.jobId = jobId;
@@ -16,13 +16,21 @@ public class Task {
     this.taskId = taskId;
   }
 
-  public Task(int jobId, int stageId, int taskId, double duration, Resources demands) {
+  public Task(int jobId, int stageId, int taskId, double duration, int demands) {
     this.jobId = jobId;
     this.stageId = stageId;
     this.taskId = taskId;
     this.duration = duration;
     this.demands = demands;
   }
+
+  // public Task(int jobId, int stageId, int taskId, double duration, Resources demands) {
+  //   this.jobId = jobId;
+  //   this.stageId = stageId;
+  //   this.taskId = taskId;
+  //   this.duration = duration;
+  //   this.demands = demands;
+  // }
 
   public Task(Task t) {
     this.jobId = t.jobId;

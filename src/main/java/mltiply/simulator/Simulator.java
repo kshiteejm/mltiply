@@ -1,9 +1,11 @@
 package mltiply.simulator;
 
 import mltiply.apps.Job;
+import mltiply.apps.Task;
 import mltiply.resources.Cluster;
 import mltiply.resources.Resources;
 import mltiply.schedulers.InterJobScheduler;
+import mltiply.schedulers.IntraJobScheduler;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -35,7 +37,7 @@ public class Simulator {
   public double STEP_TIME = 1;
   public double SIM_END_TIME = 120000;
   public double CURRENT_TIME = 0;
-  public int NUM_JOBS = 100;
+  public int NUM_JOBS = 1;
 
   public Queue<Job> runnableJobs;
   public Queue<Job> runningJobs;
@@ -45,6 +47,7 @@ public class Simulator {
   public double nextTimeToLaunchJob = 0;
 
   public InterJobScheduler interJobScheduler;
+  public IntraJobScheduler intraJobScheduler;
 
   public Simulator() {
 
@@ -78,11 +81,12 @@ public class Simulator {
     runningJobs = new LinkedList<Job>();
     completedJobs = new LinkedList<Job>();
     // cluster = new Cluster(NUM_MACHINES, new Resources(NUM_DIMENSIONS, MACHINE_MAX_RESOURCE));
-    cluster = new Cluster(NUM_MACHINES, MACHINE_MAX_RESOURCE);
+    cluster = new Cluster(NUM_MACHINES, MACHINE_MAX_RESOURCE, this);
     for (int i = 0; i < NUM_JOBS; i++) {
       runnableJobs.add(new Job(i, 120));
     }
     interJobScheduler = new InterJobScheduler(this);
+    intraJobScheduler = new IntraJobScheduler(this);
   }
 
   public void simulate() {
@@ -100,6 +104,8 @@ public class Simulator {
       }
       runningJobs.removeAll(finishedJobs);
       completedJobs.addAll(finishedJobs);
+      // any tasks finished?
+      cluster.finishTasks();
       // any new jobs?
       List<Job> newJobs = new LinkedList<Job>();
       if (JOBS_ARRIVAL_POLICY == JobsArrivalPolicy.All) {
@@ -112,7 +118,9 @@ public class Simulator {
         continue;
       interJobScheduler.schedule();
       // schedule tasks from each job
+      for (Job job: runningJobs) {
+        intraJobScheduler.schedule(job);
+      }
     }
   }
-
 }
