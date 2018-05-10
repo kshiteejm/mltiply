@@ -1,9 +1,52 @@
 package mltiply.apps;
 
+import mltiply.resources.Resources;
 import mltiply.utils.Function;
+import mltiply.utils.Interval;
+import mltiply.utils.SublinearFunction;
+import mltiply.utils.SuperlinearFunction;
+
+import java.util.Random;
 
 public class Job {
   public int jobId;
+  public int numIterations;
+  public int currIterationNum;
+  public int numWorkers;
+  public double serialIterationDuration;
+  public Stage currIteration;
+  public Function lossFunction;
+  public int numTasksUntilNow;
+
+  public Job(int jobId, int numIterations) {
+    this.jobId = jobId;
+    this.numIterations = numIterations;
+    this.currIterationNum = -1;
+    Random r = new Random();
+    int rn = r.nextInt(2);
+    if (rn == 0) {
+      lossFunction = SublinearFunction.getRandomSublinearFunction(numIterations);
+    } else {
+      lossFunction = SuperlinearFunction.getRandomSuperlinearFunction(numIterations);
+    }
+    numWorkers = 0;
+    numTasksUntilNow = 0;
+    serialIterationDuration = r.nextInt(91) + 10;
+  }
+
+  public void initNextIteration() {
+    currIterationNum += 1;
+    currIteration = new Stage(jobId, currIterationNum, serialIterationDuration/numWorkers,
+        1, new Interval(numTasksUntilNow, numTasksUntilNow+numWorkers-1));
+    numTasksUntilNow = numTasksUntilNow + numWorkers;
+  }
+
+  public boolean isFinished() {
+    if (currIterationNum < numIterations-1)
+      return false;
+    else
+      return true;
+  }
   
   // public int jid; // unique job id
   // public int workers; // number of workers currently assigned to this job

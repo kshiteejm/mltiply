@@ -7,6 +7,7 @@ import mltiply.sharepolicies.SlaqSharePolicy;
 import mltiply.simulator.Simulator;
 
 public class InterJobScheduler {
+
   public SharePolicy resourceSharePolicy;
   Simulator simulator;
 
@@ -14,13 +15,13 @@ public class InterJobScheduler {
     this.simulator = simulator;
     switch (simulator.INTER_JOB_POLICY) {
       case Fair:
-        resourceSharePolicy = new FairSharePolicy(this.simulator);
+        resourceSharePolicy = new FairSharePolicy(simulator);
         break;
       case Slaq:
-        resourceSharePolicy = new SlaqSharePolicy(this.simulator);
+        resourceSharePolicy = new SlaqSharePolicy(simulator);
         break;
       case Mltiply:
-        resourceSharePolicy = new MltiplySharePolicy(this.simulator);
+        resourceSharePolicy = new MltiplySharePolicy(simulator);
         break;
       default:
         System.err.println("Unknown Sharing Policy");

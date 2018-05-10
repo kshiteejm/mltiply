@@ -9,13 +9,23 @@ public class Machine {
   int machineId;
   Map<Task, Double> runningTasks;
 
-  Resources maxResAlloc;
-  Resources totalResAlloc;
+  // Resources maxResAlloc;
+  // Resources totalResAlloc;
+  //
+  // public Machine(int machineId, Resources size) {
+  //   this.machineId = machineId;
+  //   runningTasks = new TreeMap<Task, Double>();
+  //   maxResAlloc = Resources.clone(size);
+  //   totalResAlloc = new Resources(size.dimension);
+  // }
 
-  public Machine(int machineId, Resources size) {
+  int maxResAlloc;
+  int totalResAlloc;
+
+  public Machine(int machineId, int size) {
     this.machineId = machineId;
     runningTasks = new TreeMap<Task, Double>();
-    maxResAlloc = Resources.clone(size);
-    totalResAlloc = new Resources(size.dimension);
+    maxResAlloc = size;
+    totalResAlloc = size;
   }
 }
