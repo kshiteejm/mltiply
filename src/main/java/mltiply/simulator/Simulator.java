@@ -54,7 +54,7 @@ public class Simulator {
       case Custom:
         NUM_MACHINES = 1;
         NUM_DIMENSIONS = 1;
-        MACHINE_MAX_RESOURCE = 100;
+        MACHINE_MAX_RESOURCE = 100.0;
         STEP_TIME = 1;
         SIM_END_TIME = 20000;
         JOBS_ARRIVAL_POLICY = JobsArrivalPolicy.All;
