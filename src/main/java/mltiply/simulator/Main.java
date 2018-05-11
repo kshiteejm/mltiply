@@ -9,13 +9,17 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import static java.util.logging.Level.INFO;
+
 public class Main {
 
   private static Logger LOG = Logger.getLogger(Main.class.getName());
 
   public static void runSimulator() {
+    LOG.log(INFO, "======= Begin Simulation =======");
     Simulator simulator = new Simulator();
     simulator.simulate();
+    LOG.log(INFO, "======= End Simulation =======");
   }
 
   public static void main(String[] args) {

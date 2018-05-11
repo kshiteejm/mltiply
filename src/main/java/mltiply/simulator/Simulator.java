@@ -10,8 +10,14 @@ import mltiply.schedulers.IntraJobScheduler;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.logging.Logger;
+
+import static java.util.logging.Level.INFO;
 
 public class Simulator {
+
+  private static Logger LOG = Logger.getLogger(Simulator.class.getName());
+
   public enum RunMode {
     Default, Custom;
   }
@@ -91,6 +97,7 @@ public class Simulator {
 
   public void simulate() {
     for (CURRENT_TIME = 0; CURRENT_TIME < SIM_END_TIME; CURRENT_TIME += STEP_TIME) {
+      LOG.log(INFO, Double.toString(CURRENT_TIME));
       // finish simulation?
       if (runnableJobs.isEmpty() && runningJobs.isEmpty()) {
         System.out.println("=== Simulation Ended at - " + CURRENT_TIME);
@@ -114,8 +121,8 @@ public class Simulator {
       runnableJobs.removeAll(newJobs);
       runningJobs.addAll(newJobs);
       // share cluster across jobs
-      if (finishedJobs.isEmpty() && newJobs.isEmpty())
-        continue;
+      // if (finishedJobs.isEmpty() && newJobs.isEmpty())
+      //   continue;
       interJobScheduler.schedule();
       // schedule tasks from each job
       for (Job job: runningJobs) {
