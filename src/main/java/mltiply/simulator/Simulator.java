@@ -17,6 +17,9 @@ import java.util.logging.Logger;
 import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.INFO;
 
+import java.util.Random;
+import java.lang.Math;
+
 public class Simulator {
 
   private static Logger LOG = Logger.getLogger(Simulator.class.getName());
@@ -57,6 +60,9 @@ public class Simulator {
 
   public InterJobScheduler interJobScheduler;
   public IntraJobScheduler intraJobScheduler;
+
+  public Random generator;
+  public double POISSON_RATE;
 
   public Simulator() {
 
@@ -100,6 +106,16 @@ public class Simulator {
     }
     interJobScheduler = new InterJobScheduler(this);
     intraJobScheduler = new IntraJobScheduler(this);
+
+    // Randomness for Poisson Process.
+    generator = new Random();
+    POISSON_RATE = 1.0;
+
+  }
+
+  // Based on http://preshing.com/20111007/how-to-generate-random-timings-for-a-poisson-process/
+  public double getExpSample() {
+    return - Math.log(1.0 - generator.nextDouble()) / POISSON_RATE;
   }
 
   public void simulate() {
@@ -127,9 +143,31 @@ public class Simulator {
       cluster.finishTasks();
       // any new jobs?
       List<Job> newJobs = new LinkedList<Job>();
+
       if (JOBS_ARRIVAL_POLICY == JobsArrivalPolicy.All) {
         newJobs.addAll(runnableJobs);
       }
+
+      // Simulate a Poisson Process for Arrival of jobs.
+      else if (JOBS_ARRIVAL_POLICY == JobsArrivalPolicy.Distribution) {
+        if (CURRENT_TIME >= nextTimeToLaunchJob) {
+          LOG.log(Level.INFO, "=== Job Arrived at - " + nextTimeToLaunchJob);
+          LOG.log(Level.INFO, "=== Launching Job at - " + CURRENT_TIME);
+          nextTimeToLaunchJob = CURRENT_TIME + getExpSample(); // Sample random time for next job to arrive.
+          Job nextJob = runnableJobs.remove(); // Pop job from runnable queue.
+          newJobs.add(nextJob);
+        }
+      }
+
+      // Jobs arrive one at a time at each time step.
+      else if (JOBS_ARRIVAL_POLICY == JobsArrivalPolicy.One) {
+        LOG.log(Level.INFO, "=== Job Arrived at - " + nextTimeToLaunchJob);
+        LOG.log(Level.INFO, "=== Launching Job at - " + CURRENT_TIME);
+        nextTimeToLaunchJob = CURRENT_TIME + STEP_TIME;
+        Job nextJob = runnableJobs.remove();
+        newJobs.add(nextJob);
+      }
+
       runnableJobs.removeAll(newJobs);
       runningJobs.addAll(newJobs);
       LOG.log(Level.INFO, "Number of Running Jobs: " + Integer.toString(runningJobs.size()));
