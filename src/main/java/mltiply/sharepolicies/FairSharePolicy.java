@@ -3,7 +3,12 @@ package mltiply.sharepolicies;
 import mltiply.apps.Job;
 import mltiply.simulator.Simulator;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class FairSharePolicy extends SharePolicy {
+
+  private static Logger LOG = Logger.getLogger(FairSharePolicy.class.getName());
 
   public FairSharePolicy(Simulator simulator) {
     super(simulator);
@@ -19,6 +24,7 @@ public class FairSharePolicy extends SharePolicy {
     int quotaResShare = clusterTotCapacity/numJobsRunning;
     for (Job job: simulator.runningJobs) {
       job.resQuota = quotaResShare;
+      LOG.log(Level.FINE, "Job " + job.jobId + " - Quota " + job.resQuota);
     }
   }
 }

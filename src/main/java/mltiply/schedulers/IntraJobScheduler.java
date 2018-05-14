@@ -12,7 +12,7 @@ public class IntraJobScheduler {
 
   public IntraJobScheduler(Simulator simulator) {
     this.simulator = simulator;
-    switch (Simulator.INTRA_JOB_POLICY) {
+    switch (simulator.INTRA_JOB_POLICY) {
       case Random:
         resSchedPolicy = new RandomSchedPolicy(simulator);
         break;

@@ -2,7 +2,7 @@ package mltiply.apps;
 
 import mltiply.resources.Resources;
 
-public class Task {
+public class Task implements Comparable<Task> {
 
   public int taskId;
   public int stageId;
@@ -44,5 +44,25 @@ public class Task {
   public String toString() {
     String output = "<" + this.jobId + ":" + this.stageId + ":" + this.taskId + ">";
     return output;
+  }
+
+  public int compareTo(Task other) {
+    int out = 0;
+    if (jobId != other.jobId)
+      if (jobId > other.jobId)
+        out = 1;
+      else
+        out = -1;
+    else if (stageId != other.stageId)
+      if (stageId > other.stageId)
+        out = 1;
+      else
+        out = -1;
+    else if (taskId != other.taskId)
+      if (taskId > other.taskId)
+        out = 1;
+      else
+        out = -1;
+    return out;
   }
 }

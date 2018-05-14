@@ -7,8 +7,12 @@ import mltiply.simulator.Simulator;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Machine {
+
+  private static Logger LOG = Logger.getLogger(Machine.class.getName());
 
   int machineId;
   Map<Task, Double> runningTasks;
@@ -31,14 +35,16 @@ public class Machine {
     this.machineId = machineId;
     runningTasks = new TreeMap<Task, Double>();
     maxResAlloc = size;
-    totalResAlloc = size;
+    totalResAlloc = 0;
     this.simulator = simulator;
   }
 
   public boolean assignTask(Task t) {
     boolean isTaskRun = false;
+    LOG.log(Level.FINE, "Machine " + machineId + " - Machine Max " + maxResAlloc +
+        " - Machine Total " + totalResAlloc + " - Task Demands " + t.demands);
     if (t.demands <= maxResAlloc - totalResAlloc) {
-      totalResAlloc = maxResAlloc + t.demands;
+      totalResAlloc = totalResAlloc + t.demands;
       runningTasks.put(t, t.duration + simulator.CURRENT_TIME);
       isTaskRun = true;
     }

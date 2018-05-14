@@ -4,14 +4,17 @@ import mltiply.apps.Job;
 import mltiply.apps.Task;
 import mltiply.resources.Cluster;
 import mltiply.resources.Resources;
+import mltiply.schedpolicies.SchedPolicy;
 import mltiply.schedulers.InterJobScheduler;
 import mltiply.schedulers.IntraJobScheduler;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.INFO;
 
 public class Simulator {
@@ -31,7 +34,7 @@ public class Simulator {
   public enum SchedulingPolicy {
     Random, Tetris;
   }
-  public static SchedulingPolicy INTRA_JOB_POLICY = SchedulingPolicy.Random;
+  public SchedulingPolicy INTRA_JOB_POLICY = SchedulingPolicy.Random;
 
   public enum JobsArrivalPolicy {
     All, One, Distribution, Trace;
@@ -63,10 +66,11 @@ public class Simulator {
         NUM_DIMENSIONS = 1;
         MACHINE_MAX_RESOURCE = 100;
         STEP_TIME = 1;
-        SIM_END_TIME = 120000;
+        SIM_END_TIME = 12000;
         JOBS_ARRIVAL_POLICY = JobsArrivalPolicy.All;
         INTER_JOB_POLICY = SharingPolicy.Fair;
-        NUM_JOBS = 100;
+        INTRA_JOB_POLICY = SchedulingPolicy.Random;
+        NUM_JOBS = 10;
         break;
       case Custom:
         NUM_MACHINES = 1;
@@ -76,6 +80,7 @@ public class Simulator {
         SIM_END_TIME = 120000;
         JOBS_ARRIVAL_POLICY = JobsArrivalPolicy.All;
         INTER_JOB_POLICY = SharingPolicy.Slaq;
+        INTRA_JOB_POLICY = SchedulingPolicy.Random;
         NUM_JOBS = 100;
         break;
       default:
@@ -89,20 +94,26 @@ public class Simulator {
     // cluster = new Cluster(NUM_MACHINES, new Resources(NUM_DIMENSIONS, MACHINE_MAX_RESOURCE));
     cluster = new Cluster(NUM_MACHINES, MACHINE_MAX_RESOURCE, this);
     for (int i = 0; i < NUM_JOBS; i++) {
-      runnableJobs.add(new Job(i, 120));
+      Job job = new Job(i, 120);
+      runnableJobs.add(job);
+      LOG.log(INFO, Integer.toString(runnableJobs.size()));
     }
     interJobScheduler = new InterJobScheduler(this);
     intraJobScheduler = new IntraJobScheduler(this);
   }
 
   public void simulate() {
+
     for (CURRENT_TIME = 0; CURRENT_TIME < SIM_END_TIME; CURRENT_TIME += STEP_TIME) {
-      LOG.log(INFO, Double.toString(CURRENT_TIME));
+
+      LOG.log(Level.FINE, Double.toString(CURRENT_TIME));
+
       // finish simulation?
       if (runnableJobs.isEmpty() && runningJobs.isEmpty()) {
-        System.out.println("=== Simulation Ended at - " + CURRENT_TIME);
+        LOG.log(Level.INFO, "=== Simulation Ended at - " + CURRENT_TIME);
         break;
       }
+
       // any jobs finished?
       List<Job> finishedJobs = new LinkedList<Job>();
       for (Job j: runningJobs) {
@@ -111,6 +122,7 @@ public class Simulator {
       }
       runningJobs.removeAll(finishedJobs);
       completedJobs.addAll(finishedJobs);
+
       // any tasks finished?
       cluster.finishTasks();
       // any new jobs?
@@ -120,14 +132,18 @@ public class Simulator {
       }
       runnableJobs.removeAll(newJobs);
       runningJobs.addAll(newJobs);
+      LOG.log(Level.INFO, "Number of Running Jobs: " + Integer.toString(runningJobs.size()));
+
       // share cluster across jobs
       // if (finishedJobs.isEmpty() && newJobs.isEmpty())
       //   continue;
       interJobScheduler.schedule();
+
       // schedule tasks from each job
       for (Job job: runningJobs) {
         intraJobScheduler.schedule(job);
       }
+      // System.exit(1);
     }
   }
 }

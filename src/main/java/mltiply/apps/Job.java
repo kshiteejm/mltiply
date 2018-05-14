@@ -45,6 +45,9 @@ public class Job {
   }
 
   public void initNextIteration() {
+    if (isFinished())
+      return;
+
     currIterationNum += 1;
     // currIteration = new Stage(jobId, currIterationNum, serialIterationDuration/resQuota,
     //     1, new Interval(numTasksUntilNow, numTasksUntilNow+resQuota-1));
@@ -64,7 +67,7 @@ public class Job {
   }
 
   public boolean isIterationOver() {
-    return runnableTasks.isEmpty() && runningTasks.isEmpty();
+    return runnableTasks.isEmpty() && runningTasks.isEmpty() && !isFinished();
   }
 
   // public int jid; // unique job id
