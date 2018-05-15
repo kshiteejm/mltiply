@@ -12,7 +12,6 @@ public class FairSharePolicy extends SharePolicy {
 
   public FairSharePolicy(Simulator simulator) {
     super(simulator);
-
   }
 
   @Override

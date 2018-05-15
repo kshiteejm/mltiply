@@ -5,7 +5,12 @@ import mltiply.schedpolicies.RandomSchedPolicy;
 import mltiply.schedpolicies.SchedPolicy;
 import mltiply.simulator.Simulator;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class IntraJobScheduler {
+
+  private static Logger LOG = Logger.getLogger(IntraJobScheduler.class.getName());
 
   public SchedPolicy resSchedPolicy;
   Simulator simulator;
@@ -22,6 +27,11 @@ public class IntraJobScheduler {
   }
 
   public void schedule(Job job) {
+    if (job.isIterationOver()) {
+      job.initNextIteration();
+      LOG.log(Level.INFO, "Time: " + simulator.CURRENT_TIME +
+          " Init Next Iteration for Job " + job.jobId + " Iteration " + job.currIterationNum);
+    }
     // while tasks can be assigned in my resource
     // share quanta, on any machine, keep assigning
     // otherwise return

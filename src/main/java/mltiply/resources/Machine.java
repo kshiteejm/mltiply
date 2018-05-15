@@ -39,13 +39,13 @@ public class Machine {
     this.simulator = simulator;
   }
 
-  public boolean assignTask(Task t) {
+  public boolean assignTask(Task task) {
     boolean isTaskRun = false;
     LOG.log(Level.FINE, "Machine " + machineId + " - Machine Max " + maxResAlloc +
-        " - Machine Total " + totalResAlloc + " - Task Demands " + t.demands);
-    if (t.demands <= maxResAlloc - totalResAlloc) {
-      totalResAlloc = totalResAlloc + t.demands;
-      runningTasks.put(t, t.duration + simulator.CURRENT_TIME);
+        " - Machine Total " + totalResAlloc + " - Task Demands " + task.demands);
+    if (task.demands <= maxResAlloc - totalResAlloc) {
+      totalResAlloc += task.demands;
+      runningTasks.put(task, task.duration + simulator.CURRENT_TIME);
       isTaskRun = true;
     }
     return isTaskRun;
@@ -54,9 +54,12 @@ public class Machine {
   public void finishTasks() {
     ArrayList<Task> finishedTasks = new ArrayList<Task>();
     for (Map.Entry<Task, Double> td: runningTasks.entrySet()) {
-      if (simulator.CURRENT_TIME >= td.getValue()) {
-        finishedTasks.add(td.getKey());
-        LOG.log(Level.INFO, td.toString());
+      Task task = td.getKey();
+      double taskEndTime = td.getValue();
+      if (simulator.CURRENT_TIME >= taskEndTime) {
+        finishedTasks.add(task);
+        totalResAlloc -= task.demands;
+        LOG.log(Level.INFO, task.toString());
       }
     }
     for (Task task: finishedTasks) {
@@ -68,8 +71,7 @@ public class Machine {
           job.currResUse -= task.demands;
           LOG.log(Level.INFO, "Time: " + simulator.CURRENT_TIME
               + ". Job " + job.jobId + ", Finished Task " + task.taskId + " from Stage "
-              + task.stageId + " Task Duration " + task.duration);
-          // System.exit(1);
+              + task.stageId + " Task Duration " + task.duration + " Job Iteration Over " + job.isIterationOver());
           break;
         }
       }

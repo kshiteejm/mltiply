@@ -61,7 +61,20 @@ public class Simulator {
   public Random generator;
   public double POISSON_RATE;
 
+  // metrics
+  public double JAINS_FAIRNESS_INDEX;
+  public double MAKESPAN;
+  public double AVG_JCT;
+
   public Simulator() {
+
+    // Randomness for Poisson Process.
+    generator = new Random();
+
+    // initialize metrics
+    JAINS_FAIRNESS_INDEX = 0.0;
+    MAKESPAN = 0.0;
+    AVG_JCT = 0.0;
 
     switch (runMode) {
       case Default:
@@ -74,6 +87,7 @@ public class Simulator {
         INTER_JOB_POLICY = SharingPolicy.Fair;
         INTRA_JOB_POLICY = SchedulingPolicy.Random;
         NUM_JOBS = 10;
+        POISSON_RATE = 1.0;
         break;
       case Custom:
         NUM_MACHINES = 1;
@@ -85,6 +99,7 @@ public class Simulator {
         INTER_JOB_POLICY = SharingPolicy.Slaq;
         INTRA_JOB_POLICY = SchedulingPolicy.Random;
         NUM_JOBS = 100;
+        POISSON_RATE = 1.0;
         break;
       default:
         System.err.println("Unknown Run Mode");
@@ -94,8 +109,12 @@ public class Simulator {
     runnableJobs = new LinkedList<Job>();
     runningJobs = new LinkedList<Job>();
     completedJobs = new LinkedList<Job>();
+
+    // initialize cluster
     // cluster = new Cluster(NUM_MACHINES, new Resources(NUM_DIMENSIONS, MACHINE_MAX_RESOURCE));
     cluster = new Cluster(NUM_MACHINES, MACHINE_MAX_RESOURCE, this);
+
+    // initialize runnable jobs
     for (int i = 0; i < NUM_JOBS; i++) {
       Job job = new Job(i, 120);
       runnableJobs.add(job);
@@ -103,11 +122,6 @@ public class Simulator {
     }
     interJobScheduler = new InterJobScheduler(this);
     intraJobScheduler = new IntraJobScheduler(this);
-
-    // Randomness for Poisson Process.
-    generator = new Random();
-    POISSON_RATE = 1.0;
-
   }
 
   // Based on http://preshing.com/20111007/how-to-generate-random-timings-for-a-poisson-process/
@@ -121,36 +135,49 @@ public class Simulator {
 
       LOG.log(Level.FINE, Double.toString(CURRENT_TIME));
 
-      // finish simulation?
-      if (runnableJobs.isEmpty() && runningJobs.isEmpty()) {
-        LOG.log(Level.INFO, "=== Simulation Ended at - " + CURRENT_TIME);
-        break;
-      }
-
-      // any jobs finished?
+      /* any jobs finished?
+       * if any job has completed it's iteration limit or target accuracy
+       */
       List<Job> finishedJobs = new LinkedList<Job>();
-      for (Job j: runningJobs) {
-        if (j.isFinished()) {
-          LOG.log(Level.INFO, "TIME: " + CURRENT_TIME + " Finished Job " + j.jobId);
-          System.exit(1);
-          finishedJobs.add(j);
+      for (Job job: runningJobs) {
+        if (job.isFinished()) {
+          LOG.log(Level.INFO, "TIME: " + CURRENT_TIME + " Finished Job " + job.jobId);
+          job.endTime = CURRENT_TIME;
+          finishedJobs.add(job);
+          AVG_JCT += job.endTime - job.startTime;
         }
       }
       runningJobs.removeAll(finishedJobs);
       completedJobs.addAll(finishedJobs);
 
-      // any tasks finished?
+      /* finish simulation?
+       * if there are no runnable and running jobs in the system then we are done
+       */
+      if (runnableJobs.isEmpty() && runningJobs.isEmpty()) {
+        AVG_JCT = AVG_JCT/completedJobs.size();
+        JAINS_FAIRNESS_INDEX = JAINS_FAIRNESS_INDEX/CURRENT_TIME;
+        LOG.log(Level.INFO, "====== Simulation Results ======");
+        LOG.log(Level.INFO, "MAKESPAN: " + CURRENT_TIME);
+        LOG.log(Level.INFO, "AVG_JCT: " + AVG_JCT);
+        LOG.log(Level.INFO, "JAINS_FAIRNESS_INDEX: " + JAINS_FAIRNESS_INDEX);
+        break;
+      }
+
+      /* any tasks finished?
+       * check for completion of running tasks
+       * update per job running and completed tasks
+       */
       cluster.finishTasks();
 
-      // any new jobs?
+      /* any new jobs?
+       * check for arrival of new jobs - depends on the arrival policy
+       */
       List<Job> newJobs = new LinkedList<Job>();
 
       if (JOBS_ARRIVAL_POLICY == JobsArrivalPolicy.All) {
         newJobs.addAll(runnableJobs);
-      }
-
-      // Simulate a Poisson Process for Arrival of jobs.
-      else if (JOBS_ARRIVAL_POLICY == JobsArrivalPolicy.Distribution) {
+      } else if (JOBS_ARRIVAL_POLICY == JobsArrivalPolicy.Distribution) {
+        // Simulate a Poisson Process for Arrival of jobs.
         if (CURRENT_TIME >= nextTimeToLaunchJob) {
           LOG.log(Level.INFO, "=== Job Arrived at - " + nextTimeToLaunchJob);
           LOG.log(Level.INFO, "=== Launching Job at - " + CURRENT_TIME);
@@ -158,31 +185,44 @@ public class Simulator {
           Job nextJob = runnableJobs.peek(); // Pop job from runnable queue.
           newJobs.add(nextJob);
         }
-      }
-
-      // Jobs arrive one at a time at each time step.
-      else if (JOBS_ARRIVAL_POLICY == JobsArrivalPolicy.One) {
+      } else if (JOBS_ARRIVAL_POLICY == JobsArrivalPolicy.One) {
+        // Jobs arrive one at a time at each time step.
         LOG.log(Level.INFO, "=== Job Arrived at - " + nextTimeToLaunchJob);
         LOG.log(Level.INFO, "=== Launching Job at - " + CURRENT_TIME);
         nextTimeToLaunchJob = CURRENT_TIME + STEP_TIME;
         Job nextJob = runnableJobs.peek();
         newJobs.add(nextJob);
       }
-
+      for (Job job: newJobs) {
+        job.startTime = CURRENT_TIME;
+      }
       runnableJobs.removeAll(newJobs);
       runningJobs.addAll(newJobs);
       LOG.log(Level.INFO, "Number of Running Jobs: " + Integer.toString(runningJobs.size()));
 
-      // share cluster across jobs
+      /* inter-job scheduler - share cluster across jobs
+       * update every jobs resource quota / resource share in the cluster
+       */
       // if (finishedJobs.isEmpty() && newJobs.isEmpty())
       //   continue;
       interJobScheduler.schedule();
 
-      // schedule tasks from each job
+      /* intra-job scheduler - schedule tasks from each job
+       * if cluster has free resources and job has not met resource quota schedule tasks
+       * update per job - next set of runnable tasks and also runnable and running tasks
+       */
       for (Job job: runningJobs) {
         intraJobScheduler.schedule(job);
       }
-      // System.exit(1);
+      double _sum_of_squares = 0.0;
+      double _square_of_sum = 0.0;
+      int numJobsRunning = runningJobs.size();
+      for (Job job: runningJobs) {
+        _square_of_sum += job.currResUse;
+        _sum_of_squares += job.currResUse*job.currResUse;
+      }
+      _square_of_sum = _square_of_sum*_square_of_sum;
+      JAINS_FAIRNESS_INDEX += _square_of_sum/(numJobsRunning*_sum_of_squares);
     }
   }
 }

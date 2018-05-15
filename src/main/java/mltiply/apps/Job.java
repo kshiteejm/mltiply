@@ -9,8 +9,13 @@ import mltiply.utils.SuperlinearFunction;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Job {
+
+  private static Logger LOG = Logger.getLogger(Job.class.getName());
+
   public int jobId;
   public int numIterations;
   public int currIterationNum;
@@ -23,6 +28,8 @@ public class Job {
   public List<Task> runnableTasks;
   public List<Task> runningTasks;
   public List<Task> completedTasks;
+  public double startTime;
+  public double endTime;
 
   public Job(int jobId, int numIterations) {
     this.jobId = jobId;
@@ -53,21 +60,42 @@ public class Job {
     //     1, new Interval(numTasksUntilNow, numTasksUntilNow+resQuota-1));
     // numTasksUntilNow = numTasksUntilNow + resQuota;
     for (int i = 0; i < resQuota; i++) {
-      runnableTasks.add(new Task(jobId, currIterationNum, numTasksUntilNow, serialIterationDuration/resQuota, 1));
+      runnableTasks.add(new Task(jobId, currIterationNum, numTasksUntilNow,
+          serialIterationDuration/resQuota, 1));
       numTasksUntilNow += 1;
     }
     completedTasks.clear();
   }
 
   public boolean isFinished() {
-    if (currIterationNum < numIterations-1)
+    if (currIterationNum < numIterations-1) {
+      LOG.log(Level.INFO, "Job " + jobId + ", Current Iteration Num " + currIterationNum +
+          ", Total Iterations " + numIterations);
       return false;
-    else
+    } else {
+      LOG.log(Level.INFO, "Job Finished " + jobId);
       return true;
+    }
   }
 
   public boolean isIterationOver() {
     return runnableTasks.isEmpty() && runningTasks.isEmpty() && !isFinished();
+  }
+
+  public void scheduleTask(Task task) {
+    if (runnableTasks.contains(task)) {
+      runnableTasks.remove(task);
+      runningTasks.add(task);
+      currResUse += task.demands;
+    }
+  }
+
+  public void completeTask(Task task) {
+    if (runningTasks.contains(task)) {
+      runningTasks.remove(task);
+      completedTasks.add(task);
+      currResUse -= task.demands;
+    }
   }
 
   // public int jid; // unique job id
