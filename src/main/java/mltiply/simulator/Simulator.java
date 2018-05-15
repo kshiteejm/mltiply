@@ -154,7 +154,7 @@ public class Simulator {
           LOG.log(Level.INFO, "=== Job Arrived at - " + nextTimeToLaunchJob);
           LOG.log(Level.INFO, "=== Launching Job at - " + CURRENT_TIME);
           nextTimeToLaunchJob = CURRENT_TIME + getExpSample(); // Sample random time for next job to arrive.
-          Job nextJob = runnableJobs.remove(); // Pop job from runnable queue.
+          Job nextJob = runnableJobs.peek(); // Pop job from runnable queue.
           newJobs.add(nextJob);
         }
       }
@@ -164,7 +164,7 @@ public class Simulator {
         LOG.log(Level.INFO, "=== Job Arrived at - " + nextTimeToLaunchJob);
         LOG.log(Level.INFO, "=== Launching Job at - " + CURRENT_TIME);
         nextTimeToLaunchJob = CURRENT_TIME + STEP_TIME;
-        Job nextJob = runnableJobs.remove();
+        Job nextJob = runnableJobs.peek();
         newJobs.add(nextJob);
       }
 
