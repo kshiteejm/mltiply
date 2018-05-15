@@ -56,6 +56,7 @@ public class Machine {
     for (Map.Entry<Task, Double> td: runningTasks.entrySet()) {
       if (simulator.CURRENT_TIME >= td.getValue()) {
         finishedTasks.add(td.getKey());
+        LOG.log(Level.INFO, td.toString());
       }
     }
     for (Task task: finishedTasks) {
@@ -65,6 +66,10 @@ public class Machine {
           job.runningTasks.remove(task);
           job.completedTasks.add(task);
           job.currResUse -= task.demands;
+          LOG.log(Level.INFO, "Time: " + simulator.CURRENT_TIME
+              + ". Job " + job.jobId + ", Finished Task " + task.taskId + " from Stage "
+              + task.stageId + " Task Duration " + task.duration);
+          // System.exit(1);
           break;
         }
       }

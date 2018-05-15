@@ -42,7 +42,7 @@ public class Task implements Comparable<Task> {
 
   @Override
   public String toString() {
-    String output = "<" + this.jobId + ":" + this.stageId + ":" + this.taskId + ">";
+    String output = "<" + jobId + ":" + stageId + ":" + taskId + ">";
     return output;
   }
 

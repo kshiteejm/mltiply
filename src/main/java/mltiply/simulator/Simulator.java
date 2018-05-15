@@ -14,9 +14,6 @@ import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static java.util.logging.Level.FINE;
-import static java.util.logging.Level.INFO;
-
 public class Simulator {
 
   private static Logger LOG = Logger.getLogger(Simulator.class.getName());
@@ -66,7 +63,7 @@ public class Simulator {
         NUM_DIMENSIONS = 1;
         MACHINE_MAX_RESOURCE = 100;
         STEP_TIME = 1;
-        SIM_END_TIME = 12000;
+        SIM_END_TIME = 120000;
         JOBS_ARRIVAL_POLICY = JobsArrivalPolicy.All;
         INTER_JOB_POLICY = SharingPolicy.Fair;
         INTRA_JOB_POLICY = SchedulingPolicy.Random;
@@ -96,7 +93,7 @@ public class Simulator {
     for (int i = 0; i < NUM_JOBS; i++) {
       Job job = new Job(i, 120);
       runnableJobs.add(job);
-      LOG.log(INFO, Integer.toString(runnableJobs.size()));
+      LOG.log(Level.INFO, Integer.toString(runnableJobs.size()));
     }
     interJobScheduler = new InterJobScheduler(this);
     intraJobScheduler = new IntraJobScheduler(this);
@@ -117,14 +114,18 @@ public class Simulator {
       // any jobs finished?
       List<Job> finishedJobs = new LinkedList<Job>();
       for (Job j: runningJobs) {
-        if (j.isFinished())
+        if (j.isFinished()) {
+          LOG.log(Level.INFO, "TIME: " + CURRENT_TIME + " Finished Job " + j.jobId);
+          System.exit(1);
           finishedJobs.add(j);
+        }
       }
       runningJobs.removeAll(finishedJobs);
       completedJobs.addAll(finishedJobs);
 
       // any tasks finished?
       cluster.finishTasks();
+
       // any new jobs?
       List<Job> newJobs = new LinkedList<Job>();
       if (JOBS_ARRIVAL_POLICY == JobsArrivalPolicy.All) {

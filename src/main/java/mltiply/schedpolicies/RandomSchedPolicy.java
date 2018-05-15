@@ -18,8 +18,13 @@ public class RandomSchedPolicy extends  SchedPolicy {
 
   @Override
   public void schedule(Job job) {
-    if (job.isIterationOver())
+    if (job.isIterationOver()) {
       job.initNextIteration();
+      LOG.log(Level.INFO, "Time: " + simulator.CURRENT_TIME +
+          " Init Next Iteration for Job " + job.jobId + " Iteration " + job.currIterationNum);
+      if (job.currIterationNum > 1)
+        System.exit(1);
+    }
 
     if (job.runnableTasks.isEmpty())
       return;
