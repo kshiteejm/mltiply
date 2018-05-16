@@ -6,20 +6,47 @@ import mltiply.schedulers.Slaq;
 
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
+import java.util.Queue;
+import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import static java.util.logging.Level.INFO;
 
 public class Main {
 
   private static Logger LOG = Logger.getLogger(Main.class.getName());
 
   public static void runSimulator() {
-    LOG.log(INFO, "======= Begin Simulation =======");
-    Simulator simulator = new Simulator();
+    LOG.log(Level.INFO, "======= Begin Simulation =======");
+
+    // initialize runnable jobs
+    int NUM_JOBS = 100;
+    Queue<Job> runnableJobs = new LinkedList<Job>();
+    for (int i = 0; i < NUM_JOBS; i++) {
+      Job job = new Job(i, 120);
+      runnableJobs.add(job);
+      LOG.log(Level.INFO, Integer.toString(runnableJobs.size()));
+    }
+
+    double FAIR_MAKESPAN = 0.0, FAIR_AVG_JCT = 0.0, FAIR_JAIN_INDEX = 0.0;
+    Simulator simulator = new Simulator(runnableJobs, Simulator.SharingPolicy.Fair);
     simulator.simulate();
-    LOG.log(INFO, "======= End Simulation =======");
+    FAIR_MAKESPAN = simulator.MAKESPAN;
+    FAIR_AVG_JCT = simulator.AVG_JCT;
+    FAIR_JAIN_INDEX = simulator.JAINS_FAIRNESS_INDEX;
+
+    double SLAQ_MAKESPAN = 0.0, SLAQ_AVG_JCT = 0.0, SLAQ_JAIN_INDEX = 0.0;
+    simulator = new Simulator(runnableJobs, Simulator.SharingPolicy.Slaq);
+    simulator.simulate();
+    SLAQ_MAKESPAN = simulator.MAKESPAN;
+    SLAQ_AVG_JCT = simulator.AVG_JCT;
+    SLAQ_JAIN_INDEX = simulator.JAINS_FAIRNESS_INDEX;
+
+    LOG.log(Level.INFO, "" + runnableJobs.size());
+    LOG.log(Level.INFO, "FAIR - " + "MAKESPAN:" + FAIR_MAKESPAN + ", AVG_JCT:" + FAIR_AVG_JCT +
+        ", JAIN_INDEX:" + FAIR_JAIN_INDEX);
+    LOG.log(Level.INFO, "SLAQ - " + "MAKESPAN:" + SLAQ_MAKESPAN + ", AVG_JCT:" + SLAQ_AVG_JCT +
+        ", JAIN_INDEX:" + SLAQ_JAIN_INDEX);
+
+    LOG.log(Level.INFO, "======= End Simulation =======");
   }
 
   public static void main(String[] args) {

@@ -45,7 +45,7 @@ public class Simulator {
   public int MACHINE_MAX_RESOURCE;
   public double STEP_TIME = 1;
   public double SIM_END_TIME = 120000;
-  public double CURRENT_TIME = 0;
+  public double CURRENT_TIME = 0.0;
   public int NUM_JOBS = 1;
 
   public Queue<Job> runnableJobs;
@@ -66,7 +66,7 @@ public class Simulator {
   public double MAKESPAN;
   public double AVG_JCT;
 
-  public Simulator() {
+  public Simulator(Queue<Job> runnableJobs, SharingPolicy sharingPolicy) {
 
     // Randomness for Poisson Process.
     generator = new Random();
@@ -81,12 +81,11 @@ public class Simulator {
         NUM_MACHINES = 1;
         NUM_DIMENSIONS = 1;
         MACHINE_MAX_RESOURCE = 100;
-        STEP_TIME = 1;
+        STEP_TIME = 0.1;
         SIM_END_TIME = 120000;
         JOBS_ARRIVAL_POLICY = JobsArrivalPolicy.All;
-        INTER_JOB_POLICY = SharingPolicy.Fair;
+        INTER_JOB_POLICY = SharingPolicy.Slaq;
         INTRA_JOB_POLICY = SchedulingPolicy.Random;
-        NUM_JOBS = 10;
         POISSON_RATE = 1.0;
         break;
       case Custom:
@@ -98,7 +97,6 @@ public class Simulator {
         JOBS_ARRIVAL_POLICY = JobsArrivalPolicy.All;
         INTER_JOB_POLICY = SharingPolicy.Slaq;
         INTRA_JOB_POLICY = SchedulingPolicy.Random;
-        NUM_JOBS = 100;
         POISSON_RATE = 1.0;
         break;
       default:
@@ -106,20 +104,20 @@ public class Simulator {
     }
 
     CURRENT_TIME = 0;
-    runnableJobs = new LinkedList<Job>();
+    this.runnableJobs = new LinkedList<Job>();
+    for (Job job: runnableJobs) {
+      this.runnableJobs.add(job.clone());
+    }
     runningJobs = new LinkedList<Job>();
     completedJobs = new LinkedList<Job>();
+    INTER_JOB_POLICY = sharingPolicy;
+    NUM_JOBS = this.runnableJobs.size();
 
     // initialize cluster
     // cluster = new Cluster(NUM_MACHINES, new Resources(NUM_DIMENSIONS, MACHINE_MAX_RESOURCE));
     cluster = new Cluster(NUM_MACHINES, MACHINE_MAX_RESOURCE, this);
 
-    // initialize runnable jobs
-    for (int i = 0; i < NUM_JOBS; i++) {
-      Job job = new Job(i, 120);
-      runnableJobs.add(job);
-      LOG.log(Level.INFO, Integer.toString(runnableJobs.size()));
-    }
+
     interJobScheduler = new InterJobScheduler(this);
     intraJobScheduler = new IntraJobScheduler(this);
   }
@@ -141,7 +139,7 @@ public class Simulator {
       List<Job> finishedJobs = new LinkedList<Job>();
       for (Job job: runningJobs) {
         if (job.isFinished()) {
-          LOG.log(Level.INFO, "TIME: " + CURRENT_TIME + " Finished Job " + job.jobId);
+          LOG.log(Level.FINE, "TIME: " + CURRENT_TIME + " Finished Job " + job.jobId);
           job.endTime = CURRENT_TIME;
           finishedJobs.add(job);
           AVG_JCT += job.endTime - job.startTime;
@@ -155,9 +153,10 @@ public class Simulator {
        */
       if (runnableJobs.isEmpty() && runningJobs.isEmpty()) {
         AVG_JCT = AVG_JCT/completedJobs.size();
-        JAINS_FAIRNESS_INDEX = JAINS_FAIRNESS_INDEX/CURRENT_TIME;
+        JAINS_FAIRNESS_INDEX = JAINS_FAIRNESS_INDEX*STEP_TIME/CURRENT_TIME;
+        MAKESPAN = CURRENT_TIME;
         LOG.log(Level.INFO, "====== Simulation Results ======");
-        LOG.log(Level.INFO, "MAKESPAN: " + CURRENT_TIME);
+        LOG.log(Level.INFO, "MAKESPAN: " + MAKESPAN);
         LOG.log(Level.INFO, "AVG_JCT: " + AVG_JCT);
         LOG.log(Level.INFO, "JAINS_FAIRNESS_INDEX: " + JAINS_FAIRNESS_INDEX);
         break;
@@ -198,7 +197,7 @@ public class Simulator {
       }
       runnableJobs.removeAll(newJobs);
       runningJobs.addAll(newJobs);
-      LOG.log(Level.INFO, "Number of Running Jobs: " + Integer.toString(runningJobs.size()));
+      LOG.log(Level.FINE, "Number of Running Jobs: " + Integer.toString(runningJobs.size()));
 
       /* inter-job scheduler - share cluster across jobs
        * update every jobs resource quota / resource share in the cluster
@@ -222,7 +221,13 @@ public class Simulator {
         _sum_of_squares += job.currResUse*job.currResUse;
       }
       _square_of_sum = _square_of_sum*_square_of_sum;
-      JAINS_FAIRNESS_INDEX += _square_of_sum/(numJobsRunning*_sum_of_squares);
+      if (!(numJobsRunning == 0) && !(_sum_of_squares == 0))
+        JAINS_FAIRNESS_INDEX += _square_of_sum/(numJobsRunning*_sum_of_squares);
+      else
+        JAINS_FAIRNESS_INDEX += 1.0;
+      if (numJobsRunning == 0 || _sum_of_squares == 0) {
+        LOG.log(Level.INFO, "Issues " + CURRENT_TIME);
+      }
     }
   }
 }

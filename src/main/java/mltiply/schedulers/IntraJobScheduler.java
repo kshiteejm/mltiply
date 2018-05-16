@@ -27,9 +27,9 @@ public class IntraJobScheduler {
   }
 
   public void schedule(Job job) {
-    if (job.isIterationOver()) {
+    if (job.isIterationOver() && job.resQuota > 0) {
       job.initNextIteration();
-      LOG.log(Level.INFO, "Time: " + simulator.CURRENT_TIME +
+      LOG.log(Level.FINE, "Time: " + simulator.CURRENT_TIME +
           " Init Next Iteration for Job " + job.jobId + " Iteration " + job.currIterationNum);
     }
     // while tasks can be assigned in my resource

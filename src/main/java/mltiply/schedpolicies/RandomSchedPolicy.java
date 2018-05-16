@@ -34,7 +34,7 @@ public class RandomSchedPolicy extends  SchedPolicy {
     }
     job.runnableTasks.removeAll(scheduledTasks);
     job.runningTasks.addAll(scheduledTasks);
-    LOG.log(Level.INFO, "Job " + job.jobId + ", Number of Running Tasks " + job.runningTasks.size() +
+    LOG.log(Level.FINE, "Job " + job.jobId + ", Number of Running Tasks " + job.runningTasks.size() +
     ", Number of Runnable Tasks " + job.runnableTasks.size());
   }
 }

@@ -12,7 +12,7 @@ import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class Job {
+public class Job implements Cloneable {
 
   private static Logger LOG = Logger.getLogger(Job.class.getName());
 
@@ -30,11 +30,13 @@ public class Job {
   public List<Task> completedTasks;
   public double startTime;
   public double endTime;
+  public double jobLossSlope;
 
   public Job(int jobId, int numIterations) {
     this.jobId = jobId;
     this.numIterations = numIterations;
-    this.currIterationNum = -1;
+    currIterationNum = -1;
+    jobLossSlope = 0.0;
     Random r = new Random();
     int rn = r.nextInt(2);
     if (rn == 0) {
@@ -51,8 +53,23 @@ public class Job {
     completedTasks = new ArrayList<Task>();
   }
 
+  public Job clone() {
+    Job job = new Job(this.jobId, this.numIterations);
+    job.jobLossSlope = this.jobLossSlope;
+    job.currIterationNum = this.currIterationNum;
+    job.lossFunction = this.lossFunction;
+    job.resQuota = this.resQuota;
+    job.currResUse = this.currResUse;
+    job.numTasksUntilNow = this.numTasksUntilNow;
+    job.serialIterationDuration = this.serialIterationDuration;
+    job.runnableTasks = new ArrayList<Task>(this.runnableTasks);
+    job.runningTasks = new ArrayList<Task>(this.runningTasks);
+    job.completedTasks = new ArrayList<Task>(this.completedTasks);
+    return job;
+  }
+
   public void initNextIteration() {
-    if (isFinished())
+    if (isFinished() || resQuota == 0)
       return;
 
     currIterationNum += 1;
@@ -68,12 +85,12 @@ public class Job {
   }
 
   public boolean isFinished() {
-    if (currIterationNum < numIterations-1) {
-      LOG.log(Level.INFO, "Job " + jobId + ", Current Iteration Num " + currIterationNum +
+    if (currIterationNum < numIterations-1 || !runningTasks.isEmpty()) {
+      LOG.log(Level.FINE, "Job " + jobId + ", Current Iteration Num " + currIterationNum +
           ", Total Iterations " + numIterations);
       return false;
     } else {
-      LOG.log(Level.INFO, "Job Finished " + jobId);
+      LOG.log(Level.FINE, "Job Finished " + jobId);
       return true;
     }
   }

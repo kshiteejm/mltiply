@@ -59,7 +59,7 @@ public class Machine {
       if (simulator.CURRENT_TIME >= taskEndTime) {
         finishedTasks.add(task);
         totalResAlloc -= task.demands;
-        LOG.log(Level.INFO, task.toString());
+        LOG.log(Level.FINE, task.toString());
       }
     }
     for (Task task: finishedTasks) {
@@ -69,7 +69,7 @@ public class Machine {
           job.runningTasks.remove(task);
           job.completedTasks.add(task);
           job.currResUse -= task.demands;
-          LOG.log(Level.INFO, "Time: " + simulator.CURRENT_TIME
+          LOG.log(Level.FINE, "Time: " + simulator.CURRENT_TIME
               + ". Job " + job.jobId + ", Finished Task " + task.taskId + " from Stage "
               + task.stageId + " Task Duration " + task.duration + " Job Iteration Over " + job.isIterationOver());
           break;

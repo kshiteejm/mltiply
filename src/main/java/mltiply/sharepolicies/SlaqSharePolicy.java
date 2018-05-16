@@ -6,8 +6,13 @@ import mltiply.utils.JobLossFunctionBySlopeComparator;
 
 import java.util.Comparator;
 import java.util.PriorityQueue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class SlaqSharePolicy extends SharePolicy {
+
+  private static Logger LOG = Logger.getLogger(SlaqSharePolicy.class.getName());
+
   public SlaqSharePolicy(Simulator simulator) {
     super(simulator);
   }
