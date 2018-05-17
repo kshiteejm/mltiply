@@ -23,7 +23,7 @@ class LossLogger(Callback):
     def on_batch_end(self, batch, logs=None):
         logs = logs or {}
         self.seen += 1
-        print(self.seen, logs.get('loss'), file=self.logFile)
+        print(self.seen, logs.get('loss'), file=self.logFile) # logs.get('acc') for accuracy.
 
 
     def on_train_end(self, logs=None):

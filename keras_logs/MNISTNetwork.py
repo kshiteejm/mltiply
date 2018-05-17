@@ -35,7 +35,7 @@ class MNISTNetwork(NeuralNetwork):
 
         self.loss = "categorical_crossentropy"
         self.optimizer = "adam"
-        self.metrics = None
+        self.metrics = ['accuracy']
 
         self.jsonFile = jsonFile
         self.weightFile = weightFile
