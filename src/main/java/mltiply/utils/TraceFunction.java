@@ -1,10 +1,8 @@
 package mltiply.utils;
 
-import sun.rmi.log.ReliableLog;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Random;
 
 public class TraceFunction implements Function {
 
@@ -15,6 +13,9 @@ public class TraceFunction implements Function {
     private ArrayList<Double> losses;
 
     public TraceFunction(String logFileName) {
+
+        this.losses = new ArrayList<Double>();
+
         this.logFileName = logFileName;
         this.logFile = new File(this.logFileName);
         try {
@@ -23,6 +24,7 @@ public class TraceFunction implements Function {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+
     }
 
     public double getValue(int iteration) {
