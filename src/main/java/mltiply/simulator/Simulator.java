@@ -175,27 +175,33 @@ public class Simulator {
 
       if (JOBS_ARRIVAL_POLICY == JobsArrivalPolicy.All) {
         newJobs.addAll(runnableJobs);
-      } else if (JOBS_ARRIVAL_POLICY == JobsArrivalPolicy.Distribution) {
+        runnableJobs.removeAll(newJobs);
+      }
+      else if (JOBS_ARRIVAL_POLICY == JobsArrivalPolicy.Distribution) {
         // Simulate a Poisson Process for Arrival of jobs.
-        if (CURRENT_TIME >= nextTimeToLaunchJob) {
+        while (CURRENT_TIME >= nextTimeToLaunchJob) {
           LOG.log(Level.INFO, "=== Job Arrived at - " + nextTimeToLaunchJob);
           LOG.log(Level.INFO, "=== Launching Job at - " + CURRENT_TIME);
-          nextTimeToLaunchJob = CURRENT_TIME + getExpSample(); // Sample random time for next job to arrive.
-          Job nextJob = runnableJobs.peek(); // Pop job from runnable queue.
-          newJobs.add(nextJob);
+          if(!runnableJobs.isEmpty()) {
+            Job nextJob = runnableJobs.remove(); // Pop job from runnable queue.
+            newJobs.add(nextJob);
+            nextTimeToLaunchJob += getExpSample(); // Sample random time for next job to arrive.
+          } else {
+            // TODO: Anything here?
+          }
+
         }
       } else if (JOBS_ARRIVAL_POLICY == JobsArrivalPolicy.One) {
         // Jobs arrive one at a time at each time step.
         LOG.log(Level.INFO, "=== Job Arrived at - " + nextTimeToLaunchJob);
         LOG.log(Level.INFO, "=== Launching Job at - " + CURRENT_TIME);
         nextTimeToLaunchJob = CURRENT_TIME + STEP_TIME;
-        Job nextJob = runnableJobs.peek();
+        Job nextJob = runnableJobs.remove();
         newJobs.add(nextJob);
       }
       for (Job job: newJobs) {
         job.startTime = CURRENT_TIME;
       }
-      runnableJobs.removeAll(newJobs);
       runningJobs.addAll(newJobs);
       LOG.log(Level.FINE, "Number of Running Jobs: " + Integer.toString(runningJobs.size()));
 
