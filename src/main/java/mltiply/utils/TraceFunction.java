@@ -24,7 +24,6 @@ public class TraceFunction implements Function {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-
     }
 
     public double getValue(int iteration) {
@@ -34,6 +33,8 @@ public class TraceFunction implements Function {
             try {
                 line = this.buffLogFileReader.readLine().split("\\s+");
                 this.losses.add(Double.parseDouble(line[1]));
+                num += 1;
+                assert(num == Integer.parseInt(line[0]));
             } catch (IOException e) {
                 e.printStackTrace();
             }
