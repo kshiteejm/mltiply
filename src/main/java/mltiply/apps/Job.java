@@ -32,6 +32,22 @@ public class Job implements Cloneable {
   public double endTime;
   public double jobLossSlope;
 
+  /* A job has
+   * jobId - unique job id
+   * numIterations - a limit on the total number of iterations after which job finishes
+   * currIterationNum - the current iteration number in the range [0, numIterations - 1]
+   * resQuota - the InterJobScheduler decided resource quota
+   * currResUse - the number of resources currently being used by the job
+   * serialIterationDuration - the serial duration of each iteration of the job
+   * currIteration -
+   * lossFunction - the loss value as a function of iteration number
+   * numTasksUntilNow - the total number of tasks the job has until now
+   * runnableTasks - the runnable tasks
+   * runningTasks - the running tasks
+   * startTime - the absolute simulation time at which the job started
+   * endTime - the absolute simulation time at which the job ended
+   * jobLossSlope - the slope of the loss function at current iteration num
+   */
   public Job(int jobId, int numIterations) {
     this.jobId = jobId;
     this.numIterations = numIterations;
@@ -53,6 +69,9 @@ public class Job implements Cloneable {
     completedTasks = new ArrayList<Task>();
   }
 
+  /* job object clone function
+   * typically used during deep copy of any datastructure containing a job
+   */
   public Job clone() {
     Job job = new Job(this.jobId, this.numIterations);
     job.jobLossSlope = this.jobLossSlope;
@@ -68,6 +87,11 @@ public class Job implements Cloneable {
     return job;
   }
 
+  /* initialize the tasks for the next iteration
+   * check if current iteration is finished
+   * increment current iteration and
+   * spawn runnable tasks for next iteration
+   */
   public void initNextIteration() {
     if (isFinished() || resQuota == 0)
       return;
@@ -81,9 +105,13 @@ public class Job implements Cloneable {
           serialIterationDuration/resQuota, 1));
       numTasksUntilNow += 1;
     }
-    completedTasks.clear();
+    completedTasks.clear(); // is this required?
   }
 
+  /* A job is finished if
+   * it reaches iteration limit, and
+   * there are no running tasks for that job
+   */
   public boolean isFinished() {
     if (currIterationNum < numIterations-1 || !runningTasks.isEmpty()) {
       LOG.log(Level.FINE, "Job " + jobId + ", Current Iteration Num " + currIterationNum +
@@ -95,8 +123,11 @@ public class Job implements Cloneable {
     }
   }
 
+  /* A job iteration is over
+   * if there are no runnable and running tasks
+   */
   public boolean isIterationOver() {
-    return runnableTasks.isEmpty() && runningTasks.isEmpty() && !isFinished();
+    return runnableTasks.isEmpty() && runningTasks.isEmpty();
   }
 
   public void scheduleTask(Task task) {
@@ -107,39 +138,20 @@ public class Job implements Cloneable {
     }
   }
 
-  public void completeTask(Task task) {
+  public boolean finishTask(Task task) {
     if (runningTasks.contains(task)) {
       runningTasks.remove(task);
       completedTasks.add(task);
       currResUse -= task.demands;
+      return true;
+    } else {
+      return false;
     }
   }
 
-  // public int jid; // unique job id
-  // public int workers; // number of workers currently assigned to this job
-  // public Function loss; // loss as a function of iteration
-  // public int iterations; // current SGD iteration number for this job
-  // public int iterationsMax; // limit on the maximum number for this iteration
-  // public double miniBatchSizeIndicator; // mini-batch size
-  // public double schedulingEpoch; // time interval when scheduling decision is taken
-  //
-  // public Job(int jid, double schedulingEpoch) {
-  //   this.jid = jid;
-  //   this.workers = 0;
-  //   this.iterations = 0;
-  //   this.loss = new Function();
-  //   this.iterationsMax = 50;
-  //   this.miniBatchSizeIndicator = 0.5;
-  //   this.schedulingEpoch = schedulingEpoch;
-  // }
-  //
-  // public double getIterationTime() {
-  //   return miniBatchSizeIndicator/workers;
-  // }
-  //
-  // public double getLossReduction() {
-  //   int numIterations = (int) Math.floor(schedulingEpoch/getIterationTime());
-  //   return loss.getDeltaLoss(iterations, iterations + numIterations);
-  // }
-
+  public void finishTasks(List<Task> tasks) {
+    for (Task task: tasks) {
+      finishTask(task);
+    }
+  }
 }

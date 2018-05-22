@@ -39,6 +39,10 @@ public class Machine {
     this.simulator = simulator;
   }
 
+  /* assign task to this machine - return true if assigned else false
+   * 1. check if task demands fit in this machine
+   * 2. update current total resource allocation accordingly and the time at which task completes
+   */
   public boolean assignTask(Task task) {
     boolean isTaskRun = false;
     LOG.log(Level.FINE, "Machine " + machineId + " - Machine Max " + maxResAlloc +
@@ -51,6 +55,11 @@ public class Machine {
     return isTaskRun;
   }
 
+  /* finish completed tasks in this machine
+   * 1. find all running tasks whose finish time exceeds current simulation time
+   * 2. reduce current total resource allocation in this machine
+   * 3. find job that completed tasks belong to and update those jobs
+   */
   public void finishTasks() {
     ArrayList<Task> finishedTasks = new ArrayList<Task>();
     for (Map.Entry<Task, Double> td: runningTasks.entrySet()) {
@@ -65,10 +74,7 @@ public class Machine {
     for (Task task: finishedTasks) {
       runningTasks.remove(task);
       for (Job job: simulator.runningJobs) {
-        if (job.runningTasks.contains(task)) {
-          job.runningTasks.remove(task);
-          job.completedTasks.add(task);
-          job.currResUse -= task.demands;
+        if (job.finishTask(task)) {
           LOG.log(Level.FINE, "Time: " + simulator.CURRENT_TIME
               + ". Job " + job.jobId + ", Finished Task " + task.taskId + " from Stage "
               + task.stageId + " Task Duration " + task.duration + " Job Iteration Over " + job.isIterationOver());
