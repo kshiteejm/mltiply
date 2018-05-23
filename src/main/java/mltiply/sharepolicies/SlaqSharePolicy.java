@@ -19,9 +19,13 @@ public class SlaqSharePolicy extends SharePolicy {
 
   @Override
   public void computeResShare() {
+    int numJobsRunning = simulator.runningJobs.size();
+    if (numJobsRunning == 0)
+      return;
+
     int clusterTotCapacity = simulator.cluster.getClusterMaxResAlloc();
     Comparator<Job> jobLossBySlopeComparator = new JobLossFunctionBySlopeComparator();
-    PriorityQueue<Job> maxJobLossSlopeFirst = new PriorityQueue<Job>(simulator.runningJobs.size(),
+    PriorityQueue<Job> maxJobLossSlopeFirst = new PriorityQueue<Job>(numJobsRunning,
         jobLossBySlopeComparator);
     for (Job job: simulator.runningJobs) {
       maxJobLossSlopeFirst.add(job);

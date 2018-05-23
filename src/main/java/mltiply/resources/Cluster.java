@@ -41,6 +41,14 @@ public class Cluster {
     return maxClusterResAvail;
   }
 
+  public int getClusterResAvail() {
+    int currClusterResAvail = 0;
+    for (Machine machine: machines.values()) {
+      currClusterResAvail += machine.totalResAlloc;
+    }
+    return currClusterResAvail;
+  }
+
   public void finishTasks() {
     for (Machine machine: machines.values()) {
       machine.finishTasks();

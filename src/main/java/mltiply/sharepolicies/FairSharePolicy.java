@@ -16,10 +16,11 @@ public class FairSharePolicy extends SharePolicy {
 
   @Override
   public void computeResShare() {
-    int clusterTotCapacity = simulator.cluster.getClusterMaxResAlloc();
     int numJobsRunning = simulator.runningJobs.size();
     if (numJobsRunning == 0)
       return;
+
+    int clusterTotCapacity = simulator.cluster.getClusterMaxResAlloc();
     int quotaResShare = clusterTotCapacity/numJobsRunning;
     for (Job job: simulator.runningJobs) {
       job.resQuota = quotaResShare;

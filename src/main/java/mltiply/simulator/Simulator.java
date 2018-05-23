@@ -133,6 +133,12 @@ public class Simulator {
 
       LOG.log(Level.FINE, Double.toString(CURRENT_TIME));
 
+      /* any tasks finished?
+       * check for completion of running tasks
+       * update per job running and completed tasks
+       */
+      cluster.finishTasks();
+
       /* any jobs finished?
        * if any job has completed it's iteration limit or target accuracy
        */
@@ -161,12 +167,6 @@ public class Simulator {
         LOG.log(Level.INFO, "JAINS_FAIRNESS_INDEX: " + JAINS_FAIRNESS_INDEX);
         break;
       }
-
-      /* any tasks finished?
-       * check for completion of running tasks
-       * update per job running and completed tasks
-       */
-      cluster.finishTasks();
 
       /* any new jobs?
        * check for arrival of new jobs - depends on the arrival policy
@@ -210,6 +210,7 @@ public class Simulator {
        */
       // if (finishedJobs.isEmpty() && newJobs.isEmpty())
       //   continue;
+      // if (!finishedJobs.isEmpty() || !newJobs.isEmpty())
       interJobScheduler.schedule();
 
       /* intra-job scheduler - schedule tasks from each job
