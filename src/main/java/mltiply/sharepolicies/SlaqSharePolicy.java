@@ -31,7 +31,12 @@ public class SlaqSharePolicy extends SharePolicy {
       maxJobLossSlopeFirst.add(job);
       job.resQuota = 0;
     }
-    Job job = maxJobLossSlopeFirst.poll();
-    job.resQuota = clusterTotCapacity;
+    while (clusterTotCapacity > 0 && !maxJobLossSlopeFirst.isEmpty()) {
+      Job job = maxJobLossSlopeFirst.poll();
+      if (job == null)
+        continue;
+      job.resQuota = clusterTotCapacity > 10 ? 10 : clusterTotCapacity;
+      clusterTotCapacity -= job.resQuota;
+    }
   }
 }

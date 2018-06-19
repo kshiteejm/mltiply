@@ -2,6 +2,7 @@ package mltiply.sharepolicies;
 
 import mltiply.apps.Job;
 import mltiply.simulator.Simulator;
+import mltiply.utils.JobLossFunctionBySlopeComparator;
 import mltiply.utils.JobResourceShareComparator;
 
 import java.util.Comparator;
@@ -14,6 +15,7 @@ public class MltiplySharePolicy extends SharePolicy {
 
   @Override
   public void computeResShare() {
+    int fairness_coefficient = 100;
     int numJobsRunning = simulator.runningJobs.size();
     if (numJobsRunning == 0)
       return;
@@ -27,9 +29,24 @@ public class MltiplySharePolicy extends SharePolicy {
       minJobResourceShareFirst.add(job);
       clusterReservedCapacity += job.resQuota;
     }
+    int fractionJobs = (numJobsRunning * fairness_coefficient) / 100;
+    fractionJobs = 1 > fractionJobs ? 1 : fractionJobs;
+    Comparator<Job> jobLossBySlopeComparator = new JobLossFunctionBySlopeComparator();
+    PriorityQueue<Job> maxJobLossSlopeFirst = new PriorityQueue<Job>(fractionJobs,
+        jobLossBySlopeComparator);
+    while (fractionJobs > 0) {
+      Job job = minJobResourceShareFirst.poll();
+      maxJobLossSlopeFirst.add(job);
+      fractionJobs -= 1;
+    }
     int clusterAvailableCapacity = clusterTotalCapacity - clusterReservedCapacity;
-    while (clusterAvailableCapacity >= 0) {
-
+    while (clusterAvailableCapacity > 0 && !maxJobLossSlopeFirst.isEmpty()) {
+      Job job = maxJobLossSlopeFirst.poll();
+      if (job == null)
+        continue;
+      int allocatedCapacity = clusterAvailableCapacity > 10 - job.resQuota ? 10 - job.resQuota : clusterAvailableCapacity;
+      job.resQuota += allocatedCapacity;
+      clusterAvailableCapacity -= allocatedCapacity;
     }
   }
 }

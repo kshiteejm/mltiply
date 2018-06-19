@@ -23,7 +23,7 @@ public class FairSharePolicy extends SharePolicy {
     int clusterTotCapacity = simulator.cluster.getClusterMaxResAlloc();
     int quotaResShare = clusterTotCapacity/numJobsRunning;
     for (Job job: simulator.runningJobs) {
-      job.resQuota = quotaResShare;
+      job.resQuota = quotaResShare > 10 ? 10 : quotaResShare;
       LOG.log(Level.FINE, "Job " + job.jobId + " - Quota " + job.resQuota);
     }
   }

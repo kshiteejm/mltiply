@@ -80,13 +80,13 @@ public class Simulator {
       case Default:
         NUM_MACHINES = 1;
         NUM_DIMENSIONS = 1;
-        MACHINE_MAX_RESOURCE = 100;
+        MACHINE_MAX_RESOURCE = 1000;
         STEP_TIME = 0.1;
         SIM_END_TIME = 120000;
         JOBS_ARRIVAL_POLICY = JobsArrivalPolicy.All;
         INTER_JOB_POLICY = SharingPolicy.Slaq;
         INTRA_JOB_POLICY = SchedulingPolicy.Random;
-        POISSON_RATE = 1.0;
+        POISSON_RATE = 0.5;
         break;
       case Custom:
         NUM_MACHINES = 1;
@@ -97,7 +97,7 @@ public class Simulator {
         JOBS_ARRIVAL_POLICY = JobsArrivalPolicy.All;
         INTER_JOB_POLICY = SharingPolicy.Slaq;
         INTRA_JOB_POLICY = SchedulingPolicy.Random;
-        POISSON_RATE = 1.0;
+        POISSON_RATE = 0.00001;
         break;
       default:
         System.err.println("Unknown Run Mode");
@@ -180,13 +180,15 @@ public class Simulator {
       else if (JOBS_ARRIVAL_POLICY == JobsArrivalPolicy.Distribution) {
         // Simulate a Poisson Process for Arrival of jobs.
         while (CURRENT_TIME >= nextTimeToLaunchJob) {
-          LOG.log(Level.INFO, "=== Job Arrived at - " + nextTimeToLaunchJob);
-          LOG.log(Level.INFO, "=== Launching Job at - " + CURRENT_TIME);
+          // LOG.log(Level.INFO, "=== Job Arrived at - " + nextTimeToLaunchJob);
+          // LOG.log(Level.INFO, "=== Launching Job at - " + CURRENT_TIME);
           if(!runnableJobs.isEmpty()) {
-            Job nextJob = runnableJobs.remove(); // Pop job from runnable queue.
+            Job nextJob = runnableJobs.poll(); // Pop job from runnable queue.
             newJobs.add(nextJob);
             nextTimeToLaunchJob += getExpSample(); // Sample random time for next job to arrive.
           } else {
+            nextTimeToLaunchJob += getExpSample();
+            break;
             // TODO: Anything here?
           }
 

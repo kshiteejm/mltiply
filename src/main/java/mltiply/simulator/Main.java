@@ -18,7 +18,7 @@ public class Main {
     LOG.log(Level.INFO, "======= Begin Simulation =======");
 
     // initialize runnable jobs
-    int NUM_JOBS = 100;
+    int NUM_JOBS = 300;
     Queue<Job> runnableJobs = new LinkedList<Job>();
     for (int i = 0; i < NUM_JOBS; i++) {
       Job job = new Job(i, 120);
@@ -40,11 +40,20 @@ public class Main {
     SLAQ_AVG_JCT = simulator.AVG_JCT;
     SLAQ_JAIN_INDEX = simulator.JAINS_FAIRNESS_INDEX;
 
+    double MLTIPLY_MAKESPAN = 0.0, MLTIPLY_AVG_JCT = 0.0, MLTIPLY_JAIN_INDEX = 0.0;
+    simulator = new Simulator(runnableJobs, Simulator.SharingPolicy.Mltiply);
+    simulator.simulate();
+    MLTIPLY_MAKESPAN = simulator.MAKESPAN;
+    MLTIPLY_AVG_JCT = simulator.AVG_JCT;
+    MLTIPLY_JAIN_INDEX = simulator.JAINS_FAIRNESS_INDEX;
+
     LOG.log(Level.INFO, "" + runnableJobs.size());
     LOG.log(Level.INFO, "FAIR - " + "MAKESPAN:" + FAIR_MAKESPAN + ", AVG_JCT:" + FAIR_AVG_JCT +
         ", JAIN_INDEX:" + FAIR_JAIN_INDEX);
     LOG.log(Level.INFO, "SLAQ - " + "MAKESPAN:" + SLAQ_MAKESPAN + ", AVG_JCT:" + SLAQ_AVG_JCT +
         ", JAIN_INDEX:" + SLAQ_JAIN_INDEX);
+    LOG.log(Level.INFO, "MLTIPLY - " + "MAKESPAN:" + MLTIPLY_MAKESPAN + ", AVG_JCT:" + MLTIPLY_AVG_JCT +
+        ", JAIN_INDEX:" + MLTIPLY_JAIN_INDEX);
 
     LOG.log(Level.INFO, "======= End Simulation =======");
   }
