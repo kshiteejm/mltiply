@@ -15,7 +15,7 @@ public class MltiplySharePolicy extends SharePolicy {
 
   @Override
   public void computeResShare() {
-    int fairness_coefficient = 100;
+    int fairness_coefficient = 30;
     int numJobsRunning = simulator.runningJobs.size();
     if (numJobsRunning == 0)
       return;

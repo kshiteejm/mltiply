@@ -154,4 +154,22 @@ public class Job implements Cloneable {
       finishTask(task);
     }
   }
+
+  public double getTotalRunningTime(double currTime) {
+    double remainingTime = 0.0;
+    double avgIterationTime = serialIterationDuration/resQuota;
+    remainingTime = avgIterationTime * (numIterations - currIterationNum + 1);
+    return (currTime - startTime + remainingTime);
+  }
+
+  public double getFairRunningTime(double fairQuota) {
+    double fairTime = 0.0;
+    double avgIterationTime = serialIterationDuration/fairQuota;
+    fairTime = avgIterationTime * numIterations;
+    return fairTime;
+  }
+
+  public double getFairnessIndex(double fairQuota, double currTime) {
+    return getFairRunningTime(fairQuota)/getTotalRunningTime(currTime);
+  }
 }

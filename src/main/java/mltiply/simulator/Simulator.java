@@ -27,7 +27,7 @@ public class Simulator {
   public static RunMode runMode = RunMode.Default;
 
   public enum SharingPolicy {
-    Fair, Slaq, Mltiply;
+    Fair, Slaq, Mltiply, TimeFair;
   }
   public SharingPolicy INTER_JOB_POLICY = SharingPolicy.Fair;
 
