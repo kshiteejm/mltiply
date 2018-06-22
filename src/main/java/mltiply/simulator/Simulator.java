@@ -65,6 +65,7 @@ public class Simulator {
   public double JAINS_FAIRNESS_INDEX;
   public double MAKESPAN;
   public double AVG_JCT;
+  public double TIME_FAIRNESS_INDEX;
 
   public Simulator(Queue<Job> runnableJobs, SharingPolicy sharingPolicy) {
 
@@ -75,6 +76,7 @@ public class Simulator {
     JAINS_FAIRNESS_INDEX = 0.0;
     MAKESPAN = 0.0;
     AVG_JCT = 0.0;
+    TIME_FAIRNESS_INDEX = 0.0;
 
     switch (runMode) {
       case Default:
@@ -161,10 +163,17 @@ public class Simulator {
         AVG_JCT = AVG_JCT/completedJobs.size();
         JAINS_FAIRNESS_INDEX = JAINS_FAIRNESS_INDEX*STEP_TIME/CURRENT_TIME;
         MAKESPAN = CURRENT_TIME;
+        TIME_FAIRNESS_INDEX = 0.0;
+        for (Job job: completedJobs) {
+          if (job.getFairnessIndex(cluster.getClusterMaxResAlloc()/NUM_JOBS, CURRENT_TIME) >= 1.0)
+            TIME_FAIRNESS_INDEX += 1.0;
+        }
+        TIME_FAIRNESS_INDEX = TIME_FAIRNESS_INDEX/completedJobs.size();
         LOG.log(Level.INFO, "====== Simulation Results ======");
         LOG.log(Level.INFO, "MAKESPAN: " + MAKESPAN);
         LOG.log(Level.INFO, "AVG_JCT: " + AVG_JCT);
         LOG.log(Level.INFO, "JAINS_FAIRNESS_INDEX: " + JAINS_FAIRNESS_INDEX);
+        LOG.log(Level.INFO, "TIME_FAIRNESS_INDEX: " + TIME_FAIRNESS_INDEX);
         break;
       }
 
@@ -205,7 +214,7 @@ public class Simulator {
         job.startTime = CURRENT_TIME;
       }
       runningJobs.addAll(newJobs);
-      LOG.log(Level.FINE, "Number of Running Jobs: " + Integer.toString(runningJobs.size()));
+      // LOG.log(Level.FINE, "Number of Running Jobs: " + Integer.toString(runningJobs.size()));
 
       /* inter-job scheduler - share cluster across jobs
        * update every jobs resource quota / resource share in the cluster

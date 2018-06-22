@@ -15,7 +15,7 @@ public class MltiplySharePolicy extends SharePolicy {
 
   @Override
   public void computeResShare() {
-    int fairness_coefficient = 30;
+    int fairness_coefficient = 20;
     int numJobsRunning = simulator.runningJobs.size();
     if (numJobsRunning == 0)
       return;
@@ -44,9 +44,12 @@ public class MltiplySharePolicy extends SharePolicy {
       Job job = maxJobLossSlopeFirst.poll();
       if (job == null)
         continue;
-      int allocatedCapacity = clusterAvailableCapacity > 10 - job.resQuota ? 10 - job.resQuota : clusterAvailableCapacity;
+      int allocatedCapacity = job.resQuota >= 10 ? 0 : 1;
+      // int allocatedCapacity = clusterAvailableCapacity > 10 - job.resQuota ? 10 - job.resQuota : clusterAvailableCapacity;
       job.resQuota += allocatedCapacity;
       clusterAvailableCapacity -= allocatedCapacity;
+      if (allocatedCapacity > 0)
+        maxJobLossSlopeFirst.add(job);
     }
   }
 }

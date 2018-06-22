@@ -63,6 +63,7 @@ public class Job implements Cloneable {
     resQuota = 0;
     currResUse = 0;
     numTasksUntilNow = 0;
+    endTime = 0.0;
     serialIterationDuration = r.nextInt(91) + 10;
     runnableTasks = new ArrayList<Task>();
     runningTasks = new ArrayList<Task>();
@@ -156,10 +157,15 @@ public class Job implements Cloneable {
   }
 
   public double getTotalRunningTime(double currTime) {
+    double runningTime = 0.0;
     double remainingTime = 0.0;
     double avgIterationTime = serialIterationDuration/resQuota;
     remainingTime = avgIterationTime * (numIterations - currIterationNum + 1);
-    return (currTime - startTime + remainingTime);
+    if (endTime > 0.0)
+      runningTime = endTime - startTime;
+    else
+      runningTime = currTime - startTime + remainingTime;
+    return runningTime;
   }
 
   public double getFairRunningTime(double fairQuota) {

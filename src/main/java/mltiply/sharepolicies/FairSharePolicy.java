@@ -51,9 +51,12 @@ public class FairSharePolicy extends SharePolicy {
       Job job = minJobResourceShareFirst.poll();
       if (job == null)
         continue;
-      int allocatedCapacity = clusterAvailableCapacity > 10 - job.resQuota ? 10 - job.resQuota : clusterAvailableCapacity;
+      int allocatedCapacity = job.resQuota >= 10 ? 0 : 1;
+      // int allocatedCapacity = clusterAvailableCapacity > 10 - job.resQuota ? 10 - job.resQuota : clusterAvailableCapacity;
       job.resQuota += allocatedCapacity;
       clusterAvailableCapacity -= allocatedCapacity;
+      if (allocatedCapacity > 0)
+        minJobResourceShareFirst.add(job);
     }
   }
 }
