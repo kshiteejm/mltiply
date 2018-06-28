@@ -23,20 +23,31 @@ public class SlaqSharePolicy extends SharePolicy {
     if (numJobsRunning == 0)
       return;
 
-    int clusterTotCapacity = simulator.cluster.getClusterMaxResAlloc();
+    int clusterTotalCapacity = simulator.cluster.getClusterMaxResAlloc();
     Comparator<Job> jobLossBySlopeComparator = new JobLossFunctionBySlopeComparator();
     PriorityQueue<Job> maxJobLossSlopeFirst = new PriorityQueue<Job>(numJobsRunning,
         jobLossBySlopeComparator);
+    int clusterReservedCapacity = 0;
     for (Job job: simulator.runningJobs) {
       maxJobLossSlopeFirst.add(job);
-      job.resQuota = 0;
+      // job.resQuota = 0;
+      clusterReservedCapacity += job.resQuota;
     }
-    while (clusterTotCapacity > 0 && !maxJobLossSlopeFirst.isEmpty()) {
+    int clusterAvailableCapacity = clusterTotalCapacity - clusterReservedCapacity;
+    // while (clusterTotCapacity > 0 && !maxJobLossSlopeFirst.isEmpty()) {
+    //   Job job = maxJobLossSlopeFirst.poll();
+    //   if (job == null)
+    //     continue;
+    //   job.resQuota = clusterTotCapacity > 10 ? 10 : clusterTotCapacity;
+    //   clusterTotCapacity -= job.resQuota;
+    // }
+    while (clusterAvailableCapacity > 0 && !maxJobLossSlopeFirst.isEmpty()) {
       Job job = maxJobLossSlopeFirst.poll();
       if (job == null)
         continue;
-      job.resQuota = clusterTotCapacity > 10 ? 10 : clusterTotCapacity;
-      clusterTotCapacity -= job.resQuota;
+      int allocatedCapacity = clusterAvailableCapacity > 10 - job.resQuota ? 10 - job.resQuota : clusterAvailableCapacity;
+      job.resQuota += allocatedCapacity;
+      clusterAvailableCapacity -= allocatedCapacity;
     }
   }
 }

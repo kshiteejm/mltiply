@@ -3,8 +3,10 @@ package mltiply.schedpolicies;
 import mltiply.apps.Job;
 import mltiply.apps.Task;
 import mltiply.simulator.Simulator;
+import mltiply.utils.JobUnallocatedProportionComparator;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -15,6 +17,13 @@ public class RandomSchedPolicy extends  SchedPolicy {
   public RandomSchedPolicy(Simulator simulator) {
     super(simulator);
   }
+
+  // @Override
+  // public void schedule() {
+  //   for (Job job: simulator.runningJobs) {
+  //     schedule(job);
+  //   }
+  // }
 
   @Override
   public void schedule(Job job) {

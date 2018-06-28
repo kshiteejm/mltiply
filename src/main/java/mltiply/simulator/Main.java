@@ -18,12 +18,12 @@ public class Main {
     LOG.log(Level.INFO, "======= Begin Simulation =======");
 
     // initialize runnable jobs
-    int NUM_JOBS = 250;
+    int NUM_JOBS = 200;
     Queue<Job> runnableJobs = new LinkedList<Job>();
     for (int i = 0; i < NUM_JOBS; i++) {
       Job job = new Job(i, 120);
       runnableJobs.add(job);
-      LOG.log(Level.INFO, Integer.toString(runnableJobs.size()));
+      LOG.log(Level.FINE, Integer.toString(runnableJobs.size()));
     }
 
     double FAIR_MAKESPAN = 0.0, FAIR_AVG_JCT = 0.0, FAIR_JAIN_INDEX = 0.0, FAIR_TIMEFAIR_INDEX = 0.0;

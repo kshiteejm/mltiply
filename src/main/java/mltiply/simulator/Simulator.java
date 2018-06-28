@@ -83,7 +83,7 @@ public class Simulator {
         NUM_MACHINES = 1;
         NUM_DIMENSIONS = 1;
         MACHINE_MAX_RESOURCE = 1000;
-        STEP_TIME = 0.1;
+        STEP_TIME = 0.01;
         SIM_END_TIME = 120000;
         JOBS_ARRIVAL_POLICY = JobsArrivalPolicy.All;
         INTER_JOB_POLICY = SharingPolicy.Slaq;
@@ -165,8 +165,11 @@ public class Simulator {
         MAKESPAN = CURRENT_TIME;
         TIME_FAIRNESS_INDEX = 0.0;
         for (Job job: completedJobs) {
-          if (job.getFairnessIndex(cluster.getClusterMaxResAlloc()/NUM_JOBS, CURRENT_TIME) >= 1.0)
+          double fairnessIndex = job.getFairnessIndex(cluster.getClusterMaxResAlloc()/NUM_JOBS, CURRENT_TIME);
+          if (fairnessIndex >= 0.97)
             TIME_FAIRNESS_INDEX += 1.0;
+          // else
+          //   LOG.log(Level.INFO, "Fairness Index: " + fairnessIndex);
         }
         TIME_FAIRNESS_INDEX = TIME_FAIRNESS_INDEX/completedJobs.size();
         LOG.log(Level.INFO, "====== Simulation Results ======");
@@ -185,8 +188,7 @@ public class Simulator {
       if (JOBS_ARRIVAL_POLICY == JobsArrivalPolicy.All) {
         newJobs.addAll(runnableJobs);
         runnableJobs.removeAll(newJobs);
-      }
-      else if (JOBS_ARRIVAL_POLICY == JobsArrivalPolicy.Distribution) {
+      } else if (JOBS_ARRIVAL_POLICY == JobsArrivalPolicy.Distribution) {
         // Simulate a Poisson Process for Arrival of jobs.
         while (CURRENT_TIME >= nextTimeToLaunchJob) {
           // LOG.log(Level.INFO, "=== Job Arrived at - " + nextTimeToLaunchJob);
@@ -228,9 +230,10 @@ public class Simulator {
        * if cluster has free resources and job has not met resource quota schedule tasks
        * update per job - next set of runnable tasks and also runnable and running tasks
        */
-      for (Job job: runningJobs) {
-        intraJobScheduler.schedule(job);
-      }
+      intraJobScheduler.schedule();
+      // for (Job job: runningJobs) {
+      //   intraJobScheduler.schedule(job);
+      // }
       double _sum_of_squares = 0.0;
       double _square_of_sum = 0.0;
       int numJobsRunning = runningJobs.size();

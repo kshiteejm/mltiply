@@ -178,4 +178,10 @@ public class Job implements Cloneable {
   public double getFairnessIndex(double fairQuota, double currTime) {
     return getFairRunningTime(fairQuota)/getTotalRunningTime(currTime);
   }
+
+  public double getUnallocatedProportion() {
+    if (runnableTasks.size() == 0.0)
+      return 1.0;
+    return runnableTasks.size()*1.0/(runnableTasks.size() + runningTasks.size());
+  }
 }
