@@ -17,4 +17,13 @@ public class Cluster {
       machines.add(machine);
     }
   }
+
+  public void finishTask(Task t) {
+    for (Machine m: machines) {
+      if (m.runningTasks.contains(t)) {
+        m.finishTask(t);
+        break;
+      }
+    }
+  }
 }

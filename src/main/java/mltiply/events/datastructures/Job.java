@@ -122,6 +122,7 @@ public class Job {
      * alternative --> find how many cpu's can be alloc'ed
      * -- to the job by simulated execution
      * -- and then decide num tasks
+     * - review -
      */
     currIterationNum += 1;
     int num_tasks = nextMaxAlloc.divide(quanta);
@@ -131,5 +132,12 @@ public class Job {
       nextTaskId += 1;
     }
     maxAlloc = new Resource(nextMaxAlloc);
+  }
+
+  public void finishTask(Task t) {
+    assert(runningTasks.contains(t));
+    runningTasks.remove(t);
+    completedTasks.add(t);
+    currAlloc = currAlloc.minus(t.demand);
   }
 }

@@ -2,8 +2,9 @@ package mltiply.events.datastructures;
 
 import java.math.BigDecimal;
 
+import static mltiply.events.simulator.Simulator.ROUND_PLACES;
+
 public class Resource {
-  public static int ROUND_PLACES = 2;
 
   double[] resources;
 

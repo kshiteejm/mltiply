@@ -10,6 +10,7 @@ public class Machine {
 
   int machineId;
   List<Task> runningTasks;
+  List<Task> completedTasks;
   Resource maxAlloc;
   Resource currAlloc;
 
@@ -18,5 +19,11 @@ public class Machine {
     maxAlloc = new Resource(machine_max_resource, num_dimensions);
     currAlloc = new Resource(num_dimensions);
     runningTasks = new LinkedList<Task>();
+  }
+
+  public void finishTask(Task t) {
+    runningTasks.remove(t);
+    completedTasks.add(t);
+    currAlloc = currAlloc.minus(t.demand);
   }
 }
