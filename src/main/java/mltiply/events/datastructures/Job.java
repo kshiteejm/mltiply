@@ -112,11 +112,11 @@ public class Job {
    * increment current iteration and
    * spawn runnable tasks for next iteration
    */
-  public void initNextIteration() {
+  public boolean initNextIteration() {
     assert(isIterationOver());
 
     if (isFinished())
-      return;
+      return false;
 
     /* currently based on nextMaxAlloc
      * alternative --> find how many cpu's can be alloc'ed
@@ -132,6 +132,7 @@ public class Job {
       nextTaskId += 1;
     }
     maxAlloc = new Resource(nextMaxAlloc);
+    return true;
   }
 
   public void finishTask(Task t) {

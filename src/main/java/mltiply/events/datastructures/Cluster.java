@@ -26,4 +26,8 @@ public class Cluster {
       }
     }
   }
+
+  public boolean assignTask(Task t) {
+
+  }
 }

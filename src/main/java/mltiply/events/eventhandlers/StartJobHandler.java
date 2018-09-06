@@ -17,12 +17,17 @@ public class StartJobHandler implements EventHandler<Job> {
     // a. start time
     j.startTime = time;
 
-    // b. nextMaxAlloc for running jobs
+    // b. init job iteration - before actual assignment of resources? - review -
+    if (!j.initNextIteration()) {
+      j.endTime = time;
+      s.runningJobs.remove(j.jobId);
+      s.completedJobs.add(j);
+    }
+
+    // c. nextMaxAlloc for running jobs
     s.interJobScheduler.computeShares(s);
 
-    // c. init job iteration - before actual assignment of resources? - review -
-    j.initNextIteration();
+    // d. if cluster has unreserved cpu cores - assign them
 
-    // d.
   }
 }
