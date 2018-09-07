@@ -27,7 +27,9 @@ public class Cluster {
     }
   }
 
-  public boolean assignTask(Task t) {
-
+  public boolean assignResource(Job job) {
+    for (Machine m: machines) {
+      if (m.assignResource)
+    }
   }
 }

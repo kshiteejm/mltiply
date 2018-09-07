@@ -41,6 +41,14 @@ public class Resource {
     return resources.length;
   }
 
+  public double absValue() {
+    double ret = 0.0;
+    for (int i = 0; i < resources.length; i++) {
+      ret += resources[i];
+    }
+    return ret;
+  }
+
   public Resource add(Resource other) {
     Resource ret = new Resource(this);
     for (int i = 0; i < resources.length; i++) {
@@ -81,5 +89,9 @@ public class Resource {
         return false;
     }
     return true;
+  }
+
+  public static int compare(Resource r1, Resource r2) {
+    return Double.compare(r1.absValue(), r2.absValue());
   }
 }

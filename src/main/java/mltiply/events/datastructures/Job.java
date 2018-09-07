@@ -141,4 +141,8 @@ public class Job {
     completedTasks.add(t);
     currAlloc = currAlloc.minus(t.demand);
   }
+
+  public Resource deficit() {
+    return maxAlloc.minus(currAlloc);
+  }
 }
