@@ -142,6 +142,13 @@ public class Job {
     currAlloc = currAlloc.minus(t.demand);
   }
 
+  public void startTask(Task t) {
+    assert(runnableTasks.contains(t));
+    runnableTasks.remove(t);
+    runningTasks.add(t);
+    currAlloc = currAlloc.add(t.demand);
+  }
+
   public Resource deficit() {
     return maxAlloc.minus(currAlloc);
   }

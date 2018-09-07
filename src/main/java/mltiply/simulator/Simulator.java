@@ -1,10 +1,7 @@
 package mltiply.simulator;
 
 import mltiply.apps.Job;
-import mltiply.apps.Task;
 import mltiply.resources.Cluster;
-import mltiply.resources.Resources;
-import mltiply.schedpolicies.SchedPolicy;
 import mltiply.schedulers.InterJobScheduler;
 import mltiply.schedulers.IntraJobScheduler;
 

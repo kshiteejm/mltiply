@@ -14,7 +14,7 @@ import java.util.logging.Logger;
 
 public class Simulator {
 
-  private static Logger LOG = Logger.getLogger(mltiply.simulator.Simulator.class.getName());
+  private static Logger LOG = Logger.getLogger(Simulator.class.getName());
   public static int ROUND_PLACES = 2;
 
   public int NUM_MACHINES, NUM_DIMENSIONS;
@@ -36,7 +36,7 @@ public class Simulator {
     runningJobs = new HashMap<Integer, Job>();
     completedJobs = new LinkedList<Job>();
     interJobScheduler = new MltiplyShareScheduler();
-    intraJobScheduler = new IntraJobScheduler();
+    intraJobScheduler = new TetrisTaskScheduler();
   }
 
   public void simulate() {

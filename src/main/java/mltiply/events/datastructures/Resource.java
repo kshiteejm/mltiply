@@ -94,4 +94,12 @@ public class Resource {
   public static int compare(Resource r1, Resource r2) {
     return Double.compare(r1.absValue(), r2.absValue());
   }
+
+  public double dot(Resource other) {
+    double ret = 0.0;
+    for (int i = 0; i < resources.length; i++) {
+      ret += resources[i]*other.resources[i];
+    }
+    return ret;
+  }
 }

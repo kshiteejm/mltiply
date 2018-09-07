@@ -3,9 +3,7 @@ package mltiply.events.schedulers;
 import mltiply.events.datastructures.Job;
 import mltiply.events.simulator.Simulator;
 
-public class IntraJobScheduler {
+public interface IntraJobScheduler {
 
-  public void schedule(Simulator s, Job j) {
-
-  }
+  public boolean assignTask(Simulator s, Job j, double time);
 }

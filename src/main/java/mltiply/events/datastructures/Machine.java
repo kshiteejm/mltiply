@@ -21,9 +21,19 @@ public class Machine {
     runningTasks = new LinkedList<Task>();
   }
 
+  public Resource deficit() {
+    return maxAlloc.minus(currAlloc);
+  }
+
   public void finishTask(Task t) {
     runningTasks.remove(t);
     completedTasks.add(t);
     currAlloc = currAlloc.minus(t.demand);
+  }
+
+  public void assignTask(Task t) {
+    assert(t.demand.isLessThan(deficit()));
+    runningTasks.add(t);
+    currAlloc = currAlloc.add(t.demand);
   }
 }

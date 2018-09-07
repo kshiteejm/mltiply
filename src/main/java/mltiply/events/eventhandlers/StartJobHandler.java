@@ -28,6 +28,6 @@ public class StartJobHandler implements EventHandler<Job> {
     s.interJobScheduler.computeShares(s);
 
     // d. if cluster has unreserved cpu cores - assign them
-
+    s.interJobScheduler.allocateResource(s, time);
   }
 }
