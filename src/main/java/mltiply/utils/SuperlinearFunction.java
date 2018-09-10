@@ -40,4 +40,8 @@ public class SuperlinearFunction implements Function {
     value = Math.log(u)*value;
     return value;
   }
+
+  public double getDeltaValue(int iteration) {
+    return getValue(iteration-1) - getValue(iteration);
+  }
 }

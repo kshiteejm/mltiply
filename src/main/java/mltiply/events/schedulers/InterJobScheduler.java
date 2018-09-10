@@ -12,11 +12,13 @@ public abstract class InterJobScheduler {
   abstract public void computeShares(Simulator s);
 
   public void allocateResource(Simulator s, double time) {
-    PriorityQueue<Job> greedyJobQueue = new PriorityQueue<Job>(s.runningJobs.size(), new Comparator<Job>() {
-      public int compare(Job o1, Job o2) {
-        return -Resource.compare(o1.deficit(), o2.deficit());
-      }
-    });
+    PriorityQueue<Job> greedyJobQueue = new PriorityQueue<Job>(s.runningJobs.size(),
+        new Comparator<Job>() {
+          public int compare(Job o1, Job o2) {
+          return -Resource.compare(o1.deficit(), o2.deficit());
+          }
+        }
+    );
 
     for (Job job: s.runningJobs.values()) {
       greedyJobQueue.add(job);

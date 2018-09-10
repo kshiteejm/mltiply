@@ -43,6 +43,14 @@ public class Cluster {
   }
 
   public boolean hasDeficit() {
-    return deficit().isLessThan(new Resource(num_dimensions));
+    return deficit().isGreaterThanZero();
+  }
+
+  public Resource maxAlloc() {
+    Resource maxCapacity = new Resource(num_dimensions);
+    for (Machine m: machines) {
+      maxCapacity = maxCapacity.add(m.maxAlloc);
+    }
+    return maxCapacity;
   }
 }

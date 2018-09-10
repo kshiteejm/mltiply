@@ -91,6 +91,11 @@ public class Resource {
     return true;
   }
 
+  public boolean isGreaterThanZero() {
+    Resource zero = new Resource(resources.length);
+    return zero.isLessThan(this);
+  }
+
   public static int compare(Resource r1, Resource r2) {
     return Double.compare(r1.absValue(), r2.absValue());
   }

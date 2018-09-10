@@ -16,6 +16,8 @@ public class Simulator {
 
   private static Logger LOG = Logger.getLogger(Simulator.class.getName());
   public static int ROUND_PLACES = 2;
+  public static int AVG_LOAD = 10;
+  public static double FAIR_KNOB = 1.0;
 
   public int NUM_MACHINES, NUM_DIMENSIONS;
   public double MACHINE_MAX_RESOURCE;

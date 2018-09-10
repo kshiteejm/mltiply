@@ -45,4 +45,8 @@ public class SublinearFunction implements Function {
     value = value * (-2*a*iteration + b);
     return value;
   }
+
+  public double getDeltaValue(int iteration) {
+    return getValue(iteration) - getValue(iteration+1);
+  }
 }

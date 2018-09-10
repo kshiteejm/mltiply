@@ -10,6 +10,9 @@ import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static mltiply.events.simulator.Simulator.AVG_LOAD;
+import static mltiply.events.simulator.Simulator.FAIR_KNOB;
+
 public class Job {
 
   private static Logger LOG = Logger.getLogger(Job.class.getName());
@@ -151,5 +154,29 @@ public class Job {
 
   public Resource deficit() {
     return maxAlloc.minus(currAlloc);
+  }
+
+  public double fairnessScore() {
+    double fairnessScore = 0.0;
+    double fairTime = maxIterationNum*serialIterationDuration/AVG_LOAD;
+    int estimatedCurrResource = maxAlloc.divide(quanta);
+    int estimatedNextResource = nextMaxAlloc.divide(quanta);
+    double estimatedTime = serialIterationDuration/estimatedCurrResource;
+    estimatedTime += (maxIterationNum - currIterationNum)*serialIterationDuration/estimatedNextResource;
+    if (estimatedTime > 0) {
+      fairnessScore = estimatedTime/fairTime;
+      fairnessScore = Math.pow(Math.E, -fairTime/fairnessScore); // needs to be normalized between 1.0 to 0.0
+    }
+    return fairnessScore;
+  }
+
+  public double qualityScore() {
+    double qualityScore = 0.0;
+    qualityScore = lossFunction.getDeltaValue(currIterationNum); // ranges from 1.0 to 0.0
+    return qualityScore;
+  }
+
+  public double mltiplyScore() {
+    return FAIR_KNOB*fairnessScore() + (1.0-FAIR_KNOB)*qualityScore();
   }
 }
