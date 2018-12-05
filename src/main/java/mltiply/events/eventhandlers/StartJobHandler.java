@@ -25,7 +25,7 @@ public class StartJobHandler implements EventHandler<Job> {
     }
 
     // c. nextMaxAlloc for running jobs
-    s.interJobScheduler.computeShares(s);
+    s.interJobScheduler.computeShares(s, time);
 
     // d. if cluster has unreserved cpu cores - assign them
     s.interJobScheduler.allocateResource(s, time);

@@ -1,5 +1,6 @@
 package mltiply.events.datastructures;
 
+import mltiply.events.simulator.Simulator;
 import mltiply.utils.Function;
 import mltiply.utils.SublinearFunction;
 import mltiply.utils.SuperlinearFunction;
@@ -128,7 +129,8 @@ public class Job {
      * - review -
      */
     currIterationNum += 1;
-    int num_tasks = nextMaxAlloc.divide(quanta);
+    int num_tasks = (int) Math.floor(nextMaxAlloc.divide(quanta));
+    // edge case -> what if num_tasks is zero
     for (int i = 0; i < num_tasks; i++) {
       runnableTasks.add(new Task(jobId, nextTaskId,
           serialIterationDuration/num_tasks, quanta));
@@ -156,17 +158,42 @@ public class Job {
     return maxAlloc.minus(currAlloc);
   }
 
-  public double fairnessScore() {
-    double fairnessScore = 0.0;
+  public double expectedAvgShare(Simulator simulator, double time) {
+    double clusterCapacity = simulator.cluster.maxAlloc().avgAbsValue();
+    double expectedAvgShare = clusterCapacity;
+    double fairTime = maxIterationNum*serialIterationDuration*AVG_LOAD / clusterCapacity;
+    double remainingIterations = maxIterationNum - currIterationNum;
+    if (fairTime > time - startTime)
+      if (remainingIterations > 0)
+        expectedAvgShare = (remainingIterations * serialIterationDuration)/(fairTime - (time - startTime));
+      else
+        expectedAvgShare = maxAlloc.avgAbsValue();
+    return expectedAvgShare;
+  }
+
+  public double fairnessScore(Simulator simulator, double time) {
+    double fairnessScore = Double.MAX_VALUE;
+    double expectedAvgShare = expectedAvgShare(simulator, time);
+    double remainingIterations = maxIterationNum - currIterationNum;
+    double clusterCapacity = simulator.cluster.maxAlloc().avgAbsValue();
+    if (!(Resource.equals(expectedAvgShare, clusterCapacity) || remainingIterations <= 1))
+      fairnessScore = 1/((1 - expectedAvgShare/clusterCapacity) * (remainingIterations - 1) * serialIterationDuration);
+
+    /*
     double fairTime = maxIterationNum*serialIterationDuration/AVG_LOAD;
-    int estimatedCurrResource = maxAlloc.divide(quanta);
+    double estimatedTime = 0.0;
     int estimatedNextResource = nextMaxAlloc.divide(quanta);
-    double estimatedTime = serialIterationDuration/estimatedCurrResource;
-    estimatedTime += (maxIterationNum - currIterationNum)*serialIterationDuration/estimatedNextResource;
-    if (estimatedTime > 0) {
-      fairnessScore = estimatedTime/fairTime;
-      fairnessScore = Math.pow(Math.E, -fairTime/fairnessScore); // needs to be normalized between 1.0 to 0.0
+    if (estimatedNextResource == 0) {
+      fairnessScore = 1.0;
+    } else {
+      estimatedTime += ((maxIterationNum - currIterationNum) * serialIterationDuration / estimatedNextResource) + time - startTime;
+      if (estimatedTime > 0.0) {
+        fairnessScore = estimatedTime / fairTime;
+        fairnessScore = Math.pow(Math.E, -fairTime / fairnessScore); // fairTime/fairnessScore needs to be normalized
+      }
     }
+    */
+
     return fairnessScore;
   }
 
@@ -176,7 +203,17 @@ public class Job {
     return qualityScore;
   }
 
-  public double mltiplyScore() {
-    return FAIR_KNOB*fairnessScore() + (1.0-FAIR_KNOB)*qualityScore();
+  public double mltiplyScore(Simulator simulator, double time) {
+    double fairnessKnob = 0.0;
+    for (Job job: simulator.runningJobs.values()) {
+      fairnessKnob += job.expectedAvgShare(simulator, time);
+    }
+    if (!Resource.equals(fairnessKnob, 0.0))
+      fairnessKnob /= simulator.cluster.maxAlloc().avgAbsValue();
+    fairnessKnob = Math.min(fairnessKnob, 1.0);
+    double mltiplyScore = fairnessScore(simulator, time);
+    if (!Resource.equals(mltiplyScore, Double.MAX_VALUE))
+      mltiplyScore = fairnessKnob*fairnessScore(simulator, time) + (1.0-fairnessKnob)*qualityScore();
+    return mltiplyScore;
   }
 }

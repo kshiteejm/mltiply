@@ -9,7 +9,7 @@ import java.util.PriorityQueue;
 
 public abstract class InterJobScheduler {
 
-  abstract public void computeShares(Simulator s);
+  abstract public void computeShares(Simulator s, final double time);
 
   public void allocateResource(Simulator s, double time) {
     PriorityQueue<Job> greedyJobQueue = new PriorityQueue<Job>(s.runningJobs.size(),

@@ -27,6 +27,13 @@ public class Resource {
     }
   }
 
+  public static boolean equals(double a, double b) {
+    if (Math.abs(a - b) >= Resource.getThreshold())
+      return false;
+    else
+      return true;
+  }
+
   public static double getThreshold() {
     return Math.pow(10, -ROUND_PLACES);
   }
@@ -49,6 +56,15 @@ public class Resource {
     return ret;
   }
 
+  public double avgAbsValue() {
+    double ret = 0.0;
+    for (int i = 0; i < resources.length; i++) {
+      ret += resources[i];
+    }
+    ret /= resources.length;
+    return ret;
+  }
+
   public Resource add(Resource other) {
     Resource ret = new Resource(this);
     for (int i = 0; i < resources.length; i++) {
@@ -65,12 +81,20 @@ public class Resource {
     return ret;
   }
 
-  public int divide(Resource other) {
-    int ret = Integer.MAX_VALUE;
+  public double divide(Resource other) {
+    double ret = Double.MAX_VALUE;
     for (int i = 0; i < resources.length; i++) {
-      int tmp = (int) Math.floor(resources[i]/other.resources[i]);
+      double tmp = resources[i]/other.resources[i];
       if (tmp < ret)
         ret = tmp;
+    }
+    return ret;
+  }
+
+  public Resource multiply(double num) {
+    Resource ret = new Resource(this);
+    for (int i = 0; i < resources.length; i++) {
+      ret.resources[i] *= num;
     }
     return ret;
   }
@@ -85,7 +109,7 @@ public class Resource {
 
   public boolean isLessThan(Resource other) {
     for (int i = 0; i < resources.length; i++) {
-      if (other.resources[i] - resources[i] < Resource.getThreshold())
+      if (resources[i] - other.resources[i] >= Resource.getThreshold())
         return false;
     }
     return true;

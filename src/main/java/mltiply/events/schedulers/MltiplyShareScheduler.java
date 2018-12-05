@@ -9,18 +9,18 @@ import java.util.PriorityQueue;
 
 public class MltiplyShareScheduler extends InterJobScheduler {
 
-  public void computeShares(Simulator s) {
+  public void computeShares(Simulator s, final double time) { // does use of final sort out issues?
     PriorityQueue<Job> maxSchedulerScore = new PriorityQueue<Job>(s.runningJobs.size(),
         new Comparator<Job>() {
           public int compare(Job o1, Job o2) {
-            return -Double.compare(o1.mltiplyScore(), o2.mltiplyScore());
+            return -Double.compare(o1.mltiplyScore(s, time), o2.mltiplyScore(s, time));
           }
         }
     );
 
     Resource maxAlloc = s.cluster.maxAlloc();
 
-    // init nextMaxAllocations of jobs to one each
+    // init nextMaxAllocations of jobs to one each to avoid divide-by-zero errors
     for (Job job: s.runningJobs.values()) {
       job.nextMaxAlloc = new Resource(job.quanta);
       maxAlloc = maxAlloc.minus(job.quanta);

@@ -25,7 +25,7 @@ public class EndTaskHandler implements EventHandler<Task> {
     }
 
     // 2. recompute job shares
-    s.interJobScheduler.computeShares(s);
+    s.interJobScheduler.computeShares(s, time);
 
     // 3. assign new task to freed cpu core
     s.interJobScheduler.allocateResource(s, time);
