@@ -1,4 +1,4 @@
-package mltiply.utils;
+package mlsched.utils;
 
 public class Utils {
   public static double round(double value, int places) {
