@@ -2,9 +2,11 @@ package mlsched.workload;
 
 import mlsched.utils.SublinearFunction;
 import mlsched.utils.SuperlinearFunction;
+import mlsched.utils.Function;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

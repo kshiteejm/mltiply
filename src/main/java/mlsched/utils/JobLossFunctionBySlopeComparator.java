@@ -1,6 +1,6 @@
-package mltiply.utils;
+package mlsched.utils;
 
-import mltiply.apps.Job;
+import mlsched.workload.Job;
 
 import java.util.Comparator;
 
