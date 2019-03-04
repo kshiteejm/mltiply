@@ -2,13 +2,14 @@ package mlsched.workload;
 
 public class Task implements Comparable<Task> {
 	public int jobId;	
-	public int taskId;
+	public String taskId;
 	public double duration;
 	public int demands;
 
-	public Task(int jobId, int taskId) {
+	public Task(int jobId, String taskId, double duration) {
 		this.jobId = jobId;
 		this.taskId = taskId;
+		this.duration = duration;
 	}
 
 	@Override
@@ -25,10 +26,7 @@ public class Task implements Comparable<Task> {
 	      else
 	        out = -1;
 	    else if (taskId != t.taskId)
-	      if (taskId > t.taskId)
-	        out = 1;
-	      else
-	        out = -1;
+	      out = taskId.compareTo(t.taskId);   
 	    return out;
 	}
 }

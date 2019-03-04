@@ -2,6 +2,7 @@ package mlsched.workload;
 
 import mlsched.utils.SublinearFunction;
 import mlsched.utils.SuperlinearFunction;
+import mlsched.scheduler.IntraJobScheduler;
 import mlsched.utils.Function;
 
 import java.util.ArrayList;
@@ -10,7 +11,7 @@ import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class Job implements Cloneable {
+public class Job {
 	private static Logger LOG = Logger.getLogger(Job.class.getName());
 
 	public int jobId;
@@ -27,6 +28,7 @@ public class Job implements Cloneable {
 	public double startTime;
 	public double endTime;
 	public double jobLossSlope;
+	public IntraJobScheduler intraJobScheduler;
 
 	// A job will be submitted by the user. It has to run for n iterations
 	// and serialIterationDuration captures the runtime of this task when it
@@ -34,7 +36,7 @@ public class Job implements Cloneable {
 	public Job(int jobId, int numIterations, double serialIterationDuration) {
 		this.jobId = jobId;
 		this.numIterations = numIterations;
-		currIterationNum = -1;
+		currIterationNum = 0;
 		jobLossSlope = 0.0;
 		Random r = new Random();
 		int rn = r.nextInt(2);
@@ -51,23 +53,23 @@ public class Job implements Cloneable {
 		runnableTasks = new ArrayList<Task>();
 		runningTasks = new ArrayList<Task>();
 		completedTasks = new ArrayList<Task>();
+		this.intraJobScheduler = new IntraJobScheduler();
 	}
 
-	/*
-	 * job object clone function typically used during deep copy of any data
-	 * structure containing a job
-	 */
-	public Job clone() {
-		Job job = new Job(this.jobId, this.numIterations, this.serialIterationDuration);
-		job.jobLossSlope = this.jobLossSlope;
-		job.currIterationNum = this.currIterationNum;
-		job.lossFunction = this.lossFunction;
-		job.resAllocated = this.resAllocated;
-		job.currResUse = this.currResUse;
-		job.numTasksUntilNow = this.numTasksUntilNow;
-		job.runnableTasks = new ArrayList<Task>(this.runnableTasks);
-		job.runningTasks = new ArrayList<Task>(this.runningTasks);
-		job.completedTasks = new ArrayList<Task>(this.completedTasks);
-		return job;
-	}
+//	/*
+//	 * job object clone function typically used during deep copy of any data
+//	 * structure containing a job
+//	 */
+//	public Job clone() {
+//		Job job = new Job(this.jobId, this.numIterations, this.serialIterationDuration);
+//		job.jobLossSlope = this.jobLossSlope;
+//		job.currIterationNum = this.currIterationNum;
+//		job.lossFunction = this.lossFunction;
+//		job.resAllocated = this.resAllocated;
+//		job.currResUse = this.currResUse;
+//		job.runnableTasks = new ArrayList<Task>(this.runnableTasks);
+//		job.runningTasks = new ArrayList<Task>(this.runningTasks);
+//		job.completedTasks = new ArrayList<Task>(this.completedTasks);
+//		return job;
+//	}
 }
