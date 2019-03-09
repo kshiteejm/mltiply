@@ -2,23 +2,25 @@ package mlsched.workload;
 
 import mlsched.utils.SublinearFunction;
 import mlsched.utils.SuperlinearFunction;
-import mlsched.events.Event;
 import mlsched.scheduler.IntraJobScheduler;
 import mlsched.utils.Function;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class Job implements Comparable<Job>{
+public class Job {
+	
+	public enum State {
+		WAITING_FOR_RESOURCES,
+		RUNNING
+	};
+	
 	private static Logger LOG = Logger.getLogger(Job.class.getName());
 	public int jobId;
 	public int numIterations;
 	public int currIterationNum;
-	// public int resAllocated;
-	// public int currResUse;
 	public int logicalFairShare;
 	public int currIterAllocation;
 	public int nextIterAllocation;
@@ -34,6 +36,7 @@ public class Job implements Comparable<Job>{
 	public IntraJobScheduler intraJobScheduler;
 	public int maxParallelism;
 	public int minParallelism = 1;
+	public State jobState = State.WAITING_FOR_RESOURCES;
 	
 	// A job will be submitted by the user. It has to run for n iterations
 	// and serialIterationDuration captures the runtime of this task when it
@@ -62,31 +65,4 @@ public class Job implements Comparable<Job>{
 		this.intraJobScheduler = new IntraJobScheduler();
 		this.maxParallelism = maxParallelism;
 	}
-
-	@Override
-	public int compareTo(Job j) {
-		int thisJobDifference = this.logicalFairShare - this.currIterAllocation;
-		int otherJobDifference = j.logicalFairShare - j.currIterAllocation;
-		if ( thisJobDifference > otherJobDifference)
-			return 1;
-		else
-			return -1;
-
-	}
-//	/*
-//	 * job object clone function typically used during deep copy of any data
-//	 * structure containing a job
-//	 */
-//	public Job clone() {
-//		Job job = new Job(this.jobId, this.numIterations, this.serialIterationDuration);
-//		job.jobLossSlope = this.jobLossSlope;
-//		job.currIterationNum = this.currIterationNum;
-//		job.lossFunction = this.lossFunction;
-//		job.resAllocated = this.resAllocated;
-//		job.currResUse = this.currResUse;
-//		job.runnableTasks = new ArrayList<Task>(this.runnableTasks);
-//		job.runningTasks = new ArrayList<Task>(this.runningTasks);
-//		job.completedTasks = new ArrayList<Task>(this.completedTasks);
-//		return job;
-//	}
 }

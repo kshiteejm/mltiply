@@ -6,6 +6,7 @@ import java.util.Comparator;
 import mlsched.events.ResourceAllocated;
 import mlsched.simulator.Main;
 import mlsched.workload.Job;
+import mlsched.workload.JobComparator;
 
 public class InterJobScheduler {
 
@@ -13,28 +14,19 @@ public class InterJobScheduler {
 	}
 	
 	public void distributeResources() {
-		Job[] jobArr = (Job[]) Main.jobList.toArray();
 		
-		// TODO: Validate that the ordering is indeed correct.
-		Arrays.sort(jobArr, new Comparator<Job>() {
-			public int compare(Job j1, Job j2) {
-				
-				int j1Diff = j1.logicalFairShare - j1.currIterAllocation;
-				int j2Diff = j2.logicalFairShare - j2.currIterAllocation;
-				
-				if(j1Diff > j2Diff)
-					return 1;
-				else
-					return -1;
-			}
-		});
+		Job[] jobArr = Arrays.copyOf(Main.jobList.toArray(), Main.jobList.toArray().length, Job[].class);
+		
+		Arrays.sort(jobArr, new JobComparator());
 		
 		// At the start of each iteration we allocate resources to jobs
 		// farthest from their fair share.
 		for(Job j : jobArr) {
 			if(Main.cluster.availableGPUs >= j.logicalFairShare) {
 				Main.cluster.availableGPUs -= j.logicalFairShare;
+				Main.jobList.remove(j);
 				j.nextIterAllocation = j.logicalFairShare;
+				Main.jobList.add(j);
 			}
 		}
 		
@@ -46,7 +38,9 @@ public class InterJobScheduler {
 			if(jobArr[i].nextIterAllocation < jobArr[i].maxParallelism) {
 				numTicks = 0;
 				Main.cluster.availableGPUs -= 1;
+				Main.jobList.remove(jobArr[i]);
 				jobArr[i].nextIterAllocation += 1;
+				Main.jobList.add(jobArr[i]);
 			} else {
 				numTicks += 1;
 			}

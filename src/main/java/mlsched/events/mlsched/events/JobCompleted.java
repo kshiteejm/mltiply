@@ -11,6 +11,6 @@ public class JobCompleted extends Event {
 
 	@Override
 	public void eventHandler() {
-		Main.cluster.availableGPUs += j.resAllocated;
+		Main.jobList.remove(j);
 	}
 }

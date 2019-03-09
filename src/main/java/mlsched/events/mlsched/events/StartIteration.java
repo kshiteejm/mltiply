@@ -14,7 +14,9 @@ public class StartIteration extends Event {
 	public void eventHandler() {
 		j.currIterationNum++;
 		for(Task t : j.runningTasks) {
+//			System.out.println("StartIteration adding taskID = " + t.taskId);
 			Main.eventQueue.add(new EndTask(Main.currentTime + t.duration, j, t));
 		}
+		
 	}
 }

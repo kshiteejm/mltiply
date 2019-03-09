@@ -14,16 +14,23 @@ public class IntraJobScheduler {
 	}
 	
 	public void schedule(Job j) {
-		int numTasks = j.resAllocated - j.currResUse;
+		int numTasks = j.currIterAllocation;
 		for(int i = 0; i < numTasks; i++) {
 			j.runnableTasks.add(new Task(j.jobId, j.jobId + "_" + i, j.serialIterationDuration/numTasks));
-			j.currResUse++;
 		}
+		
 		// Decide which tasks should be added to running tasks
-
-		// TODO: Validate this works
+		// All runnable tasks are eligible to run
+		
+		for(int i = 0; i < j.runnableTasks.size(); i++) {
+			j.runningTasks.add(j.runnableTasks.get(i));
+		}
+		
+//		for(Task t : j.runningTasks) {
+//			System.out.println("IntraJob: TaskID = " + t.taskId);
+//		}
+		
 		List<Task> tasks = new ArrayList<Task>(j.runnableTasks);
-		j.runningTasks.addAll(tasks);
 		j.runnableTasks.removeAll(tasks);
 		
 		Main.eventQueue.add(new StartIteration(Main.currentTime, j));

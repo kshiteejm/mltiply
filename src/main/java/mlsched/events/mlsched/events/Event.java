@@ -2,7 +2,8 @@ package mlsched.events;
 
 import mlsched.workload.Job;
 
-public class Event implements Comparable<Event> {
+public class Event {
+	
 	public double timeStamp;
 	Job j;
 
@@ -12,15 +13,9 @@ public class Event implements Comparable<Event> {
 	}
 	
 	public void eventHandler() {
-	}	
+	}
 	
-	@Override
-	public int compareTo(Event e) {
-
-		if (timeStamp > e.timeStamp)
-			return 1;
-		else
-			return -1;
-
+	public void printInfo() {
+		System.out.println("Event = " + this.getClass().toString() + " Timestamp = " + this.timeStamp + " JobID = " + this.j.jobId);
 	}
 }

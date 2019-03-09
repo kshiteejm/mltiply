@@ -12,20 +12,22 @@ public class JobArrived extends Event {
 	@Override
 	public void eventHandler() {
 		Main.jobList.add(j);
-		// There are no more events to be processed in the queue
-		// implies that all jobs have arrived.
+		
 		if(Main.eventQueue.isEmpty()) {
+			
+			// There are no more events to be processed in the queue
+			// implies that all jobs have arrived.			
 			Main.interJobScheduler.computeLogicalFairShare();
-		}
-		
-		// There is not more JobArrival events at the head of the
-		// queue implies that all Jobs at this time have arrived.
-		if(!(Main.eventQueue.peek() instanceof JobArrived)) {
+			
+		} else if(!(Main.eventQueue.first() instanceof JobArrived)) {
+			
+			// There is not more JobArrival events at the head of the
+			// queue implies that all Jobs at this time have arrived.
 			Main.interJobScheduler.computeLogicalFairShare();
-		}
-		
-		// We have processed all the JobArrivals at current time.
-		if(Main.currentTime < Main.eventQueue.peek().timeStamp) {
+			
+		} else if(Main.currentTime < Main.eventQueue.first().timeStamp) {
+			
+			// We have processed all the JobArrivals at current time.
 			Main.interJobScheduler.computeLogicalFairShare();
 		}
 	}

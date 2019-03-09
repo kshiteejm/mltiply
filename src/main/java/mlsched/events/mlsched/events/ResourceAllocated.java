@@ -10,6 +10,16 @@ public class ResourceAllocated extends Event {
 	
 	@Override
 	public void eventHandler() {
-		j.intraJobScheduler.schedule(j);
+		
+		// Only start newly arriving jobs if it has enough resources
+		
+		if(j.jobState == Job.State.WAITING_FOR_RESOURCES && j.nextIterAllocation>=j.logicalFairShare) {
+			j.jobState = Job.State.RUNNING;
+			j.currIterAllocation = j.nextIterAllocation;
+			j.intraJobScheduler.schedule(j);
+		} else {
+			// The allocation will be reflected at the end of the iteration
+			// for jobs that are in progress
+		}
 	}
 }
