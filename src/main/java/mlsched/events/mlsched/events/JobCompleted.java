@@ -12,5 +12,7 @@ public class JobCompleted extends Event {
 	@Override
 	public void eventHandler() {
 		Main.jobList.remove(j);
+		Main.jobStats.get(j.jobId).jobEndTime = timeStamp;
+		Main.interJobScheduler.computeLogicalFairShare();
 	}
 }

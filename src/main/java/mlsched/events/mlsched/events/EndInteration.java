@@ -15,6 +15,8 @@ public class EndInteration extends Event {
 		Main.cluster.availableGPUs += j.currIterAllocation;
 		j.currIterAllocation = 0;
 		
+		Main.jobStats.get(j.jobId).iterEndTimes.add(Main.currentTime);
+		
 		if(j.currIterationNum < j.numIterations) {
 			j.jobState = Job.State.WAITING_FOR_RESOURCES;
 			Main.interJobScheduler.computeLogicalFairShare();

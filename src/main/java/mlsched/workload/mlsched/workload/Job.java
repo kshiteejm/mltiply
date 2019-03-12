@@ -18,7 +18,7 @@ public class Job {
 	};
 	
 	private static Logger LOG = Logger.getLogger(Job.class.getName());
-	public int jobId;
+	public Integer jobId;
 	public int numIterations;
 	public int currIterationNum;
 	public int logicalFairShare;
@@ -64,5 +64,19 @@ public class Job {
 		completedTasks = new ArrayList<Task>();
 		this.intraJobScheduler = new IntraJobScheduler();
 		this.maxParallelism = maxParallelism;
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if(o == this) {
+			return true;
+		}
+		
+		if(!(o instanceof Job)) {
+			return false;
+		}
+		
+		Job j = (Job) o;
+		return j.jobId.equals(this.jobId);
 	}
 }

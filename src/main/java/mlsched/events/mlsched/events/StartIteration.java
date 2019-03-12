@@ -13,8 +13,14 @@ public class StartIteration extends Event {
 	@Override
 	public void eventHandler() {
 		j.currIterationNum++;
+		
+		if(j.currIterationNum == 1) {
+			Main.jobStats.get(j.jobId).jobStartTime = Main.currentTime;
+		}
+		
+		Main.jobStats.get(j.jobId).iterStartTimes.add(Main.currentTime);
+		
 		for(Task t : j.runningTasks) {
-//			System.out.println("StartIteration adding taskID = " + t.taskId);
 			Main.eventQueue.add(new EndTask(Main.currentTime + t.duration, j, t));
 		}
 		

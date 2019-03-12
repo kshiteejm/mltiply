@@ -1,6 +1,7 @@
 package mlsched.scheduler;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 
 import mlsched.simulator.Main;
@@ -12,11 +13,9 @@ public class EqualShareScheduler extends InterJobScheduler {
 	@Override
 	public void computeLogicalFairShare() {
 		
-		Job[] jobArr = Arrays.copyOf(Main.jobList.toArray(), Main.jobList.toArray().length, Job[].class);
+		Collections.sort(Main.jobList, new JobComparator());
 		
-		Arrays.sort(jobArr, new JobComparator());
-		
-		for(Job j : jobArr) {
+		for(Job j : Main.jobList) {
 			
 			j.logicalFairShare = Math.min(j.maxParallelism,
 					(int)Main.cluster.numGPUs / Main.jobList.size());
