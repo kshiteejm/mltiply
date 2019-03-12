@@ -12,9 +12,6 @@ public class ResourceAllocated extends Event {
 	public void eventHandler() {
 		
 		// Only start newly arriving jobs if it has enough resources
-		if(j.jobId == 5) {
-			System.out.println("Here bro");
-		}
 		if(j.jobState == Job.State.WAITING_FOR_RESOURCES && j.nextIterAllocation>=j.logicalFairShare) {
 			j.jobState = Job.State.RUNNING;
 			j.currIterAllocation = j.nextIterAllocation;
