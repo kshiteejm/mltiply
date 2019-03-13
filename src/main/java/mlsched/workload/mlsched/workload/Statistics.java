@@ -4,7 +4,11 @@ import java.util.ArrayList;
 
 public class Statistics {
 	
-	public Statistics(int jobId, double jobArrivalTime) {
+//	public Statistics(int jobId) {
+//		this.jobId = jobId;
+//	}
+
+	public Statistics(Integer jobId, double jobArrivalTime) {
 		this.jobId = jobId;
 		this.jobArrivalTime = jobArrivalTime;
 	}
@@ -16,10 +20,12 @@ public class Statistics {
 				jobEndTime);
 	}
 	
-	public int jobId;
-	public ArrayList<Double> iterStartTimes = new ArrayList<>();
-	public ArrayList<Double> iterEndTimes = new ArrayList<>();
+	public Integer jobId;
 	public double jobArrivalTime;
 	public double jobStartTime;
 	public double jobEndTime;
+	
+	public ArrayList<Double> iterStartTimes = new ArrayList<>();
+	public ArrayList<Double> iterEndTimes = new ArrayList<>();
+	
 }

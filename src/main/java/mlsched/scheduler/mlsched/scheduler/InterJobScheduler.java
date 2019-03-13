@@ -18,36 +18,29 @@ public class InterJobScheduler {
 		
 		// Job[] jobArr = Arrays.copyOf(Main.jobList.toArray(), Main.jobList.toArray().length, Job[].class);
 		
+		// At this point, nextIterAllocation and currIterAllocation are the same.
+		// Hence using nextIterAllocation in the JobComparator() is not wrong.
 		Collections.sort(Main.jobList, new JobComparator());
 		
-		// At the start of each iteration we allocate resources to jobs
-		// farthest from their fair share.
 		for(Job j : Main.jobList) {
-			if(Main.cluster.availableGPUs >= j.logicalFairShare) {
+
+			if(j.jobState == Job.State.WAITING_FOR_RESOURCES && 
+					Main.cluster.availableGPUs >= j.logicalFairShare) {
 				Main.cluster.availableGPUs -= j.logicalFairShare;
+				
+				// nextIterAllocation is updated here.
 				j.nextIterAllocation = j.logicalFairShare;
+				
+				// TODO: Try this later
+				Main.eventQueue.add(new ResourceAllocated(Main.currentTime, j));
 			}
 		}
 		
-		Collections.sort(Main.jobList, new JobComparator());
+		// Don't need to sort it here since nothing has changed --> IT'S WRONG.
+		//	Collections.sort(Main.jobList, new JobComparator());
 		
-		// Remaining resources are allocated in a round robin fashion
-		// TODO: Make sure no infinite loop :P
-		int numTicks = 0;
-		int i = 0;
-		while((Main.cluster.availableGPUs > 0) && (numTicks < 2*Main.jobList.size())) {
-			if(Main.jobList.get(i).nextIterAllocation < Main.jobList.get(i).maxParallelism) {
-				numTicks = 0;
-				Main.cluster.availableGPUs -= 1;
-				Main.jobList.get(i).nextIterAllocation += 1;
-			} else {
-				numTicks += 1;
-			}
-			i = (i + 1) % Main.jobList.size();
-		}
-		
-		for(Job j : Main.jobList) {
-			Main.eventQueue.add(new ResourceAllocated(Main.currentTime, j));
-		}
+//		for(Job j : Main.jobList) {
+//			Main.eventQueue.add(new ResourceAllocated(Main.currentTime, j));
+//		}
 	}
 }

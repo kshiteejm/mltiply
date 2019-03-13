@@ -2,6 +2,7 @@ package mlsched.events;
 
 import mlsched.simulator.Main;
 import mlsched.workload.Job;
+import mlsched.workload.Statistics;
 
 public class JobCompleted extends Event {
 
@@ -13,7 +14,12 @@ public class JobCompleted extends Event {
 	public void eventHandler() {
 		Main.cluster.availableGPUs += j.nextIterAllocation;
 		Main.jobList.remove(j);
-		Main.jobStats.get(j.jobId).jobEndTime = timeStamp;
-		Main.interJobScheduler.computeLogicalFairShare();
+		
+		Statistics statObj = Main.jobStats.get(j.jobId); 
+		statObj.jobEndTime = timeStamp;
+		Main.jobStats.put(j.jobId, statObj);
+		
+		Main.eventQueue.add(new ComputeLogicalFairShare(Main.currentTime, j));
+//		Main.interJobScheduler.computeLogicalFairShare();
 	}
 }
