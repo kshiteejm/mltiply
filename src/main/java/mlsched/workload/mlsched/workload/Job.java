@@ -37,6 +37,7 @@ public class Job {
 	public int maxParallelism;
 	public int minParallelism = 1;
 	public State jobState = State.WAITING_FOR_RESOURCES;
+	public int epochNumber = 0;
 	
 	// A job will be submitted by the user. It has to run for n iterations
 	// and serialIterationDuration captures the runtime of this task when it

@@ -1,5 +1,6 @@
 package mlsched.events;
 
+import mlsched.simulator.Main;
 import mlsched.workload.Job;
 
 public class ResourceAllocated extends Event {
@@ -21,8 +22,9 @@ public class ResourceAllocated extends Event {
 			// Why are we doing this again? --> already done in InterJS line 31
 			j.nextIterAllocation = j.logicalFairShare;
 			j.currIterAllocation = j.nextIterAllocation;
-			System.out.println("resource allocated --- " + j.nextIterAllocation + " to job id " + j.jobId);
+			// System.out.println("resource allocated --- " + j.nextIterAllocation + " to job id " + j.jobId);
 			j.intraJobScheduler.schedule(j);
+			j.epochNumber = Main.epochNumber;
 			
 		} else {
 			// The allocation will be reflected at the end of the iteration

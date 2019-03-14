@@ -6,8 +6,9 @@ import mlsched.workload.Statistics;
 
 public class ComputeLogicalFairShare extends Event {
 	
-	public ComputeLogicalFairShare(double timeStamp, Job j) {
-		super(timeStamp, j);
+	public ComputeLogicalFairShare(double timeStamp) {
+		super(timeStamp);
+		// super(timeStamp, j);
 //		Main.jobStats.put(j.jobId,new Statistics(j.jobId, timeStamp));
 	}
 
@@ -32,4 +33,8 @@ public class ComputeLogicalFairShare extends Event {
 		}
 	}
 	
+	@Override
+	public void printInfo() {
+		System.out.println("Event = " + this.getClass().toString() + " Timestamp = " + this.timeStamp);
+	}
 }

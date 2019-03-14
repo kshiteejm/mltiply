@@ -18,8 +18,9 @@ public class JobCompleted extends Event {
 		Statistics statObj = Main.jobStats.get(j.jobId); 
 		statObj.jobEndTime = timeStamp;
 		Main.jobStats.put(j.jobId, statObj);
-		
-		Main.eventQueue.add(new ComputeLogicalFairShare(Main.currentTime, j));
+		if(!Main.epochScheduling) {
+			Main.eventQueue.add(new ComputeLogicalFairShare(Main.currentTime));
+		}
 //		Main.interJobScheduler.computeLogicalFairShare();
 	}
 }

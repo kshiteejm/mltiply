@@ -7,6 +7,10 @@ public class Event {
 	public double timeStamp;
 	Job j;
 
+	public Event(double timeStamp) {
+		this.timeStamp = timeStamp;
+	}
+	
 	public Event(double timeStamp, Job j) {
 		this.timeStamp = timeStamp;
 		this.j = j;

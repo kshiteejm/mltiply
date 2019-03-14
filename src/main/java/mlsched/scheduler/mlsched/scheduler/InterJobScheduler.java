@@ -11,6 +11,12 @@ import mlsched.workload.JobComparator;
 
 public class InterJobScheduler {
 
+	public boolean schedulingEpoch;
+	
+	public InterJobScheduler(boolean schedulingEpoch) {
+		this.schedulingEpoch = schedulingEpoch;
+	}
+
 	public void computeLogicalFairShare() {
 	}
 	
