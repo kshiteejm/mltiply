@@ -24,7 +24,7 @@ public class ResourceAllocated extends Event {
 			j.currIterAllocation = j.nextIterAllocation;
 			// System.out.println("resource allocated --- " + j.nextIterAllocation + " to job id " + j.jobId);
 			j.intraJobScheduler.schedule(j);
-			j.epochNumber = Main.epochNumber;
+			// j.epochNumber = Main.epochNumber;
 			
 		} else {
 			// The allocation will be reflected at the end of the iteration

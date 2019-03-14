@@ -12,7 +12,7 @@ public class JobCompleted extends Event {
 
 	@Override
 	public void eventHandler() {
-		Main.cluster.availableGPUs += j.nextIterAllocation;
+		// Main.cluster.availableGPUs += j.nextIterAllocation;
 		Main.jobList.remove(j);
 		
 		Statistics statObj = Main.jobStats.get(j.jobId); 

@@ -19,25 +19,27 @@ public class EndInteration extends Event {
 
 		// NOTE: epoch numbers only change when we use SLAQ. We will never
 		// enter the if condition for any other scheduler.
-		if (j.epochNumber != Main.epochNumber) {
+		if (Main.epochScheduling) {
 			// Since epoch has changed, release all the resources
 			// at the end of the iteration and wait for next epoch to trigger
 			Main.cluster.availableGPUs += j.currIterAllocation;
 			j.currIterAllocation = 0;
-			// j.nextIterAllocation = 0;
+			
 			if (j.currIterationNum < j.numIterations) {
 				j.jobState = Job.State.WAITING_FOR_RESOURCES;
-				//	Main.interJobScheduler.computeLogicalFairShare();
+				Main.eventQueue.add(new DistributeResources(Main.currentTime));
+				// Main.interJobScheduler.distributeResources();
 			} else {
 				Main.eventQueue.add(new JobCompleted(Main.currentTime, j));
 			}
 		} else {
 			// The epoch number has not changed
 			if (j.currIterationNum < j.numIterations) {
+				Main.cluster.availableGPUs += j.currIterAllocation;
+				j.currIterAllocation = 0;
+				
 				if (!Main.epochScheduling) {
 					// In case of not SLAQ, put it to waiting and recompute LFS
-					Main.cluster.availableGPUs += j.currIterAllocation;
-					j.currIterAllocation = 0;
 					j.jobState = Job.State.WAITING_FOR_RESOURCES;
 					Main.eventQueue.add(new ComputeLogicalFairShare(Main.currentTime));
 				} else {
