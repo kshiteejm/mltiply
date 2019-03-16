@@ -2,6 +2,8 @@ package mlsched.utils;
 
 import java.util.Random;
 
+import mlsched.simulator.Main;
+
 public class SublinearFunction implements Function {
   public int numIterations;
   public double valueBegin;
@@ -22,7 +24,7 @@ public class SublinearFunction implements Function {
   public static SublinearFunction getRandomSublinearFunction(int numIterations) {
     double tValueBegin = 1.0;
     double tValueEnd = 0.0;
-    Random r = new Random();
+    Random r = new Random(Main.randSeed);
     double tA = r.nextDouble();
     double tB = r.nextDouble();
     double tT = tA*numIterations*numIterations + tB*numIterations;

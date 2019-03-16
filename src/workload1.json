@@ -1,0 +1,20 @@
+{
+  "seed": 7.0,
+  "numGPUs": 50,
+  "jobs": [
+    {
+      "numJobs": 10,
+      "arrivalTime": 0,
+      "numIterations": 5,
+      "serialIterDuration": 25,
+      "lossFunction": "superlinear"
+    },
+    {
+      "numJobs": 10,
+      "arrivalTime": 1,
+      "numIterations": 5,
+      "serialIterDuration": 25,
+      "lossFunction": "sublinear"
+    }
+  ]
+}

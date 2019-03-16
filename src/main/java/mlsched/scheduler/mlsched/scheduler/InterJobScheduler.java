@@ -1,8 +1,6 @@
 package mlsched.scheduler;
 
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 
 import mlsched.events.ResourceAllocated;
 import mlsched.simulator.Main;
@@ -31,7 +29,9 @@ public class InterJobScheduler {
 		for (Job j : Main.jobList) {
 			if (j.jobState == Job.State.WAITING_FOR_RESOURCES) {
 				if (Main.cluster.availableGPUs >= j.logicalFairShare) {
-
+					
+					System.out.println("JobID = " + j.jobId + " Resources = " + j.logicalFairShare);
+					
 					Main.cluster.availableGPUs -= j.logicalFairShare;
 
 					// nextIterAllocation is updated here.

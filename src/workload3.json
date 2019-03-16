@@ -1,0 +1,15 @@
+{
+  "seed": 7,
+  "numGPUs": 10,
+  "schedPolicy": "slaq",
+  "schedulingInterval": 2,
+  "jobs": [
+    {
+      "numJobs": 5,
+      "arrivalTime": 0,
+      "numIterations": 10,
+      "serialIterDuration": 10,
+      "lossFunction": "superlinear"
+    }
+  ]
+}

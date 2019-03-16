@@ -2,6 +2,8 @@ package mlsched.utils;
 
 import java.util.Random;
 
+import mlsched.simulator.Main;
+
 public class SuperlinearFunction implements Function {
   public int numIterations;
   public double valueBegin;
@@ -21,7 +23,7 @@ public class SuperlinearFunction implements Function {
   public static SuperlinearFunction getRandomSuperlinearFunction(int numIterations) {
     double tValueBegin = 1.0;
     double tValueEnd = 0.0;
-    Random r = new Random();
+    Random r = new Random(Main.randSeed);
     double tU = r.nextDouble();
     double tC = Math.pow(tU, numIterations);
     tC = tC/(tC - 1);

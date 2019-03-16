@@ -1,6 +1,5 @@
 package mlsched.events;
 
-import mlsched.simulator.Main;
 import mlsched.workload.Job;
 
 public class ResourceAllocated extends Event {
@@ -15,7 +14,7 @@ public class ResourceAllocated extends Event {
 		// Only start newly arriving jobs if it has enough resources
 		//	System.out.println(" job ID " + j.jobId + " nextIterAllocation " + j.nextIterAllocation + " logicalFairShare " + j.logicalFairShare);
 		
-		if(j.jobState == Job.State.WAITING_FOR_RESOURCES && j.nextIterAllocation>=j.logicalFairShare) {
+		if(j.jobState == Job.State.WAITING_FOR_RESOURCES && j.nextIterAllocation >= j.logicalFairShare) {
 		
 			j.jobState = Job.State.RUNNING;
 			

@@ -7,7 +7,6 @@ import mlsched.utils.Function;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.logging.Logger;
 
 public class Job {
@@ -43,17 +42,16 @@ public class Job {
 	// A job will be submitted by the user. It has to run for n iterations
 	// and serialIterationDuration captures the runtime of this task when it
 	// runs serially.
-	public Job(int jobId, int numIterations, double serialIterationDuration, int maxParallelism) {
+	public Job(int jobId, int numIterations, double serialIterationDuration, 
+			int maxParallelism, String lossFunction) {
 		this.jobId = jobId;
 		this.numIterations = numIterations;
 		currIterationNum = 0;
 		jobLossSlope = 0.0;
-		Random r = new Random();
-		int rn = r.nextInt(2);
-		if (rn == 0) {
-			lossFunction = SublinearFunction.getRandomSublinearFunction(numIterations);
+		if (lossFunction.equals("sublinear")) {
+			this.lossFunction = SublinearFunction.getRandomSublinearFunction(numIterations);
 		} else {
-			lossFunction = SuperlinearFunction.getRandomSuperlinearFunction(numIterations);
+			this.lossFunction = SuperlinearFunction.getRandomSuperlinearFunction(numIterations);
 		}
 		logicalFairShare = 0;
 		currIterAllocation = 0;

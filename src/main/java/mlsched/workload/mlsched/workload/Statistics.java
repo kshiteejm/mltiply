@@ -3,10 +3,6 @@ package mlsched.workload;
 import java.util.ArrayList;
 
 public class Statistics {
-	
-//	public Statistics(int jobId) {
-//		this.jobId = jobId;
-//	}
 
 	public Statistics(Integer jobId, double jobArrivalTime) {
 		this.jobId = jobId;

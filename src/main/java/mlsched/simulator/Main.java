@@ -18,27 +18,31 @@ import mlsched.events.JobCompleted;
 import mlsched.events.ResourceAllocated;
 import mlsched.events.SchedulingEpoch;
 import mlsched.events.StartIteration;
-import mlsched.scheduler.EqualShareScheduler;
 import mlsched.scheduler.InterJobScheduler;
-import mlsched.scheduler.SLAQ;
 import mlsched.workload.Job;
 import mlsched.workload.Statistics;
+import mlsched.workload.Workload;
 
-public class Main {
-	
-	public static boolean distributeResourcesFlag = false; 
+public class Main { 
 	
 	public static TreeSet<Event> eventQueue = new TreeSet<>(new EventComparator());
 	public static Cluster cluster;
+	
 	public static ArrayList<Job> jobList = new ArrayList<>();
 	public static HashMap<Integer, Statistics> jobStats = new HashMap<>();
-	public static InterJobScheduler interJobScheduler = new EqualShareScheduler(false);
-//	public static InterJobScheduler interJobScheduler = new SLAQ(true);
-	public static boolean epochScheduling = interJobScheduler.schedulingEpoch;
-	public static double schedulingInterval = 2;
-	// public static int epochNumber = 0;
+	public static boolean distributeResourcesFlag = false;
+	
+	public static InterJobScheduler interJobScheduler;
+	public static boolean epochScheduling;
+	
+	public static double schedulingInterval;
+
 	public static double startTime = 0;
 	public static double currentTime = 0;
+	
+	public static long randSeed;
+	
+	public static final boolean DEBUG = true;
 	
 	public static Integer eventPriority(Event e) {
 		//	Ordering of events - ET > EI > JC > JA > SA > CL > DR > RA > SI > everything else we might have missed
@@ -68,35 +72,6 @@ public class Main {
 			return 60;
 		} else {
 			return 70;
-		}
-	}
-	
-	public static void computeWorkload(String fileName) {
-		File file = new File(fileName);
-		Scanner sc = null;
-		try {			
-			sc = new Scanner(file);
-			Main.cluster = new Cluster(Integer.valueOf(sc.nextLine()));
-			int numJobs = Integer.valueOf(sc.nextLine());
-			
-			Integer jobId = 0, maxParallel = Integer.MAX_VALUE;
-			while(sc.hasNextLine()) {
-				String s = sc.nextLine();
-				String[] parts = s.split("\t");
-				
-				assert(parts.length == 3);
-				
-				double jobArrivalTime = Double.valueOf(parts[0]);
-				int numIter = Integer.valueOf(parts[1]);
-				double serialRun = Double.valueOf(parts[2]);
-				Job j = new Job(jobId, numIter, serialRun, maxParallel);
-				eventQueue.add(new JobArrived(jobArrivalTime, j));
-				jobId += 1;
-			}
-		} catch(Exception e) {
-			e.printStackTrace();
-		} finally {
-			sc.close();
 		}
 	}
 	
@@ -140,8 +115,12 @@ public class Main {
 		
 		// Epoch scheduling will be same priority event before computeLogicalFairShare
 		// because we only distribute resources after everything is released or jobs have arrived.
+				
+		final String Filename = "workload3.json";
+				
+		Workload.parseWorkload(Filename);
 		
-		computeWorkload("workload1");
+		System.out.println("THE SEED IS: " + Main.randSeed);
 		
 		if(epochScheduling) {
 			eventQueue.add(new SchedulingEpoch(currentTime, schedulingInterval));
@@ -150,20 +129,24 @@ public class Main {
 		while(!eventQueue.isEmpty()) {
 			Event e = eventQueue.pollFirst();
 			currentTime = e.timeStamp;
-			e.printInfo();
+			
+			if(DEBUG)
+				e.printInfo();
+			
 			// Enqueue next epoch event in the eventQueue only if we have
 			// Some events left to be processed.
 			if((e instanceof SchedulingEpoch) && (!jobList.isEmpty())) {
 				eventQueue.add(new SchedulingEpoch(currentTime + schedulingInterval, schedulingInterval));
 			}
+			
 			e.eventHandler();
 		}
 		
-		System.out.println("\n\nOVERALL JOB STATS -");
+		System.out.println("\nOVERALL JOB STATS -");
 		for(Integer key : jobStats.keySet()) {
 			jobStats.get(key).printStats();
 		}
 		
-		testOutput("output1");
+//		testOutput("output1");
 	}
 }

@@ -1,8 +1,6 @@
 package mlsched.events;
 
 import mlsched.simulator.Main;
-import mlsched.workload.Job;
-import mlsched.workload.Statistics;
 
 public class ComputeLogicalFairShare extends Event {
 	
