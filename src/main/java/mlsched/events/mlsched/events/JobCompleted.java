@@ -12,11 +12,14 @@ public class JobCompleted extends Event {
 
 	@Override
 	public void eventHandler() {
+		
 		Main.jobList.remove(j);
 		
 		Statistics statObj = Main.jobStats.get(j.jobId); 
 		statObj.jobEndTime = timeStamp;
 		Main.jobStats.put(j.jobId, statObj);
+		
+		// If not SLAQ then do this - 
 		if(!Main.epochScheduling) {
 			Main.eventQueue.add(new ComputeLogicalFairShare(Main.currentTime));
 		}

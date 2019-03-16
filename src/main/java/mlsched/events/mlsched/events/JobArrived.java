@@ -15,6 +15,8 @@ public class JobArrived extends Event {
 	public void eventHandler() {
 		
 		Main.jobList.add(j);
+		
+		// If not SLAQ, then do this - 		
 		if(!Main.epochScheduling) {
 			Main.eventQueue.add(new ComputeLogicalFairShare(Main.currentTime));
 		}
