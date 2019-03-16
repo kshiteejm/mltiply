@@ -42,7 +42,7 @@ public class Main {
 
 	public static long randSeed;
 
-	public static final boolean DEBUG = true;
+	public static final boolean DEBUG = false;
 
 	public static Integer eventPriority(Event e) {
 		// Ordering of events - ET > EI > JC > JA > SA > CL > DR > RA > SI > everything
@@ -118,7 +118,7 @@ public class Main {
 		// because we only distribute resources after everything is released or jobs
 		// have arrived.
 
-		final String Filename = "workload1.json";
+		final String Filename = "workload4.json";
 
 		Workload.parseWorkload(Filename);
 

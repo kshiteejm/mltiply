@@ -1,6 +1,7 @@
 package mlsched.scheduler;
 
-import java.util.PriorityQueue;
+import java.util.ArrayList;
+import java.util.Collections;
 
 import mlsched.events.DistributeResources;
 import mlsched.simulator.Main;
@@ -12,17 +13,23 @@ public class SLAQ extends InterJobScheduler {
 		super(schedulingEpoch);
 	}
 
-	public double predictLossReduction(Job j) {
-		
-		double iterationDuration = j.serialIterationDuration / j.logicalFairShare; 
+	public double predictLossResource(Job j, int numResources) {
+		double iterationDuration = j.serialIterationDuration / numResources; 
 		int numIterationsEpoch = (int) Math.floor(Main.schedulingInterval / iterationDuration);
 		
 		double lossValInitial = j.lossFunction.getValue(j.currIterationNum);
 		double lossValFinal = j.lossFunction.getValue(j.currIterationNum + numIterationsEpoch);
 		
 		assert(lossValFinal <= lossValInitial);
+		return lossValFinal - lossValInitial;
+	}
+	
+	public double predictLossReduction(Job j) {
+		double predLoss = predictLossResource(j, j.logicalFairShare);
+		double predLossP1 = predictLossResource(j, j.logicalFairShare+1);
 		
-		return Math.abs(lossValFinal - lossValInitial);
+		assert(predLoss >= predLossP1);
+		return predLoss - predLossP1;
 	}
 
 	@Override
@@ -38,7 +45,8 @@ public class SLAQ extends InterJobScheduler {
 			j.logicalFairShare = 0;
 		}
 
-		PriorityQueue<Job> priorQ = new PriorityQueue<>(new SLAQJobComparator());
+		// TODO: Find out which type of job has better loss reduction.
+		ArrayList<Job> priorQ = new ArrayList<>();
 		for (Job j : Main.jobList) {
 			assert (totalResources != 0);
 			j.logicalFairShare += 1;
@@ -47,12 +55,13 @@ public class SLAQ extends InterJobScheduler {
 			priorQ.add(j);
 		}
 
+		Collections.sort(priorQ, new SLAQJobComparator());
 		while (totalResources > 0) {
-			Job j = priorQ.poll();
+			Job j = priorQ.get(0);
 			j.logicalFairShare += 1;
 			totalResources -= 1;
 			j.predLossRed = predictLossReduction(j);
-			priorQ.add(j);
+			Collections.sort(priorQ, new SLAQJobComparator());
 		}
 
 		if (Main.distributeResourcesFlag == false)

@@ -8,7 +8,7 @@
       "numJobs": 5,
       "arrivalTime": 0,
       "numIterations": 10,
-      "serialIterDuration": 10,
+      "serialIterDuration": 1,
       "lossFunction": "superlinear"
     }
   ]

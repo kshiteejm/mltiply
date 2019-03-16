@@ -36,10 +36,13 @@ public class InterJobScheduler {
 					j.jobState = Job.State.RESOURCE_ALLOCATED;
 
 					Main.eventQueue.add(new ResourceAllocated(Main.currentTime, j));
+					
+					System.out.println("Allocated = " + j.logicalFairShare + " Job ID = " + j.jobId);
 				} else {
 					break;
 				}
 			}
 		}
+		System.out.println("----");
 	}
 }
