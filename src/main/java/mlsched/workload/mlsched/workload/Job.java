@@ -13,6 +13,7 @@ public class Job {
 	
 	public enum State {
 		WAITING_FOR_RESOURCES,
+		RESOURCE_ALLOCATED,
 		RUNNING
 	};
 	

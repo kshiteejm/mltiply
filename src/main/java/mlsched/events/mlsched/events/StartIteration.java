@@ -30,4 +30,9 @@ public class StartIteration extends Event {
 		}
 		
 	}
+	
+	@Override
+	public void printInfo() {
+		System.out.println("Event = " + this.getClass().toString() + " Timestamp = " + this.timeStamp + " JobID = " + this.j.jobId + " Iteration = " + this.j.currIterationNum);
+	}
 }

@@ -23,36 +23,37 @@ import mlsched.workload.Job;
 import mlsched.workload.Statistics;
 import mlsched.workload.Workload;
 
-public class Main { 
-	
+public class Main {
+
 	public static TreeSet<Event> eventQueue = new TreeSet<>(new EventComparator());
 	public static Cluster cluster;
-	
+
 	public static ArrayList<Job> jobList = new ArrayList<>();
 	public static HashMap<Integer, Statistics> jobStats = new HashMap<>();
 	public static boolean distributeResourcesFlag = false;
-	
+
 	public static InterJobScheduler interJobScheduler;
 	public static boolean epochScheduling;
-	
+
 	public static double schedulingInterval;
 
 	public static double startTime = 0;
 	public static double currentTime = 0;
-	
+
 	public static long randSeed;
-	
+
 	public static final boolean DEBUG = true;
-	
+
 	public static Integer eventPriority(Event e) {
-		//	Ordering of events - ET > EI > JC > JA > SA > CL > DR > RA > SI > everything else we might have missed
-		
+		// Ordering of events - ET > EI > JC > JA > SA > CL > DR > RA > SI > everything
+		// else we might have missed
+
 		// Scheduling epoch cannot happen before Job Completed
 		// But since End Iteration is happening before Scheduling Epoch
 		// This will not reflect the next iterations computation at Epoch
 		// So add a Distribute Resource event which has lesser priority
 		// than Scheduling Epoch.
-		if(e instanceof EndTask) {
+		if (e instanceof EndTask) {
 			return 0;
 		} else if (e instanceof EndInteration) {
 			return 10;
@@ -64,7 +65,7 @@ public class Main {
 			return 35;
 		} else if (e instanceof ComputeLogicalFairShare) {
 			return 40;
-		} else if (e instanceof DistributeResources ) {
+		} else if (e instanceof DistributeResources) {
 			return 45;
 		} else if (e instanceof ResourceAllocated) {
 			return 50;
@@ -74,23 +75,23 @@ public class Main {
 			return 70;
 		}
 	}
-	
+
 	public static boolean doubleEquals(double a, double b) {
 		final double THRESHOLD = .000000001;
-		
+
 		if (Math.abs(a - b) < THRESHOLD)
 			return true;
 		else
 			return false;
 	}
-	
+
 	public static void testOutput(String fileName) {
 		File file = new File(fileName);
 		Scanner sc = null;
-		try {			
+		try {
 			sc = new Scanner(file);
-			
-			while(sc.hasNextLine()) {
+
+			while (sc.hasNextLine()) {
 				String s = sc.nextLine();
 				String[] parts = s.split("\t");
 				Integer jobId = Integer.valueOf(parts[0]);
@@ -100,53 +101,54 @@ public class Main {
 				assert doubleEquals(jobStats.get(jobId).jobStartTime, startTime);
 				assert doubleEquals(jobStats.get(jobId).jobEndTime, endTime);
 			}
-			
-		} catch(Exception e) {
+
+		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
 			sc.close();
 		}
 	}
-	
+
 	public static void main(String[] args) {
-			
+
 		// Start Iteration always happens after Job Arrived. We know
 		// Job Arrival times in advance from the workload.
-		
+
 		// Epoch scheduling will be same priority event before computeLogicalFairShare
-		// because we only distribute resources after everything is released or jobs have arrived.
-				
-		final String Filename = "workload3.json";
-				
+		// because we only distribute resources after everything is released or jobs
+		// have arrived.
+
+		final String Filename = "workload1.json";
+
 		Workload.parseWorkload(Filename);
-		
+
 		System.out.println("THE SEED IS: " + Main.randSeed);
-		
-		if(epochScheduling) {
+
+		if (epochScheduling) {
 			eventQueue.add(new SchedulingEpoch(currentTime, schedulingInterval));
 		}
-		
-		while(!eventQueue.isEmpty()) {
+
+		while (!eventQueue.isEmpty()) {
 			Event e = eventQueue.pollFirst();
 			currentTime = e.timeStamp;
-			
-			if(DEBUG)
+
+			if (DEBUG)
 				e.printInfo();
-			
+
 			// Enqueue next epoch event in the eventQueue only if we have
 			// Some events left to be processed.
-			if((e instanceof SchedulingEpoch) && (!jobList.isEmpty())) {
+			if ((e instanceof SchedulingEpoch) && (!jobList.isEmpty())) {
 				eventQueue.add(new SchedulingEpoch(currentTime + schedulingInterval, schedulingInterval));
 			}
-			
+
 			e.eventHandler();
 		}
-		
+
 		System.out.println("\nOVERALL JOB STATS -");
-		for(Integer key : jobStats.keySet()) {
+		for (Integer key : jobStats.keySet()) {
 			jobStats.get(key).printStats();
 		}
-		
+
 //		testOutput("output1");
 	}
 }

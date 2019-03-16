@@ -29,13 +29,11 @@ public class InterJobScheduler {
 		for (Job j : Main.jobList) {
 			if (j.jobState == Job.State.WAITING_FOR_RESOURCES) {
 				if (Main.cluster.availableGPUs >= j.logicalFairShare) {
-					
-					System.out.println("JobID = " + j.jobId + " Resources = " + j.logicalFairShare);
-					
+										
 					Main.cluster.availableGPUs -= j.logicalFairShare;
 
-					// nextIterAllocation is updated here.
 					j.nextIterAllocation = j.logicalFairShare;
+					j.jobState = Job.State.RESOURCE_ALLOCATED;
 
 					Main.eventQueue.add(new ResourceAllocated(Main.currentTime, j));
 				} else {

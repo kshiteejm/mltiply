@@ -1,6 +1,7 @@
 {
-  "seed": 7.0,
+  "seed": 7,
   "numGPUs": 50,
+  "schedPolicy": "equal",
   "jobs": [
     {
       "numJobs": 10,
@@ -8,13 +9,6 @@
       "numIterations": 5,
       "serialIterDuration": 25,
       "lossFunction": "superlinear"
-    },
-    {
-      "numJobs": 10,
-      "arrivalTime": 1,
-      "numIterations": 5,
-      "serialIterDuration": 25,
-      "lossFunction": "sublinear"
     }
   ]
 }

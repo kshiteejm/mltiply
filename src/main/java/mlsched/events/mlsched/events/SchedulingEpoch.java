@@ -13,7 +13,6 @@ public class SchedulingEpoch extends Event {
 	
 	@Override
 	public void eventHandler() {
-		// Main.epochNumber += 1;
 		Main.eventQueue.add(new ComputeLogicalFairShare(Main.currentTime));
 	}
 	

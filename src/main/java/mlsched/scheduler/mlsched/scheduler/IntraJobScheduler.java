@@ -19,16 +19,10 @@ public class IntraJobScheduler {
 			j.runnableTasks.add(new Task(j.jobId, j.jobId + "_" + i, j.serialIterationDuration/numTasks));
 		}
 		
-		// Decide which tasks should be added to running tasks
 		// All runnable tasks are eligible to run
-		
 		for(int i = 0; i < j.runnableTasks.size(); i++) {
 			j.runningTasks.add(j.runnableTasks.get(i));
 		}
-		
-//		for(Task t : j.runningTasks) {
-//			System.out.println("IntraJob: TaskID = " + t.taskId);
-//		}
 		
 		List<Task> tasks = new ArrayList<Task>(j.runnableTasks);
 		j.runnableTasks.removeAll(tasks);

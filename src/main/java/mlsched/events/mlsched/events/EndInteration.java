@@ -17,13 +17,15 @@ public class EndInteration extends Event {
 		statObj.iterEndTimes.add(Main.currentTime);
 		Main.jobStats.put(j.jobId, statObj);
 
-		// NOTE: epoch numbers only change when we use SLAQ. We will never
+		Main.cluster.availableGPUs += j.currIterAllocation;
+		j.currIterAllocation = 0;
+		
+		// NOTE: epoch scheduling only change when we use SLAQ. We will never
 		// enter the if condition for any other scheduler.
 		if (Main.epochScheduling) {
 			// Since epoch has changed, release all the resources
 			// at the end of the iteration and wait for next epoch to trigger
-			Main.cluster.availableGPUs += j.currIterAllocation;
-			j.currIterAllocation = 0;
+
 			
 			if (j.currIterationNum < j.numIterations) {
 				j.jobState = Job.State.WAITING_FOR_RESOURCES;
@@ -35,8 +37,6 @@ public class EndInteration extends Event {
 		} else {
 			// The epoch number has not changed
 			if (j.currIterationNum < j.numIterations) {
-				Main.cluster.availableGPUs += j.currIterAllocation;
-				j.currIterAllocation = 0;
 				
 				if (!Main.epochScheduling) {
 					// In case of not SLAQ, put it to waiting and recompute LFS
@@ -51,5 +51,10 @@ public class EndInteration extends Event {
 				Main.eventQueue.add(new JobCompleted(Main.currentTime, j));
 			}
 		}
+	}
+	
+	@Override
+	public void printInfo() {
+		System.out.println("Event = " + this.getClass().toString() + " Timestamp = " + this.timeStamp + " JobID = " + this.j.jobId + " Iteration = " + this.j.currIterationNum);
 	}
 }

@@ -20,12 +20,11 @@ public class SLAQ extends InterJobScheduler {
 		double lossValInitial = j.lossFunction.getValue(j.currIterationNum);
 		double lossValFinal = j.lossFunction.getValue(j.currIterationNum + numIterationsEpoch);
 		
-		assert(lossValFinal <= lossValInitial); // Because KC said so.
+		assert(lossValFinal <= lossValInitial);
 		
 		return Math.abs(lossValFinal - lossValInitial);
 	}
 
-	// TODO: For now copied EqualShareLogic. Change this.
 	@Override
 	public void computeLogicalFairShare() {
 
@@ -57,7 +56,6 @@ public class SLAQ extends InterJobScheduler {
 		}
 
 		if (Main.distributeResourcesFlag == false)
-			// this.distributeResources();
 			Main.eventQueue.add(new DistributeResources(Main.currentTime));
 	}
 }
