@@ -1,5 +1,6 @@
-import java.util.List;
+package com.wisr.mlsched;
 
+import java.util.List;
 import org.json.simple.JSONObject;
 
 public class GandivaIntraJobScheduler extends IntraJobScheduler {

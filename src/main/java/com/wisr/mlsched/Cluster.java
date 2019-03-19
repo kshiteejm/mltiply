@@ -1,7 +1,7 @@
+package com.wisr.mlsched;
+
 import java.util.List;
-
 import org.json.simple.JSONObject;
-
 import java.util.ArrayList;
 
 /**

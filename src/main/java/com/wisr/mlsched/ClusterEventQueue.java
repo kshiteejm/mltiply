@@ -1,3 +1,5 @@
+package com.wisr.mlsched;
+
 import java.util.Comparator;
 import java.util.TreeSet;
 

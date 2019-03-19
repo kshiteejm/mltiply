@@ -1,3 +1,5 @@
+package com.wisr.mlsched;
+
 import java.util.List;
 
 public class AAMInterJobScheduler extends InterJobScheduler {

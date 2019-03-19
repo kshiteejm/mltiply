@@ -1,3 +1,5 @@
+package com.wisr.mlsched;
+
 /**
  * Represents the physical location coordinates of the GPU.
  */

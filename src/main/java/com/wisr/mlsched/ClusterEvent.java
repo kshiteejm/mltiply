@@ -1,3 +1,5 @@
+package com.wisr.mlsched;
+
 /**
  * Generic cluster event which will be enqueued into event queue
  */

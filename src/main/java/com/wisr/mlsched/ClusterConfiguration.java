@@ -1,3 +1,5 @@
+package com.wisr.mlsched;
+
 /**
  * Representation of the cluster's configuration
  */

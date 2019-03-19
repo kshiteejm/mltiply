@@ -1,3 +1,5 @@
+package com.wisr.mlsched;
+
 /**
  * GPU represents the location of GPU and
  * information about which job holds the GPU.

@@ -1,3 +1,5 @@
+package com.wisr.mlsched;
+
 public interface LossFunction {
   // y = f(x), where y is typically the normalized loss function value and x is the iteration number
   public double getValue(int iteration);

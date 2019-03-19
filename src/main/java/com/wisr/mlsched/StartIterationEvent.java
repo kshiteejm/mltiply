@@ -1,3 +1,5 @@
+package com.wisr.mlsched;
+
 public class StartIterationEvent extends ClusterEvent {
 
 	private IntraJobScheduler mJob;

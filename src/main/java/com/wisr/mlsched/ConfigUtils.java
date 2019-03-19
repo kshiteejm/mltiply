@@ -1,3 +1,5 @@
+package com.wisr.mlsched;
+
 import org.json.simple.JSONObject;
 
 public class ConfigUtils {

@@ -1,3 +1,5 @@
+package com.wisr.mlsched;
+
 import java.util.Random;
 
 public class SuperLinearLossFunction implements LossFunction {
