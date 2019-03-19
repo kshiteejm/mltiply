@@ -54,4 +54,15 @@ public class ConfigUtils {
 		// TODO: Write implementation
 		return null;
 	}
+	
+	/**
+	 * Given a workload configuration for a job,
+	 * return the start time for the job
+	 * @param workload_config, JSON representing workload configuration.
+	 * @return a double representing the start time.
+	 */
+	public static double getJobStartTime(JSONObject workload_config) {
+		// TODO: Write implementation
+		return 0.0;
+	}
 }

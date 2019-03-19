@@ -1,9 +1,12 @@
 package com.wisr.mlsched;
 
+/**
+ * Implementation of event when iteration ends for a job
+ */
 public class EndIterationEvent extends ClusterEvent {
 
 	private IntraJobScheduler mJob;
-	public EndIterationEvent(long timestamp, IntraJobScheduler job) {
+	public EndIterationEvent(double timestamp, IntraJobScheduler job) {
 		super(timestamp);
 		mJob = job;
 		setPriority(ClusterEvent.EventType.END_ITERATION);
@@ -11,6 +14,7 @@ public class EndIterationEvent extends ClusterEvent {
 
 	@Override
 	public void handleEvent() {
+		super.handleEvent();
 		mJob.endIteration();
 	}
 	

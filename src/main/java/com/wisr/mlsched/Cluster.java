@@ -23,7 +23,17 @@ public class Cluster {
 	 * @param config
 	 */
 	private Cluster(ClusterConfiguration config) {
-		mGpusInCluster = null; // TODO: Parse config and create List of GPUs
+		// Create GPUs based on configuration
+		mGpusInCluster = new ArrayList<GPU>();
+		for(int i=0;i<config.getRacks();i++) {
+			for(int j=0;j<config.getMachinesPerRack();j++) {
+				for(int k=0;k<config.getSlotsPerMachine();k++) {
+					for(int l=0;l<config.getGPUsPerSlot();l++) {
+						mGpusInCluster.add(new GPU(new GPULocation(l, k, j, i)));
+					}
+				}
+			}
+		}
 		mRunningJobs = new ArrayList<IntraJobScheduler>();
 		mPolicy = config.getPolicy();
 		mScheduler = InterJobSchedulerFactory.createInstance(mPolicy);
@@ -88,7 +98,7 @@ public class Cluster {
 	}
 	
 	/**
-	 * Get the instance of the inter-job scheduler
+	 * Get an instance of the inter-job scheduler
 	 * @return the singleton instance of InterJobScheduler
 	 */
 	public InterJobScheduler getScheduler() {

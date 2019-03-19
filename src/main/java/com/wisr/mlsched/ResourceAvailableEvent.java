@@ -2,10 +2,13 @@ package com.wisr.mlsched;
 
 import java.util.List;
 
+/**
+ * Implementation of event when resources are available.
+ */
 public class ResourceAvailableEvent extends ClusterEvent {
 
 	private List<GPU> mResources;
-	public ResourceAvailableEvent(long timestamp, List<GPU> resources) {
+	public ResourceAvailableEvent(double timestamp, List<GPU> resources) {
 		super(timestamp);
 		mResources = resources;
 		setPriority(ClusterEvent.EventType.RESOURCE_AVAILABLE);
@@ -13,6 +16,7 @@ public class ResourceAvailableEvent extends ClusterEvent {
 
 	@Override
 	public void handleEvent() {
+		super.handleEvent();
 		Cluster.getInstance().getScheduler().onResourceAvailable(mResources);
 	}
 	

@@ -11,8 +11,8 @@ import org.json.simple.JSONObject;
 public abstract class IntraJobScheduler {
 	// List of Job configurations
 	private int mJobId; // Unique identifier for this job
+	private double mJobStartTime; // Job start time
 	private int mTotalExpectedIterations; // Total number of iterations job is expected to run
-	private int mTotalIterationsRemaining; // Number of iterations of job remaining
 	private int mTimePerIteration; // Amount of time for a single iteration of job on 1 GPU
 	private int mMaxParallelism; // Represents max GPUs job can request
 	private int mRandomSeed; // Random seed for loss curve
@@ -22,20 +22,21 @@ public abstract class IntraJobScheduler {
 	private double mCrossRackSlowdown; // Slowdown due to network b/w GPUs across slots
 
 	// State management for job
-	private long mJobStartTime; // Job start time
+	private int mTotalIterationsRemaining; // Number of iterations of job remaining
 	private Set<GPU> mCurrentIterationGPUs; // GPUs for current iteration
 	private Set<GPU> mNextIterationGPUs; // GPUs allocated for next iteration
 	private boolean mIsWaiting; // Represents if job is waiting for resources
 	
 	public IntraJobScheduler(JSONObject config) {
 		// TODO: Parse configuration and assign to values
-		mJobStartTime = System.currentTimeMillis();
+		mJobStartTime = Simulation.getSimulationTime();
 		mCurrentIterationGPUs = new HashSet<GPU>();
 		mNextIterationGPUs = new HashSet<GPU>();
 		mIsWaiting = true;
 		List<GPU> availableResources = getResourcesAvailableInCluster();
 		if (!availableResources.isEmpty()) {
-			// TODO: Enqueue RA event with details of what resources are available
+			ClusterEventQueue.getInstance().enqueueEvent(
+					new ResourceAvailableEvent(Simulation.getSimulationTime(), availableResources));
 		}
 	}
 	
@@ -43,7 +44,9 @@ public abstract class IntraJobScheduler {
 		mCurrentIterationGPUs = new HashSet<GPU>(mNextIterationGPUs);
 		mNextIterationGPUs = new HashSet<GPU>();
 		// TODO: Sanity check if we have GPUs assigned before proceeding
-		// Enqueue EI event for time t=now+time_per_iteration/getJobSpeedup()
+		ClusterEventQueue.getInstance().enqueueEvent(
+				new EndIterationEvent(Simulation.getSimulationTime() 
+						+ mTimePerIteration/getJobSpeedup(), this));
 	}
 	
 	public void endIteration() {
@@ -51,7 +54,9 @@ public abstract class IntraJobScheduler {
 		if(mTotalIterationsRemaining == 0) {
 			// Job is done
 			List<GPU> relinquished_resources = relinquishAllResources();
-			// TODO: Enqueue RA event for relinquished_resources
+			// Make all relinquished resources available
+			ClusterEventQueue.getInstance().enqueueEvent(
+					new ResourceAvailableEvent(Simulation.getSimulationTime(), relinquished_resources));
 			Cluster.getInstance().removeJob(this);
 			// TODO: Record job statistics on job end
 			return;
@@ -67,16 +72,18 @@ public abstract class IntraJobScheduler {
 				mNextIterationGPUs.add(gpu);
 			}
 		}
-		// TODO: Enqueue RA event for expiredResources
+		ClusterEventQueue.getInstance().enqueueEvent(
+				new ResourceAvailableEvent(Simulation.getSimulationTime(), expiredResources));
 		if(mNextIterationGPUs.isEmpty()) {
 			mIsWaiting = true;
 		} else {
-			// TODO: Enqueue SI event for this job
+			ClusterEventQueue.getInstance().enqueueEvent(
+					new StartIterationEvent(Simulation.getSimulationTime(), this));
 		}
 	}
 	
 	public double getCurrentEstimate() {
-		return (System.currentTimeMillis() - mJobStartTime) + 
+		return (Simulation.getSimulationTime() - mJobStartTime) + 
 				(mTotalIterationsRemaining*mTimePerIteration)/getJobSpeedup();
 	}
 	

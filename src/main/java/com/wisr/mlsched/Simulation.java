@@ -4,7 +4,7 @@ import org.json.simple.JSONObject;
 
 public class Simulation {
 	
-	private static long mTime;
+	private static double mTime;
 	
 	public static void main(String args[]) {
 		String cluster_config_file = args[0];
@@ -24,18 +24,19 @@ public class Simulation {
 		
 		// Queue startup of jobs by start time
 		for(int i=0;i<workloadConfig.length;i++) {
-			// TODO: Enqueue JA for each job here
+			eventQueue.enqueueEvent(new JobArrivalEvent
+					(ConfigUtils.getJobStartTime(workloadConfig[i]), workloadConfig[i]));
 		}
 		
 		// Start processing
 		eventQueue.start();
 	}
 	
-	public static long getSimulationTime() {
+	public static double getSimulationTime() {
 		return mTime;
 	}
 	
-	public static void setSimulationTime(long time) {
+	public static void setSimulationTime(double time) {
 		mTime = time;
 	}
 }

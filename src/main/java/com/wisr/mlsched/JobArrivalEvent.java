@@ -8,7 +8,7 @@ import org.json.simple.JSONObject;
 public class JobArrivalEvent extends ClusterEvent {
 
 	private JSONObject mJobConfiguration; // Configuration
-	public JobArrivalEvent(long timestamp, JSONObject configuration) {
+	public JobArrivalEvent(double timestamp, JSONObject configuration) {
 		super(timestamp);
 		mJobConfiguration = configuration;
 		setPriority(ClusterEvent.EventType.JOB_ARRIVAL);
@@ -16,6 +16,7 @@ public class JobArrivalEvent extends ClusterEvent {
 
 	@Override
 	public void handleEvent() {
+		super.handleEvent();
 		IntraJobScheduler job = IntraJobSchedulerFactory.createInstance(mJobConfiguration, 
 				Cluster.getInstance().getPolicy());
 		Cluster.getInstance().addJob(job);

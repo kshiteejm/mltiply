@@ -4,7 +4,7 @@ package com.wisr.mlsched;
  * Generic cluster event which will be enqueued into event queue
  */
 public abstract class ClusterEvent {
-	private long mTimestamp; // Timestamp of event
+	private double mTimestamp; // Timestamp of event
 	private int mPriority; // When timestamps of two events are same, priority matters.
 	
 	public enum EventType {
@@ -18,21 +18,23 @@ public abstract class ClusterEvent {
 	 * Constuctor
 	 * @param timestamp
 	 */
-	public ClusterEvent(long timestamp) {
+	public ClusterEvent(double timestamp) {
 		mTimestamp = timestamp;
 	}
 	
 	/**
 	 * Returns the timestamp of event
 	 */
-	public long getTimestamp() {
+	public double getTimestamp() {
 		return mTimestamp;
 	}
 	
 	/**
 	 * Event handler for this event.
 	 */
-	public abstract void handleEvent();
+	public void handleEvent() {
+		Simulation.setSimulationTime(mTimestamp);
+	}
 	
 	/**
 	 * Getter for priority

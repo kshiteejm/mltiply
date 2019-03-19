@@ -8,8 +8,8 @@ public class GPU {
 	private final long NOT_LEASED = -1; // Constant for not leased
 	
 	private GPULocation mGpuLocation;
-	private long mLeaseStart; // Start time of GPU lease
-    private long mLeaseDurationMs; // Duration of GPU lease
+	private double mLeaseStart; // Start time of GPU lease
+    private double mLeaseDuration; // Duration of GPU lease
     private IntraJobScheduler mJobUsingGPU; // Job currently using the GPU
     
     /**
@@ -19,7 +19,7 @@ public class GPU {
     public GPU(GPULocation location) {
     	mGpuLocation = location;
     	mLeaseStart = NOT_LEASED;
-    	mLeaseDurationMs = NOT_LEASED;
+    	mLeaseDuration = NOT_LEASED;
     	mJobUsingGPU = null;
     }
     
@@ -28,10 +28,10 @@ public class GPU {
      * @param lease_duration_ms
      * @param job
      */
-    public void assignGPU(long lease_duration_ms, IntraJobScheduler job) {
+    public void assignGPU(double lease_duration, IntraJobScheduler job) {
     	// TODO: assert that already not leased to another job
-    	mLeaseDurationMs = lease_duration_ms;
-    	mLeaseStart = System.currentTimeMillis();
+    	mLeaseDuration = lease_duration;
+    	mLeaseStart = Simulation.getSimulationTime();
     	mJobUsingGPU = job;
     }
     
@@ -48,7 +48,7 @@ public class GPU {
      * @return true if leased has expired, false otherwise
      */
     public boolean hasLeaseExpired() {
-    	if (System.currentTimeMillis() > mLeaseStart + mLeaseDurationMs) {
+    	if (Simulation.getSimulationTime() > mLeaseStart + mLeaseDuration) {
     		return true;
     	}
     	return false;
@@ -75,7 +75,7 @@ public class GPU {
      */
     public void markLeaseEnd() {
     	mLeaseStart = NOT_LEASED;
-    	mLeaseDurationMs = NOT_LEASED;
+    	mLeaseDuration = NOT_LEASED;
     	mJobUsingGPU = null;
     }
 }
