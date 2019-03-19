@@ -1,6 +1,12 @@
 package com.wisr.mlsched;
 
+import java.io.FileReader;
+import java.io.IOException;
+
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 public class ConfigUtils {
 	/**
@@ -9,17 +15,27 @@ public class ConfigUtils {
 	 * @return JSONObject
 	 */
 	public static JSONObject getClusterConfig(String configFile) {
-		// TODO: Write implementation
+		JSONParser parser = new JSONParser();
+		try {
+			return (JSONObject) parser.parse(new FileReader(configFile));
+		} catch (IOException | ParseException e) {
+			e.printStackTrace();
+		}
 		return null;
 	}
 	
 	/**
 	 * Get workload configuration JSON from workload configuration file
 	 * @param configFile
-	 * @return array of JSONObject
+	 * @return JSONArray containing details are all workloads
 	 */
-	public static JSONObject[] getWorkloadConfigs(String workloadFile) {
-		// TODO: Write implementation
+	public static JSONArray getWorkloadConfigs(String workloadFile) {
+		JSONParser parser = new JSONParser();
+		try {
+			return (JSONArray) parser.parse(new FileReader(workloadFile));
+		} catch (IOException | ParseException e) {
+			e.printStackTrace();
+		}
 		return null;
 	}
 	
@@ -29,8 +45,12 @@ public class ConfigUtils {
 	 * @return ClusterConfiguration object
 	 */
 	public static ClusterConfiguration getClusterConfig(JSONObject config) {
-		// TODO: Write implementation
-		return null;
+		int racks = Integer.parseInt(getAttributeValue(config, "racks_in_cluster"));
+		int machines = Integer.parseInt(getAttributeValue(config, "machines_per_rack"));
+		int slots = Integer.parseInt(getAttributeValue(config, "slots_per_machines"));
+		int gpus = Integer.parseInt(getAttributeValue(config, "gpus_per_slot"));
+		String policy = getClusterPolicy(config);
+		return new ClusterConfiguration(racks, machines, slots, gpus, policy);
 	}
 	
 	/**
@@ -41,8 +61,8 @@ public class ConfigUtils {
 	 */
 	public static IntraJobScheduler createJob(JSONObject workload_config,
 			JSONObject cluster_config) {
-		// TODO: Write implementation
-		return null;
+		return IntraJobSchedulerFactory.createInstance(workload_config,
+				getClusterPolicy(cluster_config));
 	}
 	
 	/**
@@ -51,8 +71,7 @@ public class ConfigUtils {
 	 * @return string indicating the policy
 	 */
 	public static String getClusterPolicy(JSONObject config) {
-		// TODO: Write implementation
-		return null;
+		return getAttributeValue(config, "cluster_policy");
 	}
 	
 	/**
@@ -62,7 +81,14 @@ public class ConfigUtils {
 	 * @return a double representing the start time.
 	 */
 	public static double getJobStartTime(JSONObject workload_config) {
-		// TODO: Write implementation
-		return 0.0;
+		return Double.parseDouble(getAttributeValue
+				(workload_config, "start_time"));
+	}
+	
+	/**
+	 * Return an attribute value given a key and a JSON configuration
+	 */
+	public static String getAttributeValue(JSONObject object, String attribute) {
+		return (String) object.get(attribute);
 	}
 }

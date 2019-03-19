@@ -1,5 +1,6 @@
 package com.wisr.mlsched;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 public class Simulation {
@@ -12,7 +13,7 @@ public class Simulation {
 		
 		// Get the configurations
 		JSONObject clusterConfig = ConfigUtils.getClusterConfig(cluster_config_file);
-		JSONObject[] workloadConfig = ConfigUtils.getWorkloadConfigs(workload_config_file);
+		JSONArray workloadConfig = ConfigUtils.getWorkloadConfigs(workload_config_file);
 		
 		// Initialize simulator time
 		mTime = 0;
@@ -22,10 +23,10 @@ public class Simulation {
 		
 		ClusterEventQueue eventQueue = ClusterEventQueue.getInstance();
 		
-		// Queue startup of jobs by start time
-		for(int i=0;i<workloadConfig.length;i++) {
+		for(Object object : workloadConfig) {
+			JSONObject config = (JSONObject) object;
 			eventQueue.enqueueEvent(new JobArrivalEvent
-					(ConfigUtils.getJobStartTime(workloadConfig[i]), workloadConfig[i]));
+					(ConfigUtils.getJobStartTime(config), config));
 		}
 		
 		// Start processing
