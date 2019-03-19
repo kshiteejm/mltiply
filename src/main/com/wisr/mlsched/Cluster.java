@@ -13,6 +13,7 @@ public class Cluster {
 	private List<GPU> mGpusInCluster; // List of GPUs belong to cluster
 	private List<IntraJobScheduler> mRunningJobs; // List of running jobs in cluster
 	private InterJobScheduler mScheduler; // Instance of inter-job scheduler
+	private String mPolicy; // Policy of Cluster
 
 	private static Cluster sInstance = null; // Singleton Instance of Cluster
 
@@ -24,7 +25,8 @@ public class Cluster {
 	private Cluster(ClusterConfiguration config) {
 		mGpusInCluster = null; // TODO: Parse config and create List of GPUs
 		mRunningJobs = new ArrayList<IntraJobScheduler>();
-		mScheduler = null; // TODO: Create instance of inter-job scheduler based on config
+		mPolicy = config.getPolicy();
+		mScheduler = InterJobSchedulerFactory.createInstance(mPolicy);
 	}
 	
 	/**
@@ -91,5 +93,13 @@ public class Cluster {
 	 */
 	public InterJobScheduler getScheduler() {
 		return mScheduler;
+	}
+	
+	/**
+	 * Returns the policy with which the cluster is operating
+	 * @return
+	 */
+	public String getPolicy() {
+		return mPolicy;
 	}
 }

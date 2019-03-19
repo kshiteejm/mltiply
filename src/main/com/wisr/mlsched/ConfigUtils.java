@@ -42,4 +42,14 @@ public class ConfigUtils {
 		// TODO: Write implementation
 		return null;
 	}
+	
+	/**
+	 * Given the cluster configuration JSON, returns the policy
+	 * @param config
+	 * @return string indicating the policy
+	 */
+	public static String getClusterPolicy(JSONObject config) {
+		// TODO: Write implementation
+		return null;
+	}
 }

@@ -12,13 +12,14 @@ public class Simulation {
 		// Initialize cluster
 		Cluster cluster = Cluster.createCluster(clusterConfig);
 		
-		// TODO: Initialize event queue
+		ClusterEventQueue eventQueue = ClusterEventQueue.getInstance();
 		
 		// Queue startup of jobs by start time
 		for(int i=0;i<workloadConfig.length;i++) {
-			// Enqueue JA for each job here
+			// TODO: Enqueue JA for each job here
 		}
 		
-		// Start event queue and block till all events are processed
+		// Start processing
+		eventQueue.start();
 	}
 }

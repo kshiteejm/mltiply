@@ -50,7 +50,7 @@ public abstract class IntraJobScheduler {
 		if(mTotalIterationsRemaining == 0) {
 			// Job is done
 			List<GPU> relinquished_resources = relinquishAllResources();
-			// Enqueue RA event for relinquished_resources
+			// TODO: Enqueue RA event for relinquished_resources
 			Cluster.getInstance().removeJob(this);
 			// TODO: Record job statistics on job end
 			return;
@@ -66,11 +66,11 @@ public abstract class IntraJobScheduler {
 				mNextIterationGPUs.add(gpu);
 			}
 		}
-		// Enqueue RA event for expiredResources
+		// TODO: Enqueue RA event for expiredResources
 		if(mNextIterationGPUs.isEmpty()) {
 			mIsWaiting = true;
 		} else {
-			// Enqueue SI event for this job
+			// TODO: Enqueue SI event for this job
 		}
 	}
 	
