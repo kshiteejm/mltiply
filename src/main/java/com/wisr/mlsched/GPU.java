@@ -1,5 +1,8 @@
 package com.wisr.mlsched;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  * GPU represents the location of GPU and
  * information about which job holds the GPU.
@@ -11,6 +14,7 @@ public class GPU {
 	private double mLeaseStart; // Start time of GPU lease
     private double mLeaseDuration; // Duration of GPU lease
     private IntraJobScheduler mJobUsingGPU; // Job currently using the GPU
+    private static Logger sLog; // Instance of logger
     
     /**
      * Constructor for GPU object
@@ -21,6 +25,9 @@ public class GPU {
     	mLeaseStart = NOT_LEASED;
     	mLeaseDuration = NOT_LEASED;
     	mJobUsingGPU = null;
+    	sLog = Logger.getLogger(Cluster.class.getSimpleName());
+		sLog.setLevel(Simulation.getLogLevel());
+		sLog.log(Level.ALL, "Created new GPU " + location.getPrettyString());
     }
     
     /**
@@ -30,6 +37,9 @@ public class GPU {
      */
     public void assignGPU(double lease_duration, IntraJobScheduler job) {
     	// TODO: assert that already not leased to another job
+    	sLog.info("Assigning GPU " + mGpuLocation.getPrettyString() + " to job " 
+    			+ Integer.toString(job.getJobId()) + " for lease " 
+    			+ Double.toString(lease_duration));
     	mLeaseDuration = lease_duration;
     	mLeaseStart = Simulation.getSimulationTime();
     	mJobUsingGPU = job;
@@ -74,6 +84,8 @@ public class GPU {
      * Mark this GPU as not belonging to any job.
      */
     public void markLeaseEnd() {
+    	sLog.info("Marking lease ended for GPU " + mGpuLocation.getPrettyString()
+    		+ " for job " + mJobUsingGPU.getJobId());
     	mLeaseStart = NOT_LEASED;
     	mLeaseDuration = NOT_LEASED;
     	mJobUsingGPU = null;

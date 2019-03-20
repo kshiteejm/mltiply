@@ -1,6 +1,8 @@
 package com.wisr.mlsched;
 
 import java.util.List;
+import java.util.logging.Logger;
+
 import org.json.simple.JSONObject;
 import java.util.ArrayList;
 
@@ -14,8 +16,10 @@ public class Cluster {
 	private List<IntraJobScheduler> mRunningJobs; // List of running jobs in cluster
 	private InterJobScheduler mScheduler; // Instance of inter-job scheduler
 	private String mPolicy; // Policy of Cluster
+	private double mLeaseTime; // Lease time policy for GPUs within cluster
 
 	private static Cluster sInstance = null; // Singleton Instance of Cluster
+	private static Logger sLog; // Instance of logger
 
 	/**
 	 * Creates an instance of the required cluster from the given configuration.
@@ -36,7 +40,12 @@ public class Cluster {
 		}
 		mRunningJobs = new ArrayList<IntraJobScheduler>();
 		mPolicy = config.getPolicy();
+		mLeaseTime = config.getLeaseTime();
 		mScheduler = InterJobSchedulerFactory.createInstance(mPolicy);
+		sLog = Logger.getLogger(Cluster.class.getSimpleName());
+		sLog.setLevel(Simulation.getLogLevel());
+		sLog.info("Created cluster with " + Integer.toString(mGpusInCluster.size()) 
+			+ " GPUs and with " + mPolicy + " policy");
 	}
 	
 	/**
@@ -85,6 +94,7 @@ public class Cluster {
 	 * @param job
 	 */
 	public void addJob(IntraJobScheduler job) {
+		sLog.info("Adding job "+ Integer.toString(job.getJobId()) + " to cluster");
 		mRunningJobs.add(job);
 	}
 	
@@ -94,6 +104,7 @@ public class Cluster {
 	 */
 	public void removeJob(IntraJobScheduler job) {
 		// TODO: Sanity checking. Review return type
+		sLog.info("Removing job "+ Integer.toString(job.getJobId()) + " from cluster");
 		mRunningJobs.remove(job);
 	}
 	
@@ -111,5 +122,13 @@ public class Cluster {
 	 */
 	public String getPolicy() {
 		return mPolicy;
+	}
+	
+	/**
+	 * Returns the lease time policy for this cluster
+	 * @return double representing the lease time
+	 */
+	public double getLeaseTime() {
+		return mLeaseTime;
 	}
 }

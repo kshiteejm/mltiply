@@ -50,4 +50,15 @@ public class GPULocation {
     public int getRackId() {
     	return mRackId;
     }
+    
+    /**
+     * Returns a pretty string representation of the GPU location
+     */
+    public String getPrettyString() {
+    	return "(Rack,Machine,Slot,GPUID):" +
+			Integer.toString(mRackId) + "," +
+			Integer.toString(mMachineId) + "," +
+			Integer.toString(mSlotId) + "," +
+			Integer.toString(mGpuId);
+    }
 }

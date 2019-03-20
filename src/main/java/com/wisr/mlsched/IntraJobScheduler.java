@@ -6,6 +6,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.json.simple.JSONObject;
 
 public abstract class IntraJobScheduler {
@@ -26,10 +29,14 @@ public abstract class IntraJobScheduler {
 	private Set<GPU> mCurrentIterationGPUs; // GPUs for current iteration
 	private Set<GPU> mNextIterationGPUs; // GPUs allocated for next iteration
 	private boolean mIsWaiting; // Represents if job is waiting for resources
+	private static Logger sLog; // Instance of logger
 
 	public IntraJobScheduler(JSONObject config) {
 		initFromConfig(config);
 		mJobStartTime = Simulation.getSimulationTime();
+		sLog = Logger.getLogger(Cluster.class.getSimpleName());
+		sLog.setLevel(Simulation.getLogLevel());
+		sLog.info("Starting job " + Integer.toString(mJobId));
 		mCurrentIterationGPUs = new HashSet<GPU>();
 		mNextIterationGPUs = new HashSet<GPU>();
 		mIsWaiting = true;
@@ -41,6 +48,7 @@ public abstract class IntraJobScheduler {
 	}
 
 	public void startIteration() {
+		sLog.log(Level.ALL, "Starting new iteration for job " + Integer.toString(mJobId));
 		mCurrentIterationGPUs = new HashSet<GPU>(mNextIterationGPUs);
 		mNextIterationGPUs = new HashSet<GPU>();
 		mIsWaiting = false;
@@ -50,9 +58,11 @@ public abstract class IntraJobScheduler {
 	}
 
 	public void endIteration() {
+		sLog.log(Level.ALL, "End iteration for job " + Integer.toString(mJobId));
 		mTotalIterationsRemaining--;
 		if (mTotalIterationsRemaining == 0) {
 			// Job is done
+			sLog.info("Job " + Integer.toString(mJobId) + " done");
 			List<GPU> relinquished_resources = relinquishAllResources();
 			// Make all relinquished resources available
 			ClusterEventQueue.getInstance()
@@ -68,6 +78,7 @@ public abstract class IntraJobScheduler {
 			GPU gpu = currentGPUIterator.next();
 			if (gpu.hasLeaseExpired()) {
 				expiredResources.add(gpu);
+				gpu.markLeaseEnd();
 			} else {
 				mNextIterationGPUs.add(gpu);
 			}
@@ -100,6 +111,10 @@ public abstract class IntraJobScheduler {
 
 	public double getJobSpeedup() {
 		return mCurrentIterationGPUs.size() * getPlacementSlowdown();
+	}
+	
+	public int getJobId() {
+		return mJobId;
 	}
 
 	public double getPlacementSlowdown() {

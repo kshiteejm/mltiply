@@ -47,10 +47,11 @@ public class ConfigUtils {
 	public static ClusterConfiguration getClusterConfig(JSONObject config) {
 		int racks = Integer.parseInt(getAttributeValue(config, "racks_in_cluster"));
 		int machines = Integer.parseInt(getAttributeValue(config, "machines_per_rack"));
-		int slots = Integer.parseInt(getAttributeValue(config, "slots_per_machines"));
+		int slots = Integer.parseInt(getAttributeValue(config, "slots_per_machine"));
 		int gpus = Integer.parseInt(getAttributeValue(config, "gpus_per_slot"));
+		double lease_time = Double.parseDouble(getAttributeValue(config, "lease_time"));
 		String policy = getClusterPolicy(config);
-		return new ClusterConfiguration(racks, machines, slots, gpus, policy);
+		return new ClusterConfiguration(racks, machines, slots, gpus, policy, lease_time);
 	}
 	
 	/**

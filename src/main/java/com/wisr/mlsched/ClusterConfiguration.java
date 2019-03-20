@@ -9,14 +9,20 @@ public class ClusterConfiguration {
 	private int mSlotsPerMachine;
 	private int mGPUsPerSlot;
 	private String mPolicy;
+	private double mLeaseTime;
 	
 	public ClusterConfiguration(int racks, int machines_per_rack,
-			int slots_per_machine, int gpus_per_slot, String policy) {
+			int slots_per_machine, int gpus_per_slot, String policy, double lease) {
 		mRacks = racks;
 		mMachinesPerRack = machines_per_rack;
 		mSlotsPerMachine = slots_per_machine;
 		mGPUsPerSlot = gpus_per_slot;
 		mPolicy = policy;
+		mLeaseTime = lease;
+	}
+	
+	public double getLeaseTime() {
+		return mLeaseTime;
 	}
 	
 	public int getRacks() {
