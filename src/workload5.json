@@ -1,0 +1,26 @@
+{
+  "numGPUs": 6,
+  "schedPolicy": "optimus",
+  "jobs": [
+    {
+      "arrivalTime": 0,
+      "numIterations": 10,
+      "serialIterDuration": 1,
+      "lossFunction": "sublinear",
+      "synchronicity": "synchronous",
+      "workerResourceRequirement": 1,
+      "parameterServerResourceRequirement": 1,
+      "numJobs": 1
+    },
+    {
+      "arrivalTime": 2,
+      "numIterations": 10,
+      "serialIterDuration": 1,
+      "lossFunction": "superlinear",
+      "synchronicity": "synchronous",
+      "workerResourceRequirement": 1,
+      "parameterServerResourceRequirement": 1,
+      "numJobs": 1
+    }
+  ]
+}

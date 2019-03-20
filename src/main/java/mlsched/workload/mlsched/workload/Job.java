@@ -2,6 +2,8 @@ package mlsched.workload;
 
 import mlsched.utils.SublinearFunction;
 import mlsched.utils.SuperlinearFunction;
+import mlsched.utils.SynchronousTrainingSpeedFunction;
+import mlsched.utils.TrainingSpeedFunction;
 import mlsched.scheduler.IntraJobScheduler;
 import mlsched.utils.Function;
 
@@ -37,14 +39,21 @@ public class Job {
 	public int maxParallelism;
 	public int minParallelism = 1;
 	public State jobState = State.WAITING_FOR_RESOURCES;
-	public int epochNumber = 0;
 	public double predLossRed = 0;
+	public TrainingSpeedFunction trainingSpeedFunction;
+	public int workerResourceRequirement; // TODO: just considering one resource for now
+	public int parameterServerResourceRequirement;
+	public int numWorkersAllocated = 0;
+	public int parameterServersAllocated = 0;
+	public int numWorkersShare = 0;
+	public int numParameterServersShare = 0;
+	public double marginalGain = 0;
 	
 	// A job will be submitted by the user. It has to run for n iterations
 	// and serialIterationDuration captures the runtime of this task when it
 	// runs serially.
 	public Job(int jobId, int numIterations, double serialIterationDuration, 
-			int maxParallelism, String lossFunction) {
+			int maxParallelism, String lossFunction, String synchronicity) {
 		this.jobId = jobId;
 		this.numIterations = numIterations;
 		currIterationNum = 0;
@@ -53,6 +62,11 @@ public class Job {
 			this.lossFunction = SublinearFunction.getRandomSublinearFunction(numIterations);
 		} else {
 			this.lossFunction = SuperlinearFunction.getRandomSuperlinearFunction(numIterations);
+		}
+		if (synchronicity.equals("synchronous")) {
+			this.trainingSpeedFunction = new SynchronousTrainingSpeedFunction();
+		} else {
+//			this.trainingSpeedFunction = new AsynchronousTrainingSpeedFunction();
 		}
 		logicalFairShare = 0;
 		currIterAllocation = 0;
