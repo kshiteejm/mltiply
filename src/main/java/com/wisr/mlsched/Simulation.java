@@ -37,6 +37,9 @@ public class Simulation {
 		
 		// Start processing
 		eventQueue.start();
+		
+		// Print out statistics
+		JobStatistics.getInstance().printStats();
 	}
 	
 	public static double getSimulationTime() {

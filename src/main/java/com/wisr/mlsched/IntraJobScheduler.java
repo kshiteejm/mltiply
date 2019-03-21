@@ -42,6 +42,7 @@ public abstract class IntraJobScheduler {
 		mNextIterationExpectedGPUs = new HashSet<GPU>();
 		mNextIterationGPUs = new HashSet<GPU>();
 		mIsWaiting = true;
+		JobStatistics.getInstance().recordJobStart(mJobId, Simulation.getSimulationTime());
 		List<GPU> availableResources = getResourcesAvailableInCluster();
 		if (!availableResources.isEmpty()) {
 			ClusterEventQueue.getInstance()
@@ -79,6 +80,7 @@ public abstract class IntraJobScheduler {
 			ClusterEventQueue.getInstance()
 					.enqueueEvent(new ResourceAvailableEvent(Simulation.getSimulationTime(), relinquished_resources));
 			Cluster.getInstance().removeJob(this);
+			JobStatistics.getInstance().recordJobEnd(mJobId, Simulation.getSimulationTime());
 			// TODO: Record job statistics on job end
 			return;
 		}

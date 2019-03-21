@@ -78,7 +78,7 @@ public class ClusterEventQueue {
 				return e1.getPriority() - e2.getPriority();
 			}
 			// If everything is same, then random ordering
-			return -1;
+			return 1;
 		}
 	}
 }

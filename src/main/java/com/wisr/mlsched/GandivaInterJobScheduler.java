@@ -9,7 +9,6 @@ public class GandivaInterJobScheduler extends InterJobScheduler {
 
 	@Override
 	public void onResourceAvailable(List<GPU> gpu_set) {
-		// TODO: Implement
 		if(Cluster.getInstance().getRunningJobs().size() == 0) {
 			// Means no jobs are running, hence nothing to do
 			return;
