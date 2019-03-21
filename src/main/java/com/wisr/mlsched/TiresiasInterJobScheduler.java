@@ -6,7 +6,7 @@ public class TiresiasInterJobScheduler extends InterJobScheduler {
 
 	@Override
 	public void onResourceAvailable(List<GPU> gpu_set) {
-		// TODO: Implement
+		perGPUResourceAllocator(gpu_set);
 	}
 	
 }

@@ -1,7 +1,6 @@
 package com.wisr.mlsched;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -26,7 +25,7 @@ public abstract class IntraJobScheduler {
 
 	// State management for job
 	protected int mTotalIterationsRemaining; // Number of iterations of job remaining
-	private Set<GPU> mCurrentIterationGPUs; // GPUs for current iteration
+	protected Set<GPU> mCurrentIterationGPUs; // GPUs for current iteration
 	private Set<GPU> mNextIterationExpectedGPUs; // GPUs we expect from current iteration to be used for next iteration
 	protected Set<GPU> mNextIterationGPUs; // GPUs allocated for next iteration
 	private boolean mIsWaiting; // Represents if job is waiting for resources
@@ -81,7 +80,6 @@ public abstract class IntraJobScheduler {
 					.enqueueEvent(new ResourceAvailableEvent(Simulation.getSimulationTime(), relinquished_resources));
 			Cluster.getInstance().removeJob(this);
 			JobStatistics.getInstance().recordJobEnd(mJobId, Simulation.getSimulationTime());
-			// TODO: Record job statistics on job end
 			return;
 		}
 		// Job has iterations left
@@ -96,8 +94,11 @@ public abstract class IntraJobScheduler {
 				mNextIterationGPUs.add(gpu);
 			}
 		}
-		ClusterEventQueue.getInstance()
-				.enqueueEvent(new ResourceAvailableEvent(Simulation.getSimulationTime(), expiredResources));
+		if(!expiredResources.isEmpty()) {
+			ClusterEventQueue.getInstance()
+			.enqueueEvent(new ResourceAvailableEvent(Simulation.getSimulationTime(), expiredResources));
+		}
+		
 		if (mNextIterationGPUs.isEmpty()) {
 			mIsWaiting = true;
 		} else {
