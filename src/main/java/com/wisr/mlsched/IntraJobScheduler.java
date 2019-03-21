@@ -15,7 +15,7 @@ public abstract class IntraJobScheduler {
 	// List of Job configurations
 	private int mJobId; // Unique identifier for this job
 	private double mJobStartTime; // Job start time
-	private int mTotalExpectedIterations; // Total number of iterations job is expected to run
+	protected int mTotalExpectedIterations; // Total number of iterations job is expected to run
 	private double mTimePerIteration; // Amount of time for a single iteration of job on 1 GPU
 	protected int mMaxParallelism; // Represents max GPUs job can request
 	private int mRandomSeed; // Random seed for loss curve
@@ -25,7 +25,7 @@ public abstract class IntraJobScheduler {
 	private double mCrossRackSlowdown; // Slowdown due to network b/w GPUs across slots
 
 	// State management for job
-	private int mTotalIterationsRemaining; // Number of iterations of job remaining
+	protected int mTotalIterationsRemaining; // Number of iterations of job remaining
 	private Set<GPU> mCurrentIterationGPUs; // GPUs for current iteration
 	private Set<GPU> mNextIterationExpectedGPUs; // GPUs we expect from current iteration to be used for next iteration
 	protected Set<GPU> mNextIterationGPUs; // GPUs allocated for next iteration
@@ -117,6 +117,10 @@ public abstract class IntraJobScheduler {
 	public double getLossGradient() {
 		return mLossCurve.getSlope(mTotalExpectedIterations - mTotalIterationsRemaining);
 	}
+	
+	public double getLoss(int iteration) {
+		return mLossCurve.getValue(iteration);
+	}
 
 	public void notifyResourceAssignment(List<GPU> assignment) {
 		sLog.info("Job " + Integer.toString(mJobId) + " got resources"); 
@@ -177,11 +181,11 @@ public abstract class IntraJobScheduler {
 		return mNextIterationGPUs.size() > 0;
 	}
 	
-	protected int getNumGPUsAvailableForNextIteration() {
+	protected Set<GPU> getGPUsAvailableForNextIteration() {
 		Set<GPU> set = new HashSet<GPU>(mNextIterationGPUs);
 		// Now add all GPUs to this set which will not expire after the iteration
 		set.addAll(mNextIterationExpectedGPUs);
-		return set.size();
+		return set;
 	}
 
 	public abstract List<Bid> prepareBid(List<GPU> offeredGPUs);
