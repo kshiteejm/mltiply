@@ -14,6 +14,7 @@ public abstract class InterJobScheduler {
 			if(job.isWaitingForResources() && job.hasResourcesForNextIteration()) {
 				ClusterEventQueue.getInstance().enqueueEvent(
 						new StartIterationEvent(Simulation.getSimulationTime(), job));
+				job.notifyResourceAvailable();
 			}
 		}
 	}

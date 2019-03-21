@@ -16,19 +16,30 @@ public class GandivaInterJobScheduler extends InterJobScheduler {
 		}
 		for(GPU gpu : gpu_set) {
 			// Put this GPU up for auction by getting bids from jobs
+			if(gpu.isLeased()) {
+				// Already leased.
+				continue;
+			}
 			List<Bid> bids = new ArrayList<Bid>();
 			List<GPU> gpuList = new ArrayList<GPU>();
 			gpuList.add(gpu);
 			List<IntraJobScheduler> jobs = Cluster.getInstance().getRunningJobs();
 			for(IntraJobScheduler job : jobs) {
-				bids.addAll(job.prepareBid(gpuList));
+				List<Bid> bidsFromJob = job.prepareBid(gpuList);
+				if(bidsFromJob != null && !bidsFromJob.isEmpty()) {
+					bids.addAll(bidsFromJob);
+				}
+			}
+			if(bids.size() == 0) {
+				// No bids. All jobs must be running at full capacity
+				continue;
 			}
 			Collections.sort(bids, new GandivaBidComparator());
 			Bid winningBid = bids.get(0); // Select the winner
 			winningBid.getJob().notifyResourceAssignment(gpuList);
 			gpu.assignGPU(Cluster.getInstance().getLeaseTime(), winningBid.getJob());
-			startWaitingJobs();
 		}
+		startWaitingJobs();
 	}
 	
 	private class GandivaBidComparator implements Comparator<Bid> {

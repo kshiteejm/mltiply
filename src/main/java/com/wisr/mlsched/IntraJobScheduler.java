@@ -17,7 +17,7 @@ public abstract class IntraJobScheduler {
 	private double mJobStartTime; // Job start time
 	private int mTotalExpectedIterations; // Total number of iterations job is expected to run
 	private double mTimePerIteration; // Amount of time for a single iteration of job on 1 GPU
-	private int mMaxParallelism; // Represents max GPUs job can request
+	protected int mMaxParallelism; // Represents max GPUs job can request
 	private int mRandomSeed; // Random seed for loss curve
 	private LossFunction mLossCurve; // Representation of loss curve
 	private double mCrossSlotSlowdown; // Slowdown due to network b/w GPUs across slots
@@ -27,6 +27,7 @@ public abstract class IntraJobScheduler {
 	// State management for job
 	private int mTotalIterationsRemaining; // Number of iterations of job remaining
 	private Set<GPU> mCurrentIterationGPUs; // GPUs for current iteration
+	private Set<GPU> mNextIterationExpectedGPUs; // GPUs we expect from current iteration to be used for next iteration
 	protected Set<GPU> mNextIterationGPUs; // GPUs allocated for next iteration
 	private boolean mIsWaiting; // Represents if job is waiting for resources
 	private static Logger sLog; // Instance of logger
@@ -38,6 +39,7 @@ public abstract class IntraJobScheduler {
 		sLog.setLevel(Simulation.getLogLevel());
 		sLog.info("Starting job " + Integer.toString(mJobId));
 		mCurrentIterationGPUs = new HashSet<GPU>();
+		mNextIterationExpectedGPUs = new HashSet<GPU>();
 		mNextIterationGPUs = new HashSet<GPU>();
 		mIsWaiting = true;
 		List<GPU> availableResources = getResourcesAvailableInCluster();
@@ -48,13 +50,21 @@ public abstract class IntraJobScheduler {
 	}
 
 	public void startIteration() {
-		sLog.log(Level.ALL, "Starting iteration for job " + Integer.toString(mJobId));
+		sLog.log(Level.INFO, "Starting iteration for job " + Integer.toString(mJobId));
 		mCurrentIterationGPUs = new HashSet<GPU>(mNextIterationGPUs);
 		mNextIterationGPUs = new HashSet<GPU>();
 		mIsWaiting = false;
 		// TODO: Sanity check if we have GPUs assigned before proceeding
 		ClusterEventQueue.getInstance().enqueueEvent(
 				new EndIterationEvent(Simulation.getSimulationTime() + mTimePerIteration / getJobSpeedup(), this));
+		Iterator<GPU> gpuIter = mCurrentIterationGPUs.iterator();
+		mNextIterationExpectedGPUs = new HashSet<GPU>();
+		while(gpuIter.hasNext()) {
+			GPU gpu = gpuIter.next();
+			if(gpu.getLeaseEnd() > Simulation.getSimulationTime() + mTimePerIteration / getJobSpeedup()) {
+				mNextIterationExpectedGPUs.add(gpu);
+			}
+		}
 	}
 
 	public void endIteration() {
@@ -110,6 +120,10 @@ public abstract class IntraJobScheduler {
 		sLog.info("Job " + Integer.toString(mJobId) + " got resources"); 
 		mNextIterationGPUs.addAll(assignment);
 	}
+	
+	public void notifyResourceAvailable() {
+		mIsWaiting = false;
+	}
 
 	public double getJobSpeedup() {
 		return mCurrentIterationGPUs.size() * getPlacementSlowdown(mCurrentIterationGPUs);
@@ -160,6 +174,13 @@ public abstract class IntraJobScheduler {
 	public boolean hasResourcesForNextIteration() {
 		return mNextIterationGPUs.size() > 0;
 	}
+	
+	protected int getNumGPUsAvailableForNextIteration() {
+		Set<GPU> set = new HashSet<GPU>(mNextIterationGPUs);
+		// Now add all GPUs to this set which will not expire after the iteration
+		set.addAll(mNextIterationExpectedGPUs);
+		return set.size();
+	}
 
 	public abstract List<Bid> prepareBid(List<GPU> offeredGPUs);
 
@@ -169,7 +190,7 @@ public abstract class IntraJobScheduler {
 		Iterator<GPU> gpuIterator = gpus.iterator();
 		while (gpuIterator.hasNext()) {
 			GPU gpu = gpuIterator.next();
-			if (gpu.getJob().equals(this)) {
+			if (gpu.getJob() != null && gpu.getJob().equals(this)) {
 				releasedResources.add(gpu);
 				gpu.markLeaseEnd();
 			}

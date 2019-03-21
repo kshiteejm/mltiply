@@ -22,6 +22,10 @@ public class GandivaIntraJobScheduler extends IntraJobScheduler {
 	public List<Bid> prepareBid(List<GPU> offeredGPUs) {
 		// TODO: Implement
 		// We should get a bid only 1 GPU at a time
+		if(getNumGPUsAvailableForNextIteration() >= mMaxParallelism) {
+			// Already have enough GPUs. No need to bid
+			return null;
+		}
 		if(offeredGPUs.size() != 1) {
 			sLog.severe("Offered incorrect # GPUs: " + 
 					Integer.toString(offeredGPUs.size()));

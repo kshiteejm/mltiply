@@ -40,7 +40,7 @@ public class ClusterEventQueue {
 	 * @param event
 	 */
 	public void enqueueEvent(ClusterEvent event) {
-		//sLog.log(Level.ALL, "Enqueuing event " + event.toString());
+		sLog.log(Level.INFO, "Enqueuing event " + event.toString() + " with timestamp " + event.getTimestamp());
 		mEventQueue.add(event);
 	}
 	
@@ -74,7 +74,11 @@ public class ClusterEventQueue {
 				}
 			}
 			// If timestamps are same, then priority comes into picture
-			return e1.getPriority() - e2.getPriority();
+			if(e1.getPriority() != e2.getPriority()) {
+				return e1.getPriority() - e2.getPriority();
+			}
+			// If everything is same, then random ordering
+			return -1;
 		}
 	}
 }

@@ -90,4 +90,11 @@ public class GPU {
     	mLeaseDuration = NOT_LEASED;
     	mJobUsingGPU = null;
     }
+    
+    /**
+     * Return the lease end time for this GPU.
+     */
+    public double getLeaseEnd() {
+    	return mLeaseStart + mLeaseDuration;
+    }
 }

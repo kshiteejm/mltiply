@@ -1,8 +1,8 @@
 {
-	"racks_in_cluster" : "4",
-	"machines_per_rack" : "4",
-	"slots_per_machine" : "4",
-	"gpus_per_slot" : "2",
+	"racks_in_cluster" : "1",
+	"machines_per_rack" : "1",
+	"slots_per_machine" : "1",
+	"gpus_per_slot" : "4",
 	"cluster_policy" : "Gandiva"
 	"lease_time" : "25"
 }
