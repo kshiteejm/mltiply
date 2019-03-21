@@ -3,6 +3,6 @@
 	"machines_per_rack" : "4",
 	"slots_per_machine" : "4",
 	"gpus_per_slot" : "2",
-	"cluster_policy" : "SLAQ"
+	"cluster_policy" : "Gandiva"
 	"lease_time" : "25"
 }

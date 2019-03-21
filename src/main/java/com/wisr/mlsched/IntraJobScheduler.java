@@ -27,7 +27,7 @@ public abstract class IntraJobScheduler {
 	// State management for job
 	private int mTotalIterationsRemaining; // Number of iterations of job remaining
 	private Set<GPU> mCurrentIterationGPUs; // GPUs for current iteration
-	private Set<GPU> mNextIterationGPUs; // GPUs allocated for next iteration
+	protected Set<GPU> mNextIterationGPUs; // GPUs allocated for next iteration
 	private boolean mIsWaiting; // Represents if job is waiting for resources
 	private static Logger sLog; // Instance of logger
 
@@ -48,7 +48,7 @@ public abstract class IntraJobScheduler {
 	}
 
 	public void startIteration() {
-		sLog.log(Level.ALL, "Starting new iteration for job " + Integer.toString(mJobId));
+		sLog.log(Level.ALL, "Starting iteration for job " + Integer.toString(mJobId));
 		mCurrentIterationGPUs = new HashSet<GPU>(mNextIterationGPUs);
 		mNextIterationGPUs = new HashSet<GPU>();
 		mIsWaiting = false;
@@ -60,6 +60,7 @@ public abstract class IntraJobScheduler {
 	public void endIteration() {
 		sLog.log(Level.ALL, "End iteration for job " + Integer.toString(mJobId));
 		mTotalIterationsRemaining--;
+		sLog.info("Iterations Remaning: " + Integer.toString(mTotalIterationsRemaining));
 		if (mTotalIterationsRemaining == 0) {
 			// Job is done
 			sLog.info("Job " + Integer.toString(mJobId) + " done");
@@ -106,20 +107,21 @@ public abstract class IntraJobScheduler {
 	}
 
 	public void notifyResourceAssignment(List<GPU> assignment) {
+		sLog.info("Job " + Integer.toString(mJobId) + " got resources"); 
 		mNextIterationGPUs.addAll(assignment);
 	}
 
 	public double getJobSpeedup() {
-		return mCurrentIterationGPUs.size() * getPlacementSlowdown();
+		return mCurrentIterationGPUs.size() * getPlacementSlowdown(mCurrentIterationGPUs);
 	}
 	
 	public int getJobId() {
 		return mJobId;
 	}
 
-	public double getPlacementSlowdown() {
+	public double getPlacementSlowdown(Set<GPU> gpus) {
 		HashSet<Integer> map = new HashSet<Integer>();
-		Iterator<GPU> gpuIter = mCurrentIterationGPUs.iterator();
+		Iterator<GPU> gpuIter = gpus.iterator();
 		// Check if across racks
 		while (gpuIter.hasNext()) {
 			GPU gpu = gpuIter.next();
@@ -130,7 +132,7 @@ public abstract class IntraJobScheduler {
 		}
 		// Check if across machines
 		map = new HashSet<Integer>();
-		gpuIter = mCurrentIterationGPUs.iterator();
+		gpuIter = gpus.iterator();
 		while (gpuIter.hasNext()) {
 			GPU gpu = gpuIter.next();
 			map.add(gpu.getLocation().getMachineId());
@@ -140,7 +142,7 @@ public abstract class IntraJobScheduler {
 		}
 		// Check if across slots
 		map = new HashSet<Integer>();
-		gpuIter = mCurrentIterationGPUs.iterator();
+		gpuIter = gpus.iterator();
 		while (gpuIter.hasNext()) {
 			GPU gpu = gpuIter.next();
 			map.add(gpu.getLocation().getSlotId());
@@ -150,8 +152,16 @@ public abstract class IntraJobScheduler {
 		}
 		return 1.0;
 	}
+	
+	public boolean isWaitingForResources() {
+		return mIsWaiting;
+	}
+	
+	public boolean hasResourcesForNextIteration() {
+		return mNextIterationGPUs.size() > 0;
+	}
 
-	public abstract void prepareBid(List<GPU> offeredGPUs);
+	public abstract List<Bid> prepareBid(List<GPU> offeredGPUs);
 
 	private List<GPU> relinquishAllResources() {
 		List<GPU> gpus = Cluster.getInstance().getGPUsInCluster();
@@ -191,5 +201,6 @@ public abstract class IntraJobScheduler {
 		mCrossRackSlowdown = Double.parseDouble(ConfigUtils.getAttributeValue(config, "cross_rack_slowdown"));
 		mLossCurve = LossFunctionFactory.createInstance(ConfigUtils.getAttributeValue(
 				config, "loss_function_type"), mTotalExpectedIterations, mRandomSeed);
+		mTotalIterationsRemaining = mTotalExpectedIterations;
 	}
 }

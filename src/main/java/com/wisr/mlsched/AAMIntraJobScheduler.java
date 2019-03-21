@@ -10,7 +10,8 @@ public class AAMIntraJobScheduler extends IntraJobScheduler {
 	}
 
 	@Override
-	public void prepareBid(List<GPU> offeredGPUs) {
+	public List<Bid> prepareBid(List<GPU> offeredGPUs) {
+		return null;
 		// TODO: Implement
 	}
 	

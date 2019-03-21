@@ -40,7 +40,7 @@ public class ClusterEventQueue {
 	 * @param event
 	 */
 	public void enqueueEvent(ClusterEvent event) {
-		sLog.log(Level.ALL, "Enqueuing event " + event.toString());
+		//sLog.log(Level.ALL, "Enqueuing event " + event.toString());
 		mEventQueue.add(event);
 	}
 	
