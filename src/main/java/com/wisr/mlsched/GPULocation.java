@@ -61,4 +61,12 @@ public class GPULocation {
 			Integer.toString(mSlotId) + "," +
 			Integer.toString(mGpuId);
     }
+    
+    public boolean compareTo(GPULocation location) {
+    	if(mRackId == location.getRackId() && mMachineId == location.getMachineId()
+    			&& mSlotId == location.getSlotId() && mGpuId == location.getGPUId()) {
+    		return true;
+    	}
+    	return false;
+    }
 }

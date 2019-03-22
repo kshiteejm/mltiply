@@ -17,6 +17,8 @@ public class Cluster {
 	private InterJobScheduler mScheduler; // Instance of inter-job scheduler
 	private String mPolicy; // Policy of Cluster
 	private double mLeaseTime; // Lease time policy for GPUs within cluster
+	private double mFairnessThreshold; // To consider jobs having 1+fairnessThreshold for GPU allocation
+	private double mEpsilon; // Fraction of jobs to consider having good loss potential
 
 	private static Cluster sInstance = null; // Singleton Instance of Cluster
 	private static Logger sLog; // Instance of logger
@@ -41,6 +43,8 @@ public class Cluster {
 		mRunningJobs = new ArrayList<IntraJobScheduler>();
 		mPolicy = config.getPolicy();
 		mLeaseTime = config.getLeaseTime();
+		mFairnessThreshold = config.getFairnessThreshold();
+		mEpsilon = config.getEpsilon();
 		mScheduler = InterJobSchedulerFactory.createInstance(mPolicy);
 		sLog = Logger.getLogger(Cluster.class.getSimpleName());
 		sLog.setLevel(Simulation.getLogLevel());
@@ -130,5 +134,21 @@ public class Cluster {
 	 */
 	public double getLeaseTime() {
 		return mLeaseTime;
+	}
+	
+	/**
+	 * Returns the Fairness Threshold value from configuration
+	 * @return double representing fairness threshold
+	 */
+	public double getFairnessThreshold() {
+		return mFairnessThreshold;
+	}
+	
+	/**
+	 * Returns the Epsilon value from configuration
+	 * @return double representing epsilon
+	 */
+	public double getEpsilon() {
+		return mEpsilon;
 	}
 }

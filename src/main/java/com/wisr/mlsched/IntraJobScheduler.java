@@ -13,9 +13,9 @@ import org.json.simple.JSONObject;
 public abstract class IntraJobScheduler {
 	// List of Job configurations
 	private int mJobId; // Unique identifier for this job
-	private double mJobStartTime; // Job start time
+	protected double mJobStartTime; // Job start time
 	protected int mTotalExpectedIterations; // Total number of iterations job is expected to run
-	private double mTimePerIteration; // Amount of time for a single iteration of job on 1 GPU
+	protected double mTimePerIteration; // Amount of time for a single iteration of job on 1 GPU
 	protected int mMaxParallelism; // Represents max GPUs job can request
 	private int mRandomSeed; // Random seed for loss curve
 	private LossFunction mLossCurve; // Representation of loss curve
@@ -182,11 +182,19 @@ public abstract class IntraJobScheduler {
 		return mNextIterationGPUs.size() > 0;
 	}
 	
-	protected Set<GPU> getGPUsAvailableForNextIteration() {
+	public Set<GPU> getGPUsAvailableForNextIteration() {
 		Set<GPU> set = new HashSet<GPU>(mNextIterationGPUs);
 		// Now add all GPUs to this set which will not expire after the iteration
 		set.addAll(mNextIterationExpectedGPUs);
 		return set;
+	}
+	
+	/**
+	 * Returns the maximum number of GPUs this job can take
+	 * @return
+	 */
+	public int getMaxParallelism() {
+		return mMaxParallelism;
 	}
 
 	public abstract List<Bid> prepareBid(List<GPU> offeredGPUs);
