@@ -1,17 +1,25 @@
 package com.wisr.mlsched;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class JobStatistics {
 	
 	private static JobStatistics sInstance = null; // Holder of singleton
 	private HashMap<Integer, SingleJobStat> mJobTime; // Job start and end time per job
+	private List<FairnessIndex> mFairnessIndices; // List of fairness indices measured over time
+	private List<LossValue> mLossValues; // List of cumulative loss values measured over time
 	
 	/**
 	 * Private constructor to enforce singleton
 	 */
 	private JobStatistics() {
 		mJobTime = new HashMap<Integer, SingleJobStat>();
+		mFairnessIndices = new ArrayList<FairnessIndex>();
+		mLossValues = new ArrayList<LossValue>();
+		ClusterEventQueue.getInstance().enqueueEvent(new 
+				JobStatisticEvent(Simulation.getSimulationTime() + 1));
 	}
 	
 	/**
@@ -42,12 +50,57 @@ public class JobStatistics {
 		mJobTime.get(jobid).setEndTime(timestamp);
 	}
 	
+	public void recordJobStatistics() {
+		mFairnessIndices.add(new FairnessIndex(Simulation.getSimulationTime(), computeJainFairness()));
+		mLossValues.add(new LossValue(Simulation.getSimulationTime(), computeCumulativeLoss()));
+		if(Cluster.getInstance().getRunningJobs().size() > 0) {
+			ClusterEventQueue.getInstance().enqueueEvent(new 
+					JobStatisticEvent(Simulation.getSimulationTime() + 1));
+		}
+	}
+	
+	private double computeCumulativeLoss() {
+		List<IntraJobScheduler> jobs = Cluster.getInstance().getRunningJobs();
+		double loss = 0.0;
+		for(IntraJobScheduler job : jobs) {
+			loss += job.getLoss(job.mTotalExpectedIterations-job.mTotalIterationsRemaining);
+		}
+		return loss;
+	}
+	
+	private double computeJainFairness() {
+		List<IntraJobScheduler> jobs = Cluster.getInstance().getRunningJobs();
+		List<Double> ratios = new ArrayList<Double>();
+		for(IntraJobScheduler job : jobs) {
+			ratios.add(job.getCurrentEstimate()/job.getIdealEstimate());
+		}
+		return Math.pow(sum(ratios), 2)/(ratios.size() * sumOfSquares(ratios));
+	}
+	
+	private double sum(List<Double> values) {
+		double sum = 0.0;
+		for(Double val : values) {
+			sum += val;
+		}
+		return sum;
+	}
+	
+	private double sumOfSquares(List<Double> values) {
+		double sum = 0.0;
+		for(Double val : values) {
+			sum += val*val;
+		}
+		return sum;
+	}
+	
 	/**
 	 * Print out individual JCTs, average JCT, and makespan
 	 */
 	public void printStats() {
 		printJCT();
 		printMakespan();
+		printFairnessIndex();
+		printLosses();
 	}
 	
 	private void printJCT() {
@@ -77,6 +130,20 @@ public class JobStatistics {
 		System.out.println("Makespan: " + Double.toString(latest_end_time-earliest_start_time));
 	}
 	
+	private void printFairnessIndex() {
+		for(FairnessIndex f : mFairnessIndices) {
+			System.out.println(Double.toString(f.getTimestamp()) + 
+					" " + Double.toString(f.getFairness()));
+		}
+	}
+	
+	private void printLosses() {
+		for(LossValue l : mLossValues) {
+			System.out.println(Double.toString(l.getTimestamp()) + 
+					" " + Double.toString(l.getLoss()));
+		}
+	}
+	
 	private class SingleJobStat {
 		private double mStartTime;
 		private double mEndTime;
@@ -103,6 +170,42 @@ public class JobStatistics {
 				return -1; // invalid request
 			}
 			return mEndTime - mStartTime;
+		}
+	}
+	
+	private class FairnessIndex {
+		double mTimestamp;
+		double mFairness;
+		
+		public FairnessIndex(double timestamp, double fairness) {
+			mTimestamp = timestamp;
+			mFairness = fairness;
+		}
+		
+		public double getTimestamp() {
+			return mTimestamp;
+		}
+		
+		public double getFairness() {
+			return mFairness;
+		}
+	}
+	
+	private class LossValue {
+		private double mTimestamp;
+		private double mLoss;
+		
+		public LossValue(double timestamp, double loss) {
+			mTimestamp = timestamp;
+			mLoss = loss;
+		}
+		
+		public double getTimestamp() {
+			return mTimestamp;
+		}
+		
+		public double getLoss() {
+			return mLoss;
 		}
 	}
 }

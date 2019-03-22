@@ -9,8 +9,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.swing.plaf.basic.BasicInternalFrameTitlePane.MaximizeAction;
-
 public class AAMInterJobScheduler extends InterJobScheduler {
 
 	@Override
