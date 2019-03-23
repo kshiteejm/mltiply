@@ -55,7 +55,6 @@ public class ClusterEventQueue {
 			ClusterEvent event = mEventQueue.pollFirst();
 			sLog.info("Processing event " + event.toString() + " at " + Double.toString(
 					event.getTimestamp()));
-			// TODO: Handle event aggregation? - not required because of event-based prioritization?
 			event.handleEvent();
 		}
 	}

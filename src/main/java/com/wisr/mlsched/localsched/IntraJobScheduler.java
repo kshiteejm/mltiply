@@ -95,7 +95,6 @@ public abstract class IntraJobScheduler {
 		mCurrentIterationGPUs = new HashSet<GPU>(mNextIterationGPUs);
 		mNextIterationGPUs = new HashSet<GPU>();
 		mIsWaiting = false;
-		// TODO: Sanity check if we have GPUs assigned before proceeding - the following assert essentially?
 		assert(mCurrentIterationGPUs.size() > 0);
 		ClusterEventQueue.getInstance().enqueueEvent(
 				new EndIterationEvent(Simulation.getSimulationTime() + mTimePerIteration / getJobSpeedup(), this));

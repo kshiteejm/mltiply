@@ -1,9 +1,12 @@
 package com.wisr.mlsched.globalsched;
 
+import java.util.logging.Logger;
+
 /**
  * Factory for producing InterJobScheduler objects
  */
 public class InterJobSchedulerFactory {
+	private static Logger sLog = Logger.getLogger(InterJobSchedulerFactory.class.getSimpleName());
 	public static InterJobScheduler createInstance(String policy) {
 		switch(policy) {
 			case "Themis":
@@ -15,7 +18,7 @@ public class InterJobSchedulerFactory {
 			case "Tiresias":
 				return new TiresiasInterJobScheduler();
 		}
-		// TODO: Error log - will show up as NullPointer Exception right now - should be fine? add an sLog statement?
+		sLog.severe("Policy not defined");
 		return null;
 	}
 }

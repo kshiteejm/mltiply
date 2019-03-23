@@ -1,9 +1,12 @@
 package com.wisr.mlsched.job;
 
+import java.util.logging.Logger;
+
 /**
  * Factory for producing IntraJobScheduler objects
  */
 public class LossFunctionFactory {
+	private static Logger sLog = Logger.getLogger(LossFunctionFactory.class.getSimpleName());
 	public static LossFunction createInstance(String lossFunctionType, 
 			int numIterations, int seed) {
 		switch(lossFunctionType) {
@@ -12,7 +15,7 @@ public class LossFunctionFactory {
 			case "superlinear":
 				return SubLinearLossFunction.getRandomSublinearFunction(numIterations, seed);
 		}
-		// TODO: Error log - willl show up as a NullPointerException right now. so should be fine? or just have an sLog and print it as well.
+		sLog.severe("Loss function type not defined");
 		return null;
 	}
 }
