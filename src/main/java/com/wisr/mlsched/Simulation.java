@@ -1,7 +1,12 @@
 package com.wisr.mlsched;
 
-import java.util.logging.Logger;
 import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import com.wisr.mlsched.config.ConfigUtils;
+import com.wisr.mlsched.events.JobArrivalEvent;
+import com.wisr.mlsched.job.JobStatistics;
+import com.wisr.mlsched.resources.Cluster;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;

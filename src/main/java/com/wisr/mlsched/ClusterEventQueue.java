@@ -5,6 +5,8 @@ import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.wisr.mlsched.events.ClusterEvent;
+
 /**
  * Global event queue to manage cluster level events.
  */
