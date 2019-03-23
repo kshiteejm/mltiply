@@ -18,7 +18,7 @@ public class IntraJobSchedulerFactory {
 			case "Tiresias":
 				return new TiresiasIntraJobScheduler(workload_config);
 		}
-		// TODO: Error log
+		// TODO: Error log - will show up as NullPointerException right now
 		return null;
 	}
 }

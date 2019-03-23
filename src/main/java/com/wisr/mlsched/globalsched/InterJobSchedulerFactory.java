@@ -6,7 +6,7 @@ package com.wisr.mlsched.globalsched;
 public class InterJobSchedulerFactory {
 	public static InterJobScheduler createInstance(String policy) {
 		switch(policy) {
-			case "AAM":
+			case "Themis":
 				return new ThemisInterJobScheduler();
 			case "Gandiva":
 				return new GandivaInterJobScheduler();
@@ -15,7 +15,7 @@ public class InterJobSchedulerFactory {
 			case "Tiresias":
 				return new TiresiasInterJobScheduler();
 		}
-		// TODO: Error log
+		// TODO: Error log - will show up as NullPointer Exception right now - should be fine? add an sLog statement?
 		return null;
 	}
 }

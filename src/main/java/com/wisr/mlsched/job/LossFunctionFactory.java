@@ -12,7 +12,7 @@ public class LossFunctionFactory {
 			case "superlinear":
 				return SubLinearLossFunction.getRandomSublinearFunction(numIterations, seed);
 		}
-		// TODO: Error log
+		// TODO: Error log - willl show up as a NullPointerException right now. so should be fine? or just have an sLog and print it as well.
 		return null;
 	}
 }

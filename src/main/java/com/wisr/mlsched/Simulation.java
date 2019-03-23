@@ -30,7 +30,7 @@ public class Simulation {
 		mTime = 0;
 		
 		// Initialize cluster
-		Cluster cluster = Cluster.createCluster(clusterConfig);
+		Cluster.createCluster(clusterConfig);
 		
 		ClusterEventQueue eventQueue = ClusterEventQueue.getInstance();
 		

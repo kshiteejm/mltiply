@@ -59,7 +59,7 @@ public class ThemisInterJobScheduler extends InterJobScheduler {
 			return;
 		}
 		// Maxmimize fairness based on bids. For now, going for a greedy approach
-		Collections.sort(bids, new AAMBidComparator());
+		Collections.sort(bids, new ThemisBidComparator());
 		List<GPU> remainingGPUSet = new ArrayList<>(gpu_set);
 		for(Bid bid: bids) {
 			List<GPU> assignedGPUs = bid.getGPUList();
@@ -165,7 +165,7 @@ public class ThemisInterJobScheduler extends InterJobScheduler {
 		
 	}
 	
-	private class AAMBidComparator implements Comparator<Bid> {
+	private class ThemisBidComparator implements Comparator<Bid> {
 
 		@Override
 		public int compare(Bid bid1, Bid bid2) {

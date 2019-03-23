@@ -65,7 +65,8 @@ public class Cluster {
 	 */
 	public static Cluster getInstance() {
 		if (sInstance == null) {
-			// TODO: Error log here. No one should call this before cluster is created
+			// TODO: Error log here. No one should call this before cluster is created - would show up at NullPointerException somewhere else in the code?
+			// sLog.info("ERROR: Cluster not instantiated.");
 			return null;
 		}
 		return sInstance;
@@ -77,8 +78,8 @@ public class Cluster {
 	 * @param config
 	 */
 	public static Cluster createCluster(JSONObject config) {
-		// TODO: Malformed config exception handling
-		// TODO: Should be able to create only one instance globally
+		// TODO: Malformed config exception handling - shows up as exception
+		// TODO: Should be able to create only one instance globally - shows up as exception
 		ClusterConfiguration clusterConfig = ConfigUtils.getClusterConfig(config);
 		sInstance = new Cluster(clusterConfig);
 		return sInstance;
@@ -114,7 +115,7 @@ public class Cluster {
 	 * @param job
 	 */
 	public void removeJob(IntraJobScheduler job) {
-		// TODO: Sanity checking. Review return type
+		// TODO: Sanity checking. Review return type - not sure what this means - do you want to return the deleted job? because you need to add the job to a completed jobs list?
 		sLog.info("Removing job "+ Integer.toString(job.getJobId()) + " from cluster");
 		mRunningJobs.remove(job);
 	}
