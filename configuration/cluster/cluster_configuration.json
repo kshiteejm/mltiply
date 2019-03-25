@@ -3,8 +3,12 @@
 	"machines_per_rack" : "1",
 	"slots_per_machine" : "2",
 	"gpus_per_slot" : "4",
-	"cluster_policy" : "Gandiva",
+	"cluster_policy" : "Themis",
 	"fairness_threshold" : "0.0",
 	"epsilon" : "1", 
-	"lease_time" : "5"
+	"lease_time" : "5",
+	"bad_job_threshold" : "0.34",
+	"promising_job_threshold" : "0.67",
+	"bad_job_discount" : "0.4",
+	"promising_job_discount" : "0.7"
 }

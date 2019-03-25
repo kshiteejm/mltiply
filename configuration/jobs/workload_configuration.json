@@ -1,5 +1,6 @@
 [
 	{
+		"job_group_id" : "1",
 		"job_id":"1",
 		"start_time":"0",
 		"total_iterations":"10",
@@ -12,6 +13,7 @@
 		"cross_rack_slowdown":"0.4"
 	},
 	{
+		"job_group_id" : "1",
                 "job_id":"2",
                 "start_time":"0",
                 "total_iterations":"10",

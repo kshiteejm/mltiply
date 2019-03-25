@@ -7,6 +7,7 @@ import java.util.logging.Logger;
  */
 public class InterJobSchedulerFactory {
 	private static Logger sLog = Logger.getLogger(InterJobSchedulerFactory.class.getSimpleName());
+	
 	public static InterJobScheduler createInstance(String policy) {
 		switch(policy) {
 			case "Themis":

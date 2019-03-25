@@ -25,6 +25,7 @@ import org.json.simple.JSONObject;
 
 public abstract class IntraJobScheduler {
 	// List of Job configurations
+	private int mJobGroupId; // Unique identifier for job group to which this job belongs
 	private int mJobId; // Unique identifier for this job
 	protected double mJobStartTime; // Job start time
 	protected int mTotalExpectedIterations; // Total number of iterations job is expected to run
@@ -180,6 +181,10 @@ public abstract class IntraJobScheduler {
 	public int getJobId() {
 		return mJobId;
 	}
+	
+	public int getJobGroupId() {
+		return mJobGroupId;
+	}
 
 	public double getPlacementSlowdown(Set<GPU> gpus) {
 		HashSet<Integer> map = new HashSet<Integer>();
@@ -268,6 +273,7 @@ public abstract class IntraJobScheduler {
 	}
 
 	private void initFromConfig(JSONObject config) {
+		mJobGroupId = Integer.parseInt(ConfigUtils.getAttributeValue(config, "job_group_id"));
 		mJobId = Integer.parseInt(ConfigUtils.getAttributeValue(config, "job_id"));
 		setmTotalExpectedIterations(Integer.parseInt(ConfigUtils.getAttributeValue(config, "total_iterations")));
 		mTimePerIteration = Double.parseDouble(ConfigUtils.getAttributeValue(config, "time_per_iteration"));

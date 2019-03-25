@@ -12,7 +12,7 @@ public class IntraJobSchedulerFactory {
 	public static IntraJobScheduler createInstance(JSONObject workload_config,
 			String policy) {
 		switch(policy) {
-			case "AAM":
+			case "Themis":
 				return new ThemisIntraJobScheduler(workload_config);
 			case "Gandiva":
 				return new GandivaIntraJobScheduler(workload_config);

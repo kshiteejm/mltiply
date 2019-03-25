@@ -10,6 +10,7 @@ import com.wisr.mlsched.config.ConfigUtils;
 import com.wisr.mlsched.globalsched.InterJobScheduler;
 import com.wisr.mlsched.globalsched.InterJobSchedulerFactory;
 import com.wisr.mlsched.localsched.IntraJobScheduler;
+import com.wisr.mlsched.localsched.JobGroupManager;
 
 import org.json.simple.JSONObject;
 
@@ -26,6 +27,7 @@ public class Cluster {
 	private double mLeaseTime; // Lease time policy for GPUs within cluster
 	private double mFairnessThreshold; // To consider jobs having 1+fairnessThreshold for GPU allocation
 	private double mEpsilon; // Fraction of jobs to consider having good loss potential
+	private ClusterConfiguration mConfig; // Cluster configuration object
 
 	private static Cluster sInstance = null; // Singleton Instance of Cluster
 	private static Logger sLog; // Instance of logger
@@ -48,6 +50,7 @@ public class Cluster {
 			}
 		}
 		mRunningJobs = new ArrayList<IntraJobScheduler>();
+		mConfig = config;
 		mPolicy = config.getPolicy();
 		mLeaseTime = config.getLeaseTime();
 		mFairnessThreshold = config.getFairnessThreshold();
@@ -105,6 +108,7 @@ public class Cluster {
 	public void addJob(IntraJobScheduler job) {
 		sLog.info("Adding job "+ Integer.toString(job.getJobId()) + " to cluster");
 		mRunningJobs.add(job);
+		JobGroupManager.getInstance().trackJob(job);
 	}
 	
 	/**
@@ -114,6 +118,7 @@ public class Cluster {
 	public void removeJob(IntraJobScheduler job) {
 		sLog.info("Removing job "+ Integer.toString(job.getJobId()) + " from cluster");
 		mRunningJobs.remove(job);
+		JobGroupManager.getInstance().untrackJob(job);
 	}
 	
 	/**
@@ -154,5 +159,13 @@ public class Cluster {
 	 */
 	public double getEpsilon() {
 		return mEpsilon;
+	}
+	
+	/**
+	 * Returns the Cluster Configuration object for this cluster.
+	 * @return ClusterConfiguration object
+	 */
+	public ClusterConfiguration getConfiguration() {
+		return mConfig;
 	}
 }
