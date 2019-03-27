@@ -61,7 +61,7 @@ public class GPU {
      * @return true if leased has expired, false otherwise
      */
     public boolean hasLeaseExpired() {
-    	if (Simulation.getSimulationTime() > mLeaseStart + mLeaseDuration) {
+    	if (Simulation.getSimulationTime() >= mLeaseStart + mLeaseDuration) {
     		return true;
     	}
     	return false;

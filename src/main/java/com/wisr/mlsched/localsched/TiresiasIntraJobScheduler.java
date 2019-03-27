@@ -39,6 +39,9 @@ public class TiresiasIntraJobScheduler extends IntraJobScheduler {
 		// Added negative of GPUService since we want job with min value to win
 		double bidValue = mGPUServiceForJob + 
 				getGPUsAvailableForNextIteration().size()*Cluster.getInstance().getLeaseTime();
+		sLog.info("JobGroup:" + Integer.toString(getJobGroupId())
+		+ " Job:" + Integer.toString(getJobId()) + 
+		" Bid:" + Double.toString(bidValue));
 		bidList.add(new Bid(offeredGPUs, -1*bidValue, this));
 		return bidList;
 	}

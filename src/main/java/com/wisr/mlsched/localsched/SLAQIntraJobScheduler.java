@@ -43,7 +43,10 @@ public class SLAQIntraJobScheduler extends IntraJobScheduler {
 		double predicted_loss = getLoss(getmTotalExpectedIterations() - getmTotalIterationsRemaining()
 				+ num_iterations_with_lease);
 		List<Bid> bidList = new ArrayList<Bid>();
-		bidList.add(new Bid(offeredGPUs, predicted_loss-current_loss, this));
+		sLog.info("JobGroup:" + Integer.toString(getJobGroupId())
+		+ " Job:" + Integer.toString(getJobId()) + 
+		" Bid:" + Double.toString(current_loss-predicted_loss));
+		bidList.add(new Bid(offeredGPUs, current_loss-predicted_loss, this));
 		return bidList;
 	}
 

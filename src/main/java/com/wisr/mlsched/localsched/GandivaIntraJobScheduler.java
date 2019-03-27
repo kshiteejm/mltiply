@@ -40,6 +40,9 @@ public class GandivaIntraJobScheduler extends IntraJobScheduler {
 		// Prepare a bid with new placement score
 		double placementScore = getPlacementSlowdown(potentialNewGPUSet);
 		List<Bid> bidList = new ArrayList<Bid>();
+		sLog.info("JobGroup:" + Integer.toString(getJobGroupId())
+		+ " Job:" + Integer.toString(getJobId()) + 
+		" Bid:" + Double.toString(placementScore));
 		bidList.add(new Bid(offeredGPUs, placementScore, this));
 		return bidList;
 	}

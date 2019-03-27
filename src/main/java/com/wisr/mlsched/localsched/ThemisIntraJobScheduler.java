@@ -70,6 +70,9 @@ public class ThemisIntraJobScheduler extends IntraJobScheduler {
 		double expectedGain = getCurrentEstimate() - newExpectedRunningTime;
 		double normalizedExpectedGain = expectedGain * 
 				JobGroupManager.getInstance().getJobPromiseDiscount(this);
+		sLog.info("JobGroup:" + Integer.toString(getJobGroupId())
+			+ " Job:" + Integer.toString(getJobId()) + 
+			" Bid:" + Double.toString(normalizedExpectedGain));
 		return new Bid(gpusForBid, normalizedExpectedGain, this);
 	}
 	
