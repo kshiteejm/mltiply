@@ -67,7 +67,7 @@ public class ThemisIntraJobScheduler extends IntraJobScheduler {
 		double expectedJobSpeedUp = potentialNewGPUSet.size() * getPlacementSlowdown(potentialNewGPUSet);
 		double newExpectedRunningTime = (Simulation.getSimulationTime() - mJobStartTime)
 				+ (getmTotalIterationsRemaining() * mTimePerIteration) / expectedJobSpeedUp;
-		double expectedGain = getCurrentEstimate() - newExpectedRunningTime;
+		double expectedGain = getCurrentEstimate()/newExpectedRunningTime;
 		double normalizedExpectedGain = expectedGain * 
 				JobGroupManager.getInstance().getJobPromiseDiscount(this);
 		sLog.info("JobGroup:" + Integer.toString(getJobGroupId())
