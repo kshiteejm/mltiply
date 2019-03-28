@@ -12,16 +12,10 @@ public class ClusterConfiguration {
 	private double mLeaseTime;
 	private double mFairnessThreshold;
 	private double mEpsilon;
-	private double mBadJobThreshold;
-	private double mPromisingJobThreshold;
-	private double mBadJobDiscount;
-	private double mPromisingJobDiscount;
 	
 	public ClusterConfiguration(int racks, int machines_per_rack,
 			int slots_per_machine, int gpus_per_slot, String policy, double lease,
-			double fairness_threshold, double epsilon, double bad_job_threshold,
-			double promising_job_threshold, double bad_job_discount,
-			double promising_job_discount) {
+			double fairness_threshold, double epsilon) {
 		mRacks = racks;
 		mMachinesPerRack = machines_per_rack;
 		mSlotsPerMachine = slots_per_machine;
@@ -30,10 +24,6 @@ public class ClusterConfiguration {
 		mLeaseTime = lease;
 		mFairnessThreshold = fairness_threshold;
 		mEpsilon = epsilon;
-		mBadJobThreshold = bad_job_threshold;
-		mPromisingJobThreshold = promising_job_threshold;
-		mBadJobDiscount = bad_job_discount;
-		mPromisingJobDiscount = promising_job_discount;
 	}
 	
 	public double getLeaseTime() {
@@ -66,21 +56,5 @@ public class ClusterConfiguration {
 	
 	public double getEpsilon() {
 		return mEpsilon;
-	}
-
-	public double getBadJobThreshold() {
-		return mBadJobThreshold;
-	}
-
-	public double getPromisingJobThreshold() {
-		return mPromisingJobThreshold;
-	}
-
-	public double getBadJobDiscount() {
-		return mBadJobDiscount;
-	}
-	
-	public double getPromisingJobDiscount() {
-		return mPromisingJobDiscount;
 	}
 }

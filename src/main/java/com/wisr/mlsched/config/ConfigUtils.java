@@ -55,14 +55,9 @@ public class ConfigUtils {
 		double lease_time = Double.parseDouble(getAttributeValue(config, "lease_time"));
 		double fairness_threshold = Double.parseDouble(getAttributeValue(config, "fairness_threshold"));
 		double epsilon = Double.parseDouble(getAttributeValue(config, "epsilon"));
-		double bad_job_threshold = Double.parseDouble(getAttributeValue(config, "bad_job_threshold"));
-		double promising_job_threshold = Double.parseDouble(getAttributeValue(config, "promising_job_threshold"));
-		double bad_job_discount = Double.parseDouble(getAttributeValue(config, "bad_job_discount"));
-		double promising_job_discount = Double.parseDouble(getAttributeValue(config, "promising_job_discount"));
 		String policy = getClusterPolicy(config);
 		return new ClusterConfiguration(racks, machines, slots, gpus, policy, lease_time, 
-				fairness_threshold, epsilon, bad_job_threshold, promising_job_threshold,
-				bad_job_discount, promising_job_discount);
+				fairness_threshold, epsilon);
 	}
 	
 	/**

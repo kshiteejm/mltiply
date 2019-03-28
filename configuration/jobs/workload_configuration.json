@@ -10,7 +10,11 @@
 		"loss_function_type":"sublinear",
 		"cross_slot_slowdown":"0.9",
 		"cross_machine_slowdown":"0.7",
-		"cross_rack_slowdown":"0.4"
+		"cross_rack_slowdown":"0.4",
+		"bad_job_threshold" : "0.34",
+                "promising_job_threshold" : "0.67",
+                "bad_job_discount" : "0.4",
+                "promising_job_discount" : "0.7"
 	},
 	{
 		"job_group_id" : "1",
@@ -23,6 +27,10 @@
                 "loss_function_type":"sublinear",
                 "cross_slot_slowdown":"0.9",
                 "cross_machine_slowdown":"0.7",
-                "cross_rack_slowdown":"0.4"
+                "cross_rack_slowdown":"0.4",
+		"bad_job_threshold" : "0.34",
+                "promising_job_threshold" : "0.67",
+                "bad_job_discount" : "0.4",
+                "promising_job_discount" : "0.7"
         }
 ]

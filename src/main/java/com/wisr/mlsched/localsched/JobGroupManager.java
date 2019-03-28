@@ -89,28 +89,28 @@ public class JobGroupManager {
 		double rank = (index_of_job + 1)/ranks.size();
 		
 		// Get the job quality category
-		JobQualityCategory jobCategory = getJobQuality(rank);
+		JobQualityCategory jobCategory = getJobQuality(job, rank);
 		
 		// Return the promise discount
-		return getPromiseDiscountFromQuality(jobCategory);
+		return getPromiseDiscountFromQuality(job, jobCategory);
 	}
 	
-	private JobQualityCategory getJobQuality(double rank) {
-		if(rank < Cluster.getInstance().getConfiguration().getBadJobThreshold()) {
+	private JobQualityCategory getJobQuality(IntraJobScheduler job, double rank) {
+		if(rank < job.getBadJobThreshold()) {
 			return JobQualityCategory.JOB_QUALITY_BAD;
-		} else if (rank < Cluster.getInstance().getConfiguration().getPromisingJobThreshold()) {
+		} else if (rank < job.getPromisingJobThreshold()) {
 			return JobQualityCategory.JOB_QUALITY_PROMISING;
 		} else {
 			return JobQualityCategory.JOB_QUALITY_GOOD;
 		}
 	}
 	
-	private double getPromiseDiscountFromQuality(JobQualityCategory category) {
+	private double getPromiseDiscountFromQuality(IntraJobScheduler job, JobQualityCategory category) {
 		switch(category) {
 		case JOB_QUALITY_BAD:
-			return Cluster.getInstance().getConfiguration().getBadJobDiscount();
+			return job.getBadJobDiscount();
 		case JOB_QUALITY_PROMISING:
-			return Cluster.getInstance().getConfiguration().getPromisingJobDiscount();
+			return job.getPromisingJobDiscount();
 		case JOB_QUALITY_GOOD:
 			return 1.0;
 		}

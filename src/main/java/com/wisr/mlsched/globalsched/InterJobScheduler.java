@@ -21,7 +21,7 @@ public abstract class InterJobScheduler {
 	
 	protected Random mRand;
 	public InterJobScheduler() {
-		mRand = new Random();
+		mRand = new Random(0); // seed to make it deterministic
 	}
 	public abstract void onResourceAvailable(List<GPU> gpu_set);
 	
