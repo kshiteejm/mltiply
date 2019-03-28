@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Random;
 
 import com.wisr.mlsched.ClusterEventQueue;
 import com.wisr.mlsched.Simulation;
@@ -17,6 +18,11 @@ import com.wisr.mlsched.resources.GPU;
  * Interface for InterJobScheduler types
  */
 public abstract class InterJobScheduler {
+	
+	protected Random mRand;
+	public InterJobScheduler() {
+		mRand = new Random();
+	}
 	public abstract void onResourceAvailable(List<GPU> gpu_set);
 	
 	protected void startWaitingJobs() {
@@ -69,10 +75,15 @@ public abstract class InterJobScheduler {
 		public int compare(Bid bid1, Bid bid2) {
 			if(bid1.getExpectedBenefit() > bid2.getExpectedBenefit()) {
 				return -1;
+			} else if(bid1.getExpectedBenefit() < bid2.getExpectedBenefit()){
+				return 1;
+			}
+			// Else the bids are exact same. We need to break it randomly
+			if(mRand.nextBoolean()) {
+				return -1;
 			} else {
 				return 1;
 			}
-			// TODO: Break this tie randomly
 		}
 		
 	}

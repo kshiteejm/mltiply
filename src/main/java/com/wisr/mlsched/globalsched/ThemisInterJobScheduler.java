@@ -143,7 +143,12 @@ public class ThemisInterJobScheduler extends InterJobScheduler {
 
 		@Override
 		public int compare(JobFairness j1, JobFairness j2) {
-			if(j1.getFairnessValue() <= j2.getFairnessValue()) {
+			if(j1.getFairnessValue() < j2.getFairnessValue()) {
+				return -1;
+			} else if(j1.getFairnessValue() > j2.getFairnessValue()){
+				return 1;
+			}
+			if(mRand.nextBoolean()) {
 				return -1;
 			} else {
 				return 1;
@@ -156,10 +161,15 @@ public class ThemisInterJobScheduler extends InterJobScheduler {
 
 		@Override
 		public int compare(JobLossGradient j1, JobLossGradient j2) {
-			if(j1.getLossGradient() <= j2.getLossGradient()) {
+			if(j1.getLossGradient() < j2.getLossGradient()) {
 				return 1;
-			} else {
+			} else if(j1.getLossGradient() > j2.getLossGradient()) {
 				return -1;
+			}
+			if(mRand.nextBoolean()) {
+				return -1;
+			} else {
+				return 1;
 			}
 		}
 		
@@ -169,7 +179,13 @@ public class ThemisInterJobScheduler extends InterJobScheduler {
 
 		@Override
 		public int compare(Bid bid1, Bid bid2) {
-			if(bid1.getExpectedBenefit() >= bid2.getExpectedBenefit()) {
+			if(bid1.getExpectedBenefit() > bid2.getExpectedBenefit()) {
+				return -1;
+			} else if(bid1.getExpectedBenefit() < bid2.getExpectedBenefit()){
+				return 1;
+			}
+			// Else the bids are exact same. We need to break it randomly
+			if(mRand.nextBoolean()) {
 				return -1;
 			} else {
 				return 1;
