@@ -158,7 +158,7 @@ public abstract class IntraJobScheduler {
 	}
 
 	public double getIdealEstimate() {
-		return 1.0 * mTimePerIteration * getmTotalExpectedIterations() / Cluster.getInstance().getGPUsInCluster().size();
+		return 1.0 * mTimePerIteration * getmTotalExpectedIterations() / mMaxParallelism;
 	}
 
 	public double getLossGradient() {
