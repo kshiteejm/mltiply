@@ -36,10 +36,6 @@ public abstract class IntraJobScheduler {
 	private double mCrossSlotSlowdown; // Slowdown due to network b/w GPUs across slots
 	private double mCrossMachineSlowdown; // Slowdown due to network b/w GPUs across machines
 	private double mCrossRackSlowdown; // Slowdown due to network b/w GPUs across slots
-	private double mBadJobThreshold; // Percentage of jobs in JG for which are bad
-	private double mPromisingJobThreshold; // Percentage of jobs in JG for which are promising
-	private double mBadJobDiscount; // Discount issued to jobs that are bad
-	private double mPromisingJobDiscount; // Discount issued to jobs that are promising
 
 	// State management for job
 	protected int mTotalIterationsRemaining; // Number of iterations of job remaining
@@ -246,22 +242,6 @@ public abstract class IntraJobScheduler {
 	public int getMaxParallelism() {
 		return mMaxParallelism;
 	}
-	
-	public double getBadJobThreshold() {
-		return mBadJobThreshold;
-	}
-
-	public double getPromisingJobThreshold() {
-		return mPromisingJobThreshold;
-	}
-
-	public double getBadJobDiscount() {
-		return mBadJobDiscount;
-	}
-	
-	public double getPromisingJobDiscount() {
-		return mPromisingJobDiscount;
-	}
 
 	public abstract List<Bid> prepareBid(List<GPU> offeredGPUs);
 
@@ -304,10 +284,6 @@ public abstract class IntraJobScheduler {
 		mCrossRackSlowdown = Double.parseDouble(ConfigUtils.getAttributeValue(config, "cross_rack_slowdown"));
 		mLossCurve = LossFunctionFactory.createInstance(ConfigUtils.getAttributeValue(
 				config, "loss_function_type"), getmTotalExpectedIterations(), mRandomSeed);
-		mBadJobThreshold = Double.parseDouble(ConfigUtils.getAttributeValue(config, "bad_job_threshold"));
-		mPromisingJobThreshold = Double.parseDouble(ConfigUtils.getAttributeValue(config, "promising_job_threshold"));
-		mBadJobDiscount = Double.parseDouble(ConfigUtils.getAttributeValue(config, "bad_job_discount"));
-		mPromisingJobDiscount = Double.parseDouble(ConfigUtils.getAttributeValue(config, "promising_job_discount"));
 		setmTotalIterationsRemaining(getmTotalExpectedIterations());
 	}
 }

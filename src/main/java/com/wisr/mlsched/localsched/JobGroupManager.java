@@ -69,80 +69,11 @@ public class JobGroupManager {
 	public double getJobPromiseDiscount(IntraJobScheduler job) {
 		// Get list of jobs in the Job Group
 		List<IntraJobScheduler> listJobsInGroup = mJobMap.get(job.getJobGroupId());
-		
-		// Get the current gradient of loss function
-		List<JobRank> ranks = new ArrayList<JobRank>();
+		double jobIterations = job.getmTotalIterationsRemaining();
+		double totalJGIterations = 0;
 		for(IntraJobScheduler j : listJobsInGroup) {
-			ranks.add(new JobRank(j, j.getLossGradient()));
+			totalJGIterations += j.getmTotalIterationsRemaining();
 		}
-		// Sort the loss gradients in increasing order
-		Collections.sort(ranks, new JobRankComparator());
-		// Find the rank of job in it's job group
-		int index_of_job = 0;
-		for(JobRank jr : ranks) {
-			if(job.equals(jr.getJob())) {
-				break;
-			}
-			index_of_job++;
-		}
-		assert(index_of_job >= 0 && index_of_job < ranks.size()); // sanity check
-		double rank = (index_of_job + 1)/ranks.size();
-		
-		// Get the job quality category
-		JobQualityCategory jobCategory = getJobQuality(job, rank);
-		
-		// Return the promise discount
-		return getPromiseDiscountFromQuality(job, jobCategory);
-	}
-	
-	private JobQualityCategory getJobQuality(IntraJobScheduler job, double rank) {
-		if(rank < job.getBadJobThreshold()) {
-			return JobQualityCategory.JOB_QUALITY_BAD;
-		} else if (rank < job.getPromisingJobThreshold()) {
-			return JobQualityCategory.JOB_QUALITY_PROMISING;
-		} else {
-			return JobQualityCategory.JOB_QUALITY_GOOD;
-		}
-	}
-	
-	private double getPromiseDiscountFromQuality(IntraJobScheduler job, JobQualityCategory category) {
-		switch(category) {
-		case JOB_QUALITY_BAD:
-			return job.getBadJobDiscount();
-		case JOB_QUALITY_PROMISING:
-			return job.getPromisingJobDiscount();
-		case JOB_QUALITY_GOOD:
-			return 1.0;
-		}
-		return 1.0;
-	}
-	
-	private class JobRank {
-		private IntraJobScheduler mJob;
-		private double mLossGradient;
-		
-		public JobRank(IntraJobScheduler job, double loss_gradient) {
-			mJob = job;
-			mLossGradient = loss_gradient;
-		}
-		
-		public IntraJobScheduler getJob() {
-			return mJob;
-		}
-		
-		public double getLossGradient() {
-			return mLossGradient;
-		}
-	}
-	
-	private class JobRankComparator implements Comparator<JobRank> {
-		@Override
-		public int compare(JobRank jr1, JobRank jr2) {
-			if(jr1.getLossGradient() <= jr2.getLossGradient()) {
-				return -1;
-			}
-			return 1;
-		}
-		
+		return 1 - (jobIterations/totalJGIterations);
 	}
 }
