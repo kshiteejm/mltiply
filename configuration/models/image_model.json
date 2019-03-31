@@ -1,0 +1,22 @@
+{
+  "cross_slot_slowdown":"0.9",
+  "cross_machine_slowdown":"0.7",
+  "cross_rack_slowdown":"0.4",
+  "hyperparameter_jobs": [
+    {
+      "total_iterations":"5",
+      "time_per_iteration":"10",
+      "max_parallelism":"4",
+      "random_seed":"7",
+      "loss_function_type":"sublinear"
+    },
+    {
+      "total_iterations":"5",
+      "time_per_iteration":"10",
+      "max_parallelism":"4",
+      "random_seed":"7",
+      "loss_function_type":"sublinear"
+    }
+  ]
+}
+
