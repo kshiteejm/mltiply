@@ -21,6 +21,10 @@ public class ThemisInterJobScheduler extends InterJobScheduler {
 			// Means no jobs are running, hence nothing to do
 			return;
 		}
+		gpu_set = gpu_set.stream().filter(g -> !g.isLeased()).collect(Collectors.toList());
+		if(gpu_set.size() == 0) {
+			return;
+		}
 		List<JobFairness> fairnessValues = new ArrayList<JobFairness>();
 		List<IntraJobScheduler> runningJobs = Cluster.getInstance().getRunningJobs();
 		for(IntraJobScheduler job: runningJobs) {
@@ -45,8 +49,6 @@ public class ThemisInterJobScheduler extends InterJobScheduler {
 		double e = Cluster.getInstance().getEpsilon();
 		lossGradients = lossGradients.subList(0, (int) (e*lossGradients.size()));
 		
-		// Now offer bids to jobs remaining in lossGradients
-		gpu_set = gpu_set.stream().filter(g -> !g.isLeased()).collect(Collectors.toList());
 		List<Bid> bids = new ArrayList<Bid>();
 		for(JobLossGradient job: lossGradients) {
 			List<Bid> bidsFromJob = job.getJob().prepareBid(gpu_set);
@@ -59,7 +61,7 @@ public class ThemisInterJobScheduler extends InterJobScheduler {
 			return;
 		}
 		// Maxmimize fairness based on bids. For now, going for a greedy approach
-		Collections.sort(bids, new ThemisBidComparator());
+		Collections.sort(bids, new PerGPUBidComparator());
 		List<GPU> remainingGPUSet = new ArrayList<>(gpu_set);
 		for(Bid bid: bids) {
 			List<GPU> assignedGPUs = bid.getGPUList();
@@ -148,11 +150,7 @@ public class ThemisInterJobScheduler extends InterJobScheduler {
 			} else if(j1.getFairnessValue() > j2.getFairnessValue()){
 				return 1;
 			}
-			if(mRand.nextBoolean()) {
-				return -1;
-			} else {
-				return 1;
-			}
+			return j1.getJob().getJobId() - j2.getJob().getJobId();
 		}
 		
 	}
@@ -166,30 +164,8 @@ public class ThemisInterJobScheduler extends InterJobScheduler {
 			} else if(j1.getLossGradient() > j2.getLossGradient()) {
 				return -1;
 			}
-			if(mRand.nextBoolean()) {
-				return -1;
-			} else {
-				return 1;
-			}
+			return j1.getJob().getJobId() - j2.getJob().getJobId();
 		}
 		
-	}
-	
-	private class ThemisBidComparator implements Comparator<Bid> {
-
-		@Override
-		public int compare(Bid bid1, Bid bid2) {
-			if(bid1.getExpectedBenefit() > bid2.getExpectedBenefit()) {
-				return -1;
-			} else if(bid1.getExpectedBenefit() < bid2.getExpectedBenefit()){
-				return 1;
-			}
-			// Else the bids are exact same. We need to break it randomly
-			if(mRand.nextBoolean()) {
-				return -1;
-			} else {
-				return 1;
-			}
-		}
 	}
 }

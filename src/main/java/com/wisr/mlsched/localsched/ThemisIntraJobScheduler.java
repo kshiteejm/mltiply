@@ -32,21 +32,33 @@ public class ThemisIntraJobScheduler extends IntraJobScheduler {
 			return null;
 		}
 		List<Bid> bids = new ArrayList<Bid>();
-		int n = (int) Math.pow(2, offeredGPUs.size())-1;
 		Queue<String> q = new LinkedList<String>();
 		q.add("1");
-		while (n-- > 0) {
+		while (q.size() > 0) {
 			String s1 = q.peek();
 			q.remove();
 			Bid bid = prepareBidWithGPUs(s1, offeredGPUs);
 			if(bid != null) {
 				bids.add(bid);
 			}
-			String s2 = s1;
-			q.add(s1 + "0");
-			q.add(s2 + "1");
+			if(getGPUsInString(s1) < mMaxParallelism && s1.length() < offeredGPUs.size()) {
+				String s2 = s1;
+				q.add(s1 + "0");
+				q.add(s2 + "1");	
+			}
 		}
 		return bids;
+	}
+	
+	private int getGPUsInString(String s) {
+		char[] bitmaskArray = s.toCharArray();
+		int count = 0;
+		for(int i=0;i<bitmaskArray.length;i++) {
+			if(bitmaskArray[i] == '1') {
+				count++;
+			}
+		}
+		return count;
 	}
 	
 	private Bid prepareBidWithGPUs(String bitmask, List<GPU>offeredGPUs) {

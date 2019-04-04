@@ -69,7 +69,7 @@ public abstract class InterJobScheduler {
 		startWaitingJobs();
 	}
 	
-	private class PerGPUBidComparator implements Comparator<Bid> {
+	protected class PerGPUBidComparator implements Comparator<Bid> {
 
 		@Override
 		public int compare(Bid bid1, Bid bid2) {
