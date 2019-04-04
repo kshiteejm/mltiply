@@ -4,17 +4,31 @@
   "cross_rack_slowdown":"0.4",
   "hyperparameter_jobs": [
     {
-      "total_iterations":"5",
+      "total_iterations":"1000",
       "time_per_iteration":"10",
-      "max_parallelism":"4",
+      "max_parallelism":"1",
       "random_seed":"7",
       "loss_function_type":"sublinear"
     },
     {
-      "total_iterations":"5",
-      "time_per_iteration":"10",
-      "max_parallelism":"4",
-      "random_seed":"7",
+      "total_iterations":"2000",
+      "time_per_iteration":"15",
+      "max_parallelism":"1",
+      "random_seed":"6",
+      "loss_function_type":"sublinear"
+    },
+    {
+      "total_iterations":"5000",
+      "time_per_iteration":"12",
+      "max_parallelism":"1",
+      "random_seed":"3",
+      "loss_function_type":"sublinear"
+    },
+    {
+      "total_iterations":"1000",
+      "time_per_iteration":"20",
+      "max_parallelism":"1",
+      "random_seed":"8",
       "loss_function_type":"sublinear"
     }
   ]

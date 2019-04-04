@@ -76,4 +76,8 @@ public class JobGroupManager {
 		}
 		return 1 - (jobIterations/totalJGIterations);
 	}
+	
+	public List<IntraJobScheduler> getJobsInGroup(IntraJobScheduler job) {
+		return mJobMap.get(job.getJobGroupId());
+	}
 }

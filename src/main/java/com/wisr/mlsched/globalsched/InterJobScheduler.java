@@ -78,12 +78,12 @@ public abstract class InterJobScheduler {
 			} else if(bid1.getExpectedBenefit() < bid2.getExpectedBenefit()){
 				return 1;
 			}
-			// Else the bids are exact same. We need to break it randomly
-			if(mRand.nextBoolean()) {
-				return -1;
-			} else {
-				return 1;
+			if(bid1.getJob().getGPUsAvailableForNextIteration().size() !=
+					bid2.getJob().getGPUsAvailableForNextIteration().size()) {
+				return bid1.getJob().getGPUsAvailableForNextIteration().size() -
+						bid2.getJob().getGPUsAvailableForNextIteration().size();
 			}
+			return bid1.getJob().getJobId() - bid2.getJob().getJobId();
 		}
 		
 	}

@@ -8,6 +8,7 @@ import com.wisr.mlsched.ClusterEventQueue;
 import com.wisr.mlsched.Simulation;
 import com.wisr.mlsched.events.JobStatisticEvent;
 import com.wisr.mlsched.localsched.IntraJobScheduler;
+import com.wisr.mlsched.localsched.JobGroupManager;
 import com.wisr.mlsched.resources.Cluster;
 
 public class JobStatistics {
@@ -61,7 +62,7 @@ public class JobStatistics {
 		mLossValues.add(new LossValue(Simulation.getSimulationTime(), computeCumulativeLoss()));
 		if(Cluster.getInstance().getRunningJobs().size() > 0) {
 			ClusterEventQueue.getInstance().enqueueEvent(new 
-					JobStatisticEvent(Simulation.getSimulationTime() + 1));
+					JobStatisticEvent(Simulation.getSimulationTime() + 5));
 		}
 	}
 	
@@ -77,8 +78,18 @@ public class JobStatistics {
 	private double computeJainFairness() {
 		List<IntraJobScheduler> jobs = Cluster.getInstance().getRunningJobs();
 		List<Double> ratios = new ArrayList<Double>();
-		for(IntraJobScheduler job : jobs) {
-			ratios.add(job.getCurrentEstimate()/job.getIdealEstimate());
+		List<Integer> jobGroups = new ArrayList<Integer>();
+		for(IntraJobScheduler job: jobs) {
+			if(!jobGroups.contains(job.getJobGroupId())) {
+				// Have not processed this job group yet
+				jobGroups.add(job.getJobGroupId());
+				List<IntraJobScheduler> jobsInGroup = JobGroupManager.getInstance().getJobsInGroup(job);
+				double total = 0;
+				for(IntraJobScheduler jg : jobsInGroup) {
+					total += jg.getCurrentEstimate()/jg.getIdealEstimate();
+				}
+				ratios.add(total/jobsInGroup.size());
+			}
 		}
 		return Math.pow(sum(ratios), 2)/(ratios.size() * sumOfSquares(ratios));
 	}
@@ -138,14 +149,14 @@ public class JobStatistics {
 	
 	private void printFairnessIndex() {
 		for(FairnessIndex f : mFairnessIndices) {
-			System.out.println(Double.toString(f.getTimestamp()) + 
+			System.out.println("JF " + Double.toString(f.getTimestamp()) + 
 					" " + Double.toString(f.getFairness()));
 		}
 	}
 	
 	private void printLosses() {
 		for(LossValue l : mLossValues) {
-			System.out.println(Double.toString(l.getTimestamp()) + 
+			System.out.println("Loss " + Double.toString(l.getTimestamp()) + 
 					" " + Double.toString(l.getLoss()));
 		}
 	}
