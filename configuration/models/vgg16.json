@@ -1,0 +1,35 @@
+{
+  "cross_machine_slowdown": "0.8", 
+  "cross_rack_slowdown": "0.7", 
+  "cross_slot_slowdown": "0.9", 
+  "hyperparameter_jobs": [
+    {
+      "time_per_iteration": "3.5", 
+      "random_seed": "89", 
+      "total_iterations": "176", 
+      "max_parallelism": "4", 
+      "loss_function_type": "sublinear"
+    }, 
+    {
+      "time_per_iteration": "0.234215885947", 
+      "random_seed": "63", 
+      "total_iterations": "491", 
+      "max_parallelism": "1", 
+      "loss_function_type": "sublinear"
+    }, 
+    {
+      "time_per_iteration": "8.56140350877", 
+      "random_seed": "70", 
+      "total_iterations": "114", 
+      "max_parallelism": "8", 
+      "loss_function_type": "sublinear"
+    }, 
+    {
+      "time_per_iteration": "0.23553008596", 
+      "random_seed": "1", 
+      "total_iterations": "5235", 
+      "max_parallelism": "1", 
+      "loss_function_type": "sublinear"
+    }
+  ]
+}

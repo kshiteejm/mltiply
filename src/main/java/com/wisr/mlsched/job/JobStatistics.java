@@ -86,7 +86,7 @@ public class JobStatistics {
 				List<IntraJobScheduler> jobsInGroup = JobGroupManager.getInstance().getJobsInGroup(job);
 				double total = 0;
 				for(IntraJobScheduler jg : jobsInGroup) {
-					total += jg.getCurrentEstimate()/jg.getIdealEstimate();
+					total += jg.getIdealEstimate()/jg.getCurrentEstimate();
 				}
 				ratios.add(total/jobsInGroup.size());
 			}

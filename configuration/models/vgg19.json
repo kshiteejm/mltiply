@@ -1,0 +1,147 @@
+{
+  "cross_machine_slowdown": "0.8", 
+  "cross_rack_slowdown": "0.7", 
+  "cross_slot_slowdown": "0.9", 
+  "hyperparameter_jobs": [
+    {
+      "time_per_iteration": "8.83105981112", 
+      "random_seed": "59", 
+      "total_iterations": "953", 
+      "max_parallelism": "8", 
+      "loss_function_type": "sublinear"
+    }, 
+    {
+      "time_per_iteration": "3.4334038055", 
+      "random_seed": "64", 
+      "total_iterations": "946", 
+      "max_parallelism": "4", 
+      "loss_function_type": "sublinear"
+    }, 
+    {
+      "time_per_iteration": "0.270508474576", 
+      "random_seed": "50", 
+      "total_iterations": "1475", 
+      "max_parallelism": "1", 
+      "loss_function_type": "sublinear"
+    }, 
+    {
+      "time_per_iteration": "3.43529411765", 
+      "random_seed": "16", 
+      "total_iterations": "170", 
+      "max_parallelism": "4", 
+      "loss_function_type": "sublinear"
+    }, 
+    {
+      "time_per_iteration": "8.85925925926", 
+      "random_seed": "92", 
+      "total_iterations": "270", 
+      "max_parallelism": "8", 
+      "loss_function_type": "sublinear"
+    }, 
+    {
+      "time_per_iteration": "0.269851517108", 
+      "random_seed": "63", 
+      "total_iterations": "1549", 
+      "max_parallelism": "1", 
+      "loss_function_type": "sublinear"
+    }, 
+    {
+      "time_per_iteration": "0.270536692223", 
+      "random_seed": "51", 
+      "total_iterations": "1826", 
+      "max_parallelism": "1", 
+      "loss_function_type": "sublinear"
+    }, 
+    {
+      "time_per_iteration": "0.270538243626", 
+      "random_seed": "39", 
+      "total_iterations": "706", 
+      "max_parallelism": "1", 
+      "loss_function_type": "sublinear"
+    }, 
+    {
+      "time_per_iteration": "8.84210526316", 
+      "random_seed": "13", 
+      "total_iterations": "114", 
+      "max_parallelism": "8", 
+      "loss_function_type": "sublinear"
+    }, 
+    {
+      "time_per_iteration": "8.83333333333", 
+      "random_seed": "59", 
+      "total_iterations": "384", 
+      "max_parallelism": "8", 
+      "loss_function_type": "sublinear"
+    }, 
+    {
+      "time_per_iteration": "0.270426829268", 
+      "random_seed": "34", 
+      "total_iterations": "3280", 
+      "max_parallelism": "1", 
+      "loss_function_type": "sublinear"
+    }, 
+    {
+      "time_per_iteration": "0.270491803279", 
+      "random_seed": "0", 
+      "total_iterations": "2074", 
+      "max_parallelism": "1", 
+      "loss_function_type": "sublinear"
+    }, 
+    {
+      "time_per_iteration": "1.31891891892", 
+      "random_seed": "43", 
+      "total_iterations": "185", 
+      "max_parallelism": "2", 
+      "loss_function_type": "sublinear"
+    }, 
+    {
+      "time_per_iteration": "3.43226640802", 
+      "random_seed": "17", 
+      "total_iterations": "3093", 
+      "max_parallelism": "4", 
+      "loss_function_type": "sublinear"
+    }, 
+    {
+      "time_per_iteration": "0.270508474576", 
+      "random_seed": "53", 
+      "total_iterations": "1475", 
+      "max_parallelism": "1", 
+      "loss_function_type": "sublinear"
+    }, 
+    {
+      "time_per_iteration": "0.270509977827", 
+      "random_seed": "84", 
+      "total_iterations": "451", 
+      "max_parallelism": "1", 
+      "loss_function_type": "sublinear"
+    }, 
+    {
+      "time_per_iteration": "26.4096385542", 
+      "random_seed": "56", 
+      "total_iterations": "83", 
+      "max_parallelism": "16", 
+      "loss_function_type": "sublinear"
+    }, 
+    {
+      "time_per_iteration": "0.270440251572", 
+      "random_seed": "99", 
+      "total_iterations": "477", 
+      "max_parallelism": "1", 
+      "loss_function_type": "sublinear"
+    }, 
+    {
+      "time_per_iteration": "3.43324250681", 
+      "random_seed": "14", 
+      "total_iterations": "367", 
+      "max_parallelism": "4", 
+      "loss_function_type": "sublinear"
+    }, 
+    {
+      "time_per_iteration": "3.45238095238", 
+      "random_seed": "43", 
+      "total_iterations": "168", 
+      "max_parallelism": "4", 
+      "loss_function_type": "sublinear"
+    }
+  ]
+}
