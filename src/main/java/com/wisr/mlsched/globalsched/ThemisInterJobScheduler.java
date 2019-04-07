@@ -47,7 +47,9 @@ public class ThemisInterJobScheduler extends InterJobScheduler {
 		Collections.sort(lossGradients, new LossGradientComparator());
 		// Now choose epsilon fraction of this
 		double e = Cluster.getInstance().getEpsilon();
-		lossGradients = lossGradients.subList(0, (int) (e*lossGradients.size()));
+		if(Cluster.getInstance().getRunningJobs().size() * e >= 1) {
+			lossGradients = lossGradients.subList(0, (int) (e*lossGradients.size()));
+		}
 		
 		List<Bid> bids = new ArrayList<Bid>();
 		for(JobLossGradient job: lossGradients) {

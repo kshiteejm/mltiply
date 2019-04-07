@@ -1,6 +1,6 @@
 {
-  "cross_slot_slowdown":"0.9",
-  "cross_machine_slowdown":"0.8",
-  "cross_rack_slowdown":"0.7",
+  "cross_slot_slowdown":"0.95",
+  "cross_machine_slowdown":"0.87",
+  "cross_rack_slowdown":"0.78",
   "loss_function_type":"sublinear"
 }

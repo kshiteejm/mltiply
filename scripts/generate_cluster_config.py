@@ -25,7 +25,6 @@ def main():
     cluster_conf['fairness_threshold'] = str(args.fairness_knob)
     cluster_conf['epsilon'] = str(args.visibility_knob)
     cluster_conf['lease_time'] = str(args.lease_time)
-    print(cluster_conf)
     with open("configuration/cluster/" + args.config_file + ".json", 'w') as cf:
         cf.write(json.dumps(cluster_conf, indent=2, sort_keys=False))
 

@@ -42,7 +42,10 @@ def main():
             r = generate_random_number(len(value))
             job_conf["total_iterations"] = str(value[r][3])
             job_conf["time_per_iteration"] = str(float(value[r][5])*int(value[r][1])/int(value[r][3]))
-            job_conf["max_parallelism"] = str(value[r][1])
+            if value[r][1] >= 4:
+                job_conf["max_parallelism"] = "4"
+            else :
+                job_conf["max_parallelism"] = str(value[r][1])
             job_conf["loss_function_type"] = loss_curve_type
             job_conf["random_seed"] = str(generate_random_number(100))
             model_conf["hyperparameter_jobs"].append(job_conf)
