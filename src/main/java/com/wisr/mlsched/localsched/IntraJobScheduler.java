@@ -115,6 +115,7 @@ public abstract class IntraJobScheduler {
 		sLog.info("Iterations Remaning: " + Integer.toString(getmTotalIterationsRemaining()));
 		if (getmTotalIterationsRemaining() == 0) {
 			// Job is done
+			System.out.println("Job " + Integer.toString(mJobId) + " done");
 			sLog.info("Job " + Integer.toString(mJobId) + " done");
 			List<GPU> relinquished_resources = relinquishAllResources();
 			// Make all relinquished resources available
