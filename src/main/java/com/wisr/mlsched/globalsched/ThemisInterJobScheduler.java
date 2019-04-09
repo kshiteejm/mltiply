@@ -147,10 +147,9 @@ public class ThemisInterJobScheduler extends InterJobScheduler {
 
 		@Override
 		public int compare(JobFairness j1, JobFairness j2) {
-			if(j1.getFairnessValue() < j2.getFairnessValue()) {
-				return -1;
-			} else if(j1.getFairnessValue() > j2.getFairnessValue()){
-				return 1;
+			int comp = Double.compare(j1.getFairnessValue(), j2.getFairnessValue());
+			if(comp != 0) {
+				return comp;
 			}
 			return j1.getJob().getJobId() - j2.getJob().getJobId();
 		}
@@ -161,10 +160,9 @@ public class ThemisInterJobScheduler extends InterJobScheduler {
 
 		@Override
 		public int compare(JobLossGradient j1, JobLossGradient j2) {
-			if(j1.getLossGradient() < j2.getLossGradient()) {
-				return 1;
-			} else if(j1.getLossGradient() > j2.getLossGradient()) {
-				return -1;
+			int comp = Double.compare(j1.getLossGradient(), j2.getLossGradient());
+			if(comp != 0) {
+				return comp;
 			}
 			return j1.getJob().getJobId() - j2.getJob().getJobId();
 		}

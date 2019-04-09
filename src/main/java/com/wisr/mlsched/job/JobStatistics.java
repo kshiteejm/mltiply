@@ -62,7 +62,7 @@ public class JobStatistics {
 		mLossValues.add(new LossValue(Simulation.getSimulationTime(), computeCumulativeLoss()));
 		if(Cluster.getInstance().getRunningJobs().size() > 0) {
 			ClusterEventQueue.getInstance().enqueueEvent(new 
-					JobStatisticEvent(Simulation.getSimulationTime() + 5));
+					JobStatisticEvent(Simulation.getSimulationTime() + Cluster.getInstance().getLeaseTime()));
 		}
 	}
 	

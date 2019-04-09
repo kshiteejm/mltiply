@@ -14,7 +14,7 @@ import org.json.simple.JSONObject;
 public class Simulation {
 	
 	private static double mTime;
-	private static final Level mLogLevel = Level.INFO;
+	private static final Level mLogLevel = Level.OFF;
 	
 	public static void main(String args[]) {
 		String cluster_config_file = args[0];

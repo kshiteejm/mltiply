@@ -73,18 +73,14 @@ public abstract class InterJobScheduler {
 
 		@Override
 		public int compare(Bid bid1, Bid bid2) {
-			if(bid1.getExpectedBenefit() > bid2.getExpectedBenefit()) {
-				return -1;
-			} else if(bid1.getExpectedBenefit() < bid2.getExpectedBenefit()){
-				return 1;
+			int comp = Double.compare(bid1.getExpectedBenefit(), bid2.getExpectedBenefit());
+			if(comp != 0) {
+				return comp;
 			}
 			if(bid1.getJob().getGPUsAvailableForNextIteration().size() !=
 					bid2.getJob().getGPUsAvailableForNextIteration().size()) {
 				return bid1.getJob().getGPUsAvailableForNextIteration().size() -
 						bid2.getJob().getGPUsAvailableForNextIteration().size();
-			}
-			if(bid1.getGPUList().size() != bid2.getGPUList().size()) {
-				return bid1.getGPUList().size() - bid2.getGPUList().size();
 			}
 			return bid1.getJob().getJobId() - bid2.getJob().getJobId();
 		}
