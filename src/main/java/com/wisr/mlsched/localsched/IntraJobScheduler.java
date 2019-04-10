@@ -38,6 +38,7 @@ public abstract class IntraJobScheduler {
 	private double mCrossRackSlowdown; // Slowdown due to network b/w GPUs across slots
 
 	// State management for job
+	private boolean mIsLeader; // Whether this job is the leader in it's job group
 	protected int mTotalIterationsRemaining; // Number of iterations of job remaining
 	protected Set<GPU> mCurrentIterationGPUs; // GPUs for current iteration
 	private Set<GPU> mNextIterationExpectedGPUs; // GPUs we expect from current iteration to be used for next iteration
@@ -55,12 +56,23 @@ public abstract class IntraJobScheduler {
 		mNextIterationExpectedGPUs = new HashSet<GPU>();
 		mNextIterationGPUs = new HashSet<GPU>();
 		mIsWaiting = true;
+		mIsLeader = true; // By default, everyone is a leader unless told otherwise
 		JobStatistics.getInstance().recordJobStart(mJobId, Simulation.getSimulationTime());
 		List<GPU> availableResources = getResourcesAvailableInCluster();
 		if (!availableResources.isEmpty()) {
 			ClusterEventQueue.getInstance()
 					.enqueueEvent(new ResourceAvailableEvent(Simulation.getSimulationTime(), availableResources));
 		}
+	}
+	
+	/**
+	 * Set the role of job and number of iterations it needs to run.
+	 * @param is_leader
+	 * @param iterations
+	 */
+	public void setRole(boolean is_leader, int iterations) {
+		mIsLeader = is_leader;
+		mTotalIterationsRemaining = iterations;
 	}
 
 	/**

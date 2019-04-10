@@ -6,6 +6,9 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
+import com.wisr.mlsched.ClusterEventQueue;
+import com.wisr.mlsched.Simulation;
+import com.wisr.mlsched.events.JobGroupEvaluationEvent;
 import com.wisr.mlsched.resources.Cluster;
 
 public class JobGroupManager {
@@ -44,6 +47,8 @@ public class JobGroupManager {
 		List<IntraJobScheduler> listJobGroup = mJobMap.get(job.getJobGroupId());
 		if(listJobGroup == null) {
 			listJobGroup = new ArrayList<IntraJobScheduler>();
+			ClusterEventQueue.getInstance().enqueueEvent(new 
+					JobGroupEvaluationEvent(Simulation.getSimulationTime(), job.getJobGroupId()));
 		}
 		listJobGroup.add(job);
 		mJobMap.remove(job.getJobGroupId());
@@ -77,7 +82,21 @@ public class JobGroupManager {
 		return 1 - (jobIterations/totalJGIterations);
 	}
 	
+	/**
+	 * Get the list of all jobs that are in the same job group as this job
+	 * @param job
+	 * @return
+	 */
 	public List<IntraJobScheduler> getJobsInGroup(IntraJobScheduler job) {
 		return mJobMap.get(job.getJobGroupId());
+	}
+	
+	/**
+	 * Get the list of all jobs in the job group
+	 * @param jobGroupId
+	 * @return
+	 */
+	public List<IntraJobScheduler> getJobsInGroup(int jobGroupId) {
+		return mJobMap.get(jobGroupId);
 	}
 }

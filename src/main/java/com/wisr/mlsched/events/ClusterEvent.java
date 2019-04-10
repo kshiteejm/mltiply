@@ -11,6 +11,7 @@ public abstract class ClusterEvent {
 	
 	public enum EventType {
 		JOB_ARRIVAL, // Highest Priority
+		JOB_GROUP_EVALUATION,
 		END_ITERATION,
 		RESOURCE_AVAILABLE,
 		START_ITERATION; // Lowest Priority
