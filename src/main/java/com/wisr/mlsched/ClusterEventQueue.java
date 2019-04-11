@@ -47,6 +47,14 @@ public class ClusterEventQueue {
 	}
 	
 	/**
+	 * Return the current size of event size
+	 * @return integer, correponding to number of events
+	 */
+	public int getNumberEvents() {
+		return mEventQueue.size();
+	}
+	
+	/**
 	 * Start event processing
 	 */
 	public void start() {

@@ -58,15 +58,13 @@ public class JobStatistics {
 	public void recordJobEnd(int jobid, double timestamp, double start_time, double ideal_running_time,
 			boolean isLeader) {
 		mJobTime.get(jobid).setEndTime(timestamp);
-		if(isLeader) {
-			mFinishTimeFairness.add((timestamp-start_time)/ideal_running_time);
-		}
+		mFinishTimeFairness.add((timestamp-start_time)/ideal_running_time);
 	}
 	
 	public void recordJobStatistics() {
 		mFairnessIndices.add(new FairnessIndex(Simulation.getSimulationTime(), computeJainFairness()));
 		mLossValues.add(new LossValue(Simulation.getSimulationTime(), computeCumulativeLoss()));
-		if(Cluster.getInstance().getRunningJobs().size() > 0) {
+		if(ClusterEventQueue.getInstance().getNumberEvents() > 0) {
 			ClusterEventQueue.getInstance().enqueueEvent(new 
 					JobStatisticEvent(Simulation.getSimulationTime() + Cluster.getInstance().getLeaseTime()));
 		}
