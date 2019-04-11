@@ -1,0 +1,7 @@
+{
+  "cross_slot_slowdown":"1",
+  "cross_machine_slowdown":"0.98",
+  "cross_rack_slowdown":"0.96",
+  "loss_function_type":"sublinear",
+  "time_per_iteration":"0.33"
+}
