@@ -6,5 +6,5 @@
   "gpus_per_slot": "4", 
   "fairness_threshold": "0.0", 
   "slots_per_machine": "1", 
-  "cluster_policy": "Themis"
+  "cluster_policy": "Tiresias"
 }

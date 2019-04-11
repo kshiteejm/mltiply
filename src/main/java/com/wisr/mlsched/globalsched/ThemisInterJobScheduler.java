@@ -162,7 +162,7 @@ public class ThemisInterJobScheduler extends InterJobScheduler {
 		public int compare(JobLossGradient j1, JobLossGradient j2) {
 			int comp = Double.compare(j1.getLossGradient(), j2.getLossGradient());
 			if(comp != 0) {
-				return comp;
+				return -1*comp;
 			}
 			return j1.getJob().getJobId() - j2.getJob().getJobId();
 		}

@@ -134,7 +134,8 @@ public abstract class IntraJobScheduler {
 			ClusterEventQueue.getInstance()
 					.enqueueEvent(new ResourceAvailableEvent(Simulation.getSimulationTime(), relinquished_resources));
 			Cluster.getInstance().removeJob(this);
-			JobStatistics.getInstance().recordJobEnd(mJobId, Simulation.getSimulationTime());
+			JobStatistics.getInstance().recordJobEnd(mJobId, Simulation.getSimulationTime(), mJobStartTime,
+					getIdealEstimate(), mIsLeader);
 			return;
 		}
 		// Job has iterations left

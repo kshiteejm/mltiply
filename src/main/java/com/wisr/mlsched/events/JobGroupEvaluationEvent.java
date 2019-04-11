@@ -26,7 +26,9 @@ public class JobGroupEvaluationEvent extends ClusterEvent {
 		List<IntraJobScheduler> jobs = JobGroupManager.getInstance().getJobsInGroup(mJobGroupId);
 		Collections.sort(jobs, new JobIterationComparator()); // sort in ascending order of iterations
 		int max_iterations = jobs.get(jobs.size()-1).getmTotalExpectedIterations();
-		System.out.println(max_iterations);
+		if(jobs.size() == 1) {
+			return;
+		}
 		int iteration_step = max_iterations/(int)(Math.log10(jobs.size())/Math.log10(2));
 		int index = 0;
 		int count = 1;

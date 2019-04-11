@@ -75,7 +75,7 @@ public abstract class InterJobScheduler {
 		public int compare(Bid bid1, Bid bid2) {
 			int comp = Double.compare(bid1.getExpectedBenefit(), bid2.getExpectedBenefit());
 			if(comp != 0) {
-				return comp;
+				return -1*comp;
 			}
 			if(bid1.getJob().getGPUsAvailableForNextIteration().size() !=
 					bid2.getJob().getGPUsAvailableForNextIteration().size()) {

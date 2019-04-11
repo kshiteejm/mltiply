@@ -17,6 +17,7 @@ public class JobStatistics {
 	private HashMap<Integer, SingleJobStat> mJobTime; // Job start and end time per job
 	private List<FairnessIndex> mFairnessIndices; // List of fairness indices measured over time
 	private List<LossValue> mLossValues; // List of cumulative loss values measured over time
+	private List<Double> mFinishTimeFairness; // List of Ts/Ti for leader jobs
 	
 	/**
 	 * Private constructor to enforce singleton
@@ -25,6 +26,7 @@ public class JobStatistics {
 		mJobTime = new HashMap<Integer, SingleJobStat>();
 		mFairnessIndices = new ArrayList<FairnessIndex>();
 		mLossValues = new ArrayList<LossValue>();
+		mFinishTimeFairness = new ArrayList<Double>();
 		ClusterEventQueue.getInstance().enqueueEvent(new 
 				JobStatisticEvent(Simulation.getSimulationTime() + 1));
 	}
@@ -53,8 +55,12 @@ public class JobStatistics {
 	 * @param jobid
 	 * @param timestamp
 	 */
-	public void recordJobEnd(int jobid, double timestamp) {
+	public void recordJobEnd(int jobid, double timestamp, double start_time, double ideal_running_time,
+			boolean isLeader) {
 		mJobTime.get(jobid).setEndTime(timestamp);
+		if(isLeader) {
+			mFinishTimeFairness.add((timestamp-start_time)/ideal_running_time);
+		}
 	}
 	
 	public void recordJobStatistics() {
@@ -118,6 +124,18 @@ public class JobStatistics {
 		printMakespan();
 		printFairnessIndex();
 		printLosses();
+		printFinishTimeFairness();
+	}
+	
+	private void printFinishTimeFairness() {
+		double sum = 0;
+		double sum_of_squares = 0;
+		for(double d : mFinishTimeFairness) {
+			sum += d;
+			sum_of_squares += d*d;
+		}
+		double jf = (sum*sum)/(mFinishTimeFairness.size()*sum_of_squares);
+		System.out.println("Finish Time Fairness : " + Double.toString(jf));
 	}
 	
 	private void printJCT() {

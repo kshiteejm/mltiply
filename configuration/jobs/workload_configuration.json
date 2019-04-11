@@ -24,5 +24,31 @@
                 "cross_slot_slowdown":"0.9",
                 "cross_machine_slowdown":"0.7",
                 "cross_rack_slowdown":"0.4"
+        },
+	{
+                "job_group_id" : "1",
+                "job_id":"3",
+                "start_time":"0",
+                "total_iterations":"15",
+                "time_per_iteration":"10",
+                "max_parallelism":"4",
+                "random_seed":"7",
+                "loss_function_type":"sublinear",
+                "cross_slot_slowdown":"0.9",
+                "cross_machine_slowdown":"0.7",
+                "cross_rack_slowdown":"0.4"
+        },
+	{
+                "job_group_id" : "1",
+                "job_id":"4",
+                "start_time":"0",
+                "total_iterations":"20",
+                "time_per_iteration":"10",
+                "max_parallelism":"4",
+                "random_seed":"7",
+                "loss_function_type":"sublinear",
+                "cross_slot_slowdown":"0.9",
+                "cross_machine_slowdown":"0.7",
+                "cross_rack_slowdown":"0.4"
         }
 ]
