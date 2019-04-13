@@ -70,9 +70,10 @@ public abstract class IntraJobScheduler {
 	 * @param is_leader
 	 * @param iterations
 	 */
-	public void setRole(boolean is_leader, int iterations) {
+	public void setRole(boolean is_leader, int iterations) { 
 		mIsLeader = is_leader;
 		mTotalIterationsRemaining = iterations;
+		mTotalExpectedIterations = iterations;
 	}
 
 	/**

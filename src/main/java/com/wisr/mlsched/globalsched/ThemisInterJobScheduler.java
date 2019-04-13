@@ -8,6 +8,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.wisr.mlsched.ClusterEventQueue;
+import com.wisr.mlsched.Simulation;
+import com.wisr.mlsched.events.ResourceAvailableEvent;
 import com.wisr.mlsched.job.Bid;
 import com.wisr.mlsched.localsched.IntraJobScheduler;
 import com.wisr.mlsched.resources.Cluster;
@@ -30,14 +33,13 @@ public class ThemisInterJobScheduler extends InterJobScheduler {
 		for(IntraJobScheduler job: runningJobs) {
 			fairnessValues.add(new JobFairness(job, job.getCurrentEstimate()/job.getIdealEstimate()));
 		}
+		// Sort in descending order of fairness - Most unfair to most fair
 		Collections.sort(fairnessValues, new JobFairnessComparator());
-		JobFairness mostUnfairJob = fairnessValues.get(fairnessValues.size()-1);
 		double d = Cluster.getInstance().getFairnessThreshold();
-		if(mostUnfairJob.getFairnessValue() >= 1.0 + d) {
-			// Consider only those jobs which have their fairness above threshold
-			fairnessValues = fairnessValues.stream()
-				    .filter(j -> j.getFairnessValue() > 1.0 + d).collect(Collectors.toList());
-		}
+		
+		int num_jobs_to_consider = Math.max((int) (d*fairnessValues.size()), 1);
+		fairnessValues = fairnessValues.subList(0, num_jobs_to_consider);
+		
 		// For the selected jobs, prioritize them based on the gradient of loss function
 		List<JobLossGradient> lossGradients = new ArrayList<JobLossGradient>();
 		for(JobFairness j: fairnessValues) {
@@ -47,9 +49,11 @@ public class ThemisInterJobScheduler extends InterJobScheduler {
 		Collections.sort(lossGradients, new LossGradientComparator());
 		// Now choose epsilon fraction of this
 		double e = Cluster.getInstance().getEpsilon();
-		if(Cluster.getInstance().getRunningJobs().size() * e >= 1) {
-			lossGradients = lossGradients.subList(0, (int) (e*lossGradients.size()));
-		}
+		//if(Cluster.getInstance().getRunningJobs().size() * e >= 1) {
+		//	lossGradients = lossGradients.subList(0, (int) (e*lossGradients.size()));
+		//}
+		num_jobs_to_consider = Math.max((int) e*lossGradients.size(), 1);
+		lossGradients = lossGradients.subList(0, num_jobs_to_consider);
 		
 		List<Bid> bids = new ArrayList<Bid>();
 		for(JobLossGradient job: lossGradients) {
@@ -96,6 +100,10 @@ public class ThemisInterJobScheduler extends InterJobScheduler {
 			}
 		}
 		startWaitingJobs();
+		if(remainingGPUSet.size() > 0) {
+			ClusterEventQueue.getInstance().enqueueEvent(new ResourceAvailableEvent(
+					Simulation.getSimulationTime(), remainingGPUSet));
+		}
 	}
 	
 	private boolean isGpuPresent(GPU gpu, List<GPU> gpuList) {
@@ -149,7 +157,7 @@ public class ThemisInterJobScheduler extends InterJobScheduler {
 		public int compare(JobFairness j1, JobFairness j2) {
 			int comp = Double.compare(j1.getFairnessValue(), j2.getFairnessValue());
 			if(comp != 0) {
-				return comp;
+				return -1*comp;
 			}
 			return j1.getJob().getJobId() - j2.getJob().getJobId();
 		}

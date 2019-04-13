@@ -13,8 +13,8 @@ public abstract class ClusterEvent {
 		JOB_ARRIVAL, // Highest Priority
 		JOB_GROUP_EVALUATION,
 		END_ITERATION,
-		RESOURCE_AVAILABLE,
-		START_ITERATION; // Lowest Priority
+		START_ITERATION,
+		RESOURCE_AVAILABLE; // Lowest Priority
 	}
 	
 	/**
