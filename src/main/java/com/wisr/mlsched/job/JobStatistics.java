@@ -18,6 +18,7 @@ public class JobStatistics {
 	private List<FairnessIndex> mFairnessIndices; // List of fairness indices measured over time
 	private List<LossValue> mLossValues; // List of cumulative loss values measured over time
 	private List<Double> mFinishTimeFairness; // List of Ts/Ti for leader jobs
+	private List<ContentionValue> mContention; // List of contention numbers over time
 	
 	/**
 	 * Private constructor to enforce singleton
@@ -27,6 +28,7 @@ public class JobStatistics {
 		mFairnessIndices = new ArrayList<FairnessIndex>();
 		mLossValues = new ArrayList<LossValue>();
 		mFinishTimeFairness = new ArrayList<Double>();
+		mContention = new ArrayList<ContentionValue>();
 		ClusterEventQueue.getInstance().enqueueEvent(new 
 				JobStatisticEvent(Simulation.getSimulationTime() + 1));
 	}
@@ -64,10 +66,21 @@ public class JobStatistics {
 	public void recordJobStatistics() {
 		mFairnessIndices.add(new FairnessIndex(Simulation.getSimulationTime(), computeJainFairness()));
 		mLossValues.add(new LossValue(Simulation.getSimulationTime(), computeCumulativeLoss()));
+		mContention.add(new ContentionValue(Simulation.getSimulationTime(), computeCurrentContention()));
 		if(ClusterEventQueue.getInstance().getNumberEvents() > 0) {
 			ClusterEventQueue.getInstance().enqueueEvent(new 
 					JobStatisticEvent(Simulation.getSimulationTime() + Cluster.getInstance().getLeaseTime()));
 		}
+	}
+	
+	private double computeCurrentContention() {
+		List<IntraJobScheduler> jobs = Cluster.getInstance().getRunningJobs();
+		long cumulativeReq = 0;
+		for(IntraJobScheduler job : jobs) {
+			cumulativeReq += job.getMaxParallelism();
+		}
+		int num_gpus = Cluster.getInstance().getGPUsInCluster().size();
+		return (double)cumulativeReq*1.0/num_gpus;
 	}
 	
 	private double computeCumulativeLoss() {
@@ -122,6 +135,7 @@ public class JobStatistics {
 		printMakespan();
 		printFairnessIndex();
 		printLosses();
+		printContentions();
 		printFinishTimeFairness();
 	}
 	
@@ -174,6 +188,13 @@ public class JobStatistics {
 		for(LossValue l : mLossValues) {
 			System.out.println("Loss " + Double.toString(l.getTimestamp()) + 
 					" " + Double.toString(l.getLoss()));
+		}
+	}
+	
+	private void printContentions() {
+		for(ContentionValue l : mContention) {
+			System.out.println("Contention " + Double.toString(l.getTimestamp()) + 
+					" " + Double.toString(l.getContention()));
 		}
 	}
 	
@@ -239,6 +260,24 @@ public class JobStatistics {
 		
 		public double getLoss() {
 			return mLoss;
+		}
+	}
+	
+	private class ContentionValue {
+		private double mTimestamp;
+		private double mContention;
+		
+		public ContentionValue(double timestamp, double contention) {
+			mTimestamp = timestamp;
+			mContention = contention;
+		}
+		
+		public double getTimestamp() {
+			return mTimestamp;
+		}
+		
+		public double getContention() {
+			return mContention;
 		}
 	}
 }
