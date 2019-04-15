@@ -80,9 +80,6 @@ public class ThemisIntraJobScheduler extends IntraJobScheduler {
 		double newExpectedRunningTime = (Simulation.getSimulationTime() - mJobStartTime)
 				+ (getmTotalIterationsRemaining() * mTimePerIteration) / expectedJobSpeedUp;
 		double expectedGain = getCurrentEstimate()/newExpectedRunningTime;
-		sLog.info("JobGroup:" + Integer.toString(getJobGroupId())
-			+ " Job:" + Integer.toString(getJobId()) + 
-			" Bid:" + Double.toString(expectedGain));
 		return new Bid(gpusForBid, expectedGain, this);
 	}
 	

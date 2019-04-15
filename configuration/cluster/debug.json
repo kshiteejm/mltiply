@@ -1,10 +1,10 @@
 {
-  "lease_time": "10.0",
+  "lease_time": "5.0",
   "racks_in_cluster": "2",
-  "machines_per_rack": "4",
-  "epsilon": "0.4",
+  "machines_per_rack": "2",
+  "epsilon": "1.0",
   "gpus_per_slot": "4",
-  "fairness_threshold": "0.0",
+  "fairness_threshold": "0",
   "slots_per_machine": "2",
   "cluster_policy": "Themis"
 }

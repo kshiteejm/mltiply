@@ -167,6 +167,11 @@ public abstract class IntraJobScheduler {
 		return (Simulation.getSimulationTime() - mJobStartTime)
 				+ (getmTotalIterationsRemaining() * mTimePerIteration) / getJobSpeedup();
 	}
+	
+	public double getEstimateAfterAllocation() {
+		return (Simulation.getSimulationTime() - mJobStartTime)
+				+ (getmTotalIterationsRemaining() * mTimePerIteration) / getJobSpeedup1();
+	}
 
 	public double getIdealEstimate() {
 		return 1.0 * mTimePerIteration * getmTotalExpectedIterations() / mMaxParallelism;
@@ -187,6 +192,10 @@ public abstract class IntraJobScheduler {
 	
 	public void notifyResourceAvailable() {
 		mIsWaiting = false;
+	}
+	
+	public double getJobSpeedup1() {
+		return getGPUsAvailableForNextIteration().size()* getPlacementSlowdown(getGPUsAvailableForNextIteration());
 	}
 
 	public double getJobSpeedup() {
