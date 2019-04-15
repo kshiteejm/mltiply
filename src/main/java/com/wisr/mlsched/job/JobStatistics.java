@@ -192,10 +192,25 @@ public class JobStatistics {
 	}
 	
 	private void printContentions() {
+		double sum = 0.0;
+		double max = 0.0;
 		for(ContentionValue l : mContention) {
 			System.out.println("Contention " + Double.toString(l.getTimestamp()) + 
 					" " + Double.toString(l.getContention()));
+			sum += l.getContention();
+			if(l.getContention() > max) {
+				max = l.getContention();
+			}
 		}
+		double mean = (double)sum*1.0/(mContention.size()-1);
+		double standard_deviation = 0.0;
+		for(ContentionValue l : mContention) {
+			standard_deviation += Math.pow((l.getContention()-mean), 2);
+		}
+		standard_deviation = Math.sqrt((standard_deviation)/(mContention.size()-1));
+		System.out.println("Mean Contention: " + Double.toString(mean));
+		System.out.println("Standard Deviation Contention: " + Double.toString(standard_deviation));
+		System.out.println("Peak Contention: " + Double.toString(max));
 	}
 	
 	private class SingleJobStat {
