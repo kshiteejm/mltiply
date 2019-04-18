@@ -3,7 +3,7 @@ mkdir results/$1
 mkdir configuration/cluster/$1
 
 # Generate cluster configurations for Themis
-for lease in 5 #10 20 40 80 # Variation of lease time
+for lease in 5 10 20 40 80 # Variation of lease time
 do
 	for d in $(seq 0 0.02 1) # Variation of fairness knob
 	do
@@ -20,7 +20,7 @@ do
 done
 
 # Generate cluster configurations for other configurations
-for lease in 5 #10 20 40 80
+for lease in 5 10 20 40 80
 do
 	echo "Other Schemes $lease"
 	python scripts/generate_cluster_config.py --racks 2 --machines 2 --slots 2 --gpus 4 --policy SLAQ --lease_time $lease --config_file config_slaq_lease$lease
