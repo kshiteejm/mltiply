@@ -4,30 +4,142 @@
   "cross_slot_slowdown": "0.9", 
   "hyperparameter_jobs": [
     {
-      "time_per_iteration": "0.0544780998039", 
-      "random_seed": "22", 
-      "total_iterations": "13767", 
+      "time_per_iteration": "0.0544783010157", 
+      "random_seed": "4", 
+      "total_iterations": "9747", 
+      "max_parallelism": "4", 
+      "loss_function_type": "sublinear"
+    }, 
+    {
+      "time_per_iteration": "3.55612903226", 
+      "random_seed": "57", 
+      "total_iterations": "1550", 
+      "max_parallelism": "4", 
+      "loss_function_type": "sublinear"
+    }, 
+    {
+      "time_per_iteration": "10.4455958549", 
+      "random_seed": "17", 
+      "total_iterations": "1930", 
+      "max_parallelism": "4", 
+      "loss_function_type": "sublinear"
+    }, 
+    {
+      "time_per_iteration": "3.5569823435", 
+      "random_seed": "1", 
+      "total_iterations": "623", 
+      "max_parallelism": "4", 
+      "loss_function_type": "sublinear"
+    }, 
+    {
+      "time_per_iteration": "0.0544757640514", 
+      "random_seed": "35", 
+      "total_iterations": "29481", 
       "max_parallelism": "4", 
       "loss_function_type": "sublinear"
     }, 
     {
       "time_per_iteration": "0.0544971200709", 
-      "random_seed": "29", 
+      "random_seed": "32", 
+      "total_iterations": "2257", 
+      "max_parallelism": "4", 
+      "loss_function_type": "sublinear"
+    }, 
+    {
+      "time_per_iteration": "1.46016646849", 
+      "random_seed": "79", 
+      "total_iterations": "841", 
+      "max_parallelism": "4", 
+      "loss_function_type": "sublinear"
+    }, 
+    {
+      "time_per_iteration": "1.45952007176", 
+      "random_seed": "77", 
+      "total_iterations": "8918", 
+      "max_parallelism": "4", 
+      "loss_function_type": "sublinear"
+    }, 
+    {
+      "time_per_iteration": "3.56302521008", 
+      "random_seed": "53", 
+      "total_iterations": "357", 
+      "max_parallelism": "4", 
+      "loss_function_type": "sublinear"
+    }, 
+    {
+      "time_per_iteration": "0.0544971200709", 
+      "random_seed": "17", 
+      "total_iterations": "2257", 
+      "max_parallelism": "4", 
+      "loss_function_type": "sublinear"
+    }, 
+    {
+      "time_per_iteration": "0.537658360017", 
+      "random_seed": "0", 
+      "total_iterations": "7183", 
+      "max_parallelism": "4", 
+      "loss_function_type": "sublinear"
+    }, 
+    {
+      "time_per_iteration": "0.0544971200709", 
+      "random_seed": "36", 
+      "total_iterations": "2257", 
+      "max_parallelism": "4", 
+      "loss_function_type": "sublinear"
+    }, 
+    {
+      "time_per_iteration": "3.56204379562", 
+      "random_seed": "21", 
+      "total_iterations": "274", 
+      "max_parallelism": "4", 
+      "loss_function_type": "sublinear"
+    }, 
+    {
+      "time_per_iteration": "0.0544971200709", 
+      "random_seed": "26", 
       "total_iterations": "2257", 
       "max_parallelism": "4", 
       "loss_function_type": "sublinear"
     }, 
     {
       "time_per_iteration": "3.5649122807", 
-      "random_seed": "8", 
+      "random_seed": "26", 
       "total_iterations": "285", 
       "max_parallelism": "4", 
       "loss_function_type": "sublinear"
     }, 
     {
-      "time_per_iteration": "0.537706756378", 
-      "random_seed": "8", 
-      "total_iterations": "3567", 
+      "time_per_iteration": "3.55555555556", 
+      "random_seed": "28", 
+      "total_iterations": "414", 
+      "max_parallelism": "4", 
+      "loss_function_type": "sublinear"
+    }, 
+    {
+      "time_per_iteration": "0.0544830544831", 
+      "random_seed": "98", 
+      "total_iterations": "2331", 
+      "max_parallelism": "4", 
+      "loss_function_type": "sublinear"
+    }, 
+    {
+      "time_per_iteration": "0.0544774050457", 
+      "random_seed": "12", 
+      "total_iterations": "7214", 
+      "max_parallelism": "4", 
+      "loss_function_type": "sublinear"
+    }, 
+    {
+      "time_per_iteration": "0.0544780998039", 
+      "random_seed": "76", 
+      "total_iterations": "13767", 
+      "max_parallelism": "4", 
+      "loss_function_type": "sublinear"
+    }, 
+    {
+      "time_per_iteration": "1.45994065282", 
+      "random_seed": "56", 
+      "total_iterations": "337", 
       "max_parallelism": "4", 
       "loss_function_type": "sublinear"
     }

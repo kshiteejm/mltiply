@@ -110,6 +110,9 @@ public abstract class IntraJobScheduler {
 		mNextIterationGPUs = new HashSet<GPU>();
 		mIsWaiting = false;
 		assert(mCurrentIterationGPUs.size() > 0);
+		System.out.println("Placement Job " + Integer.toString(mJobId) + ": " 
+				+ "Iteration: " + Integer.toString(mTotalExpectedIterations - mTotalIterationsRemaining)
+				+ " Score: " + Double.toString(getPlacementSlowdown(mCurrentIterationGPUs)));
 		ClusterEventQueue.getInstance().enqueueEvent(
 				new EndIterationEvent(Simulation.getSimulationTime() + mTimePerIteration / getJobSpeedup(), this));
 		Iterator<GPU> gpuIter = mCurrentIterationGPUs.iterator();
