@@ -6,5 +6,6 @@
 	"cluster_policy" : "Themis",
 	"fairness_threshold" : "0.0",
 	"epsilon" : "1", 
-	"lease_time" : "5"
+	"lease_time" : "5",
+	"should_use_config" : "False"
 }

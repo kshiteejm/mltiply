@@ -37,6 +37,8 @@ public abstract class IntraJobScheduler {
 	private double mCrossMachineSlowdown; // Slowdown due to network b/w GPUs across machines
 	private double mCrossRackSlowdown; // Slowdown due to network b/w GPUs across slots
 
+	private final double CHECKPOINTING_OVERHEAD_PER_GPU = 0.1; // 6 seconds overhead
+	
 	// State management for job
 	private boolean mIsLeader; // Whether this job is the leader in it's job group
 	protected int mTotalIterationsRemaining; // Number of iterations of job remaining
@@ -136,7 +138,8 @@ public abstract class IntraJobScheduler {
 			List<GPU> relinquished_resources = relinquishAllResources();
 			// Make all relinquished resources available
 			ClusterEventQueue.getInstance()
-					.enqueueEvent(new ResourceAvailableEvent(Simulation.getSimulationTime(), relinquished_resources));
+					.enqueueEvent(new ResourceAvailableEvent(Simulation.getSimulationTime()
+							+ CHECKPOINTING_OVERHEAD_PER_GPU*relinquished_resources.size(), relinquished_resources));
 			Cluster.getInstance().removeJob(this);
 			JobStatistics.getInstance().recordJobEnd(mJobId, Simulation.getSimulationTime(), mJobStartTime,
 					getIdealEstimate(), mIsLeader);
@@ -156,7 +159,8 @@ public abstract class IntraJobScheduler {
 		}
 		if(!expiredResources.isEmpty()) {
 			ClusterEventQueue.getInstance()
-			.enqueueEvent(new ResourceAvailableEvent(Simulation.getSimulationTime(), expiredResources));
+			.enqueueEvent(new ResourceAvailableEvent(Simulation.getSimulationTime() +
+					CHECKPOINTING_OVERHEAD_PER_GPU*mCurrentIterationGPUs.size(), expiredResources));
 		}
 		
 		if (mNextIterationGPUs.isEmpty()) {

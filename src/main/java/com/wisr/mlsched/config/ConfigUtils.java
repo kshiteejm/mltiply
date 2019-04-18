@@ -55,9 +55,10 @@ public class ConfigUtils {
 		double lease_time = Double.parseDouble(getAttributeValue(config, "lease_time"));
 		double fairness_threshold = Double.parseDouble(getAttributeValue(config, "fairness_threshold"));
 		double epsilon = Double.parseDouble(getAttributeValue(config, "epsilon"));
+		boolean shouldUseConfig = Boolean.parseBoolean(getAttributeValue(config, "should_use_config"));
 		String policy = getClusterPolicy(config);
 		return new ClusterConfiguration(racks, machines, slots, gpus, policy, lease_time, 
-				fairness_threshold, epsilon);
+				fairness_threshold, epsilon, shouldUseConfig);
 	}
 	
 	/**

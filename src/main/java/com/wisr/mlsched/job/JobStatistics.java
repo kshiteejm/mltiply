@@ -143,16 +143,14 @@ public class JobStatistics {
 		double max = 0.0;
 		double sum = 0;
 		double sum_of_squares = 0;
-		System.out.print("Values: ");
 		for(double d : mFinishTimeFairness) {
 			sum += d;
 			sum_of_squares += d*d;
 			if(d > max) {
 				max = d;
 			}
-			System.out.print(Double.toString(d) + " ");
+			System.out.println("Job FFT: " + Double.toString(d));
 		}
-		System.out.println("");
 		double jf = (sum*sum)/(mFinishTimeFairness.size()*sum_of_squares);
 		System.out.println("Finish Time Fairness : " + Double.toString(jf));
 		System.out.println("Max Fairness : " + Double.toString(max));

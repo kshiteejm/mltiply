@@ -12,10 +12,11 @@ public class ClusterConfiguration {
 	private double mLeaseTime;
 	private double mFairnessThreshold;
 	private double mEpsilon;
+	private boolean mUseConfig;
 	
 	public ClusterConfiguration(int racks, int machines_per_rack,
 			int slots_per_machine, int gpus_per_slot, String policy, double lease,
-			double fairness_threshold, double epsilon) {
+			double fairness_threshold, double epsilon, boolean useConfig) {
 		mRacks = racks;
 		mMachinesPerRack = machines_per_rack;
 		mSlotsPerMachine = slots_per_machine;
@@ -24,6 +25,11 @@ public class ClusterConfiguration {
 		mLeaseTime = lease;
 		mFairnessThreshold = fairness_threshold;
 		mEpsilon = epsilon;
+		mUseConfig = useConfig;
+	}
+	
+	public boolean getUseConfig() {
+		return mUseConfig;
 	}
 	
 	public double getLeaseTime() {
