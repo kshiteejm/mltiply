@@ -17,6 +17,8 @@ import com.wisr.mlsched.localsched.IntraJobScheduler;
 import com.wisr.mlsched.resources.Cluster;
 import com.wisr.mlsched.resources.GPU;
 
+import gurobi.*;
+
 public class ThemisInterJobScheduler extends InterJobScheduler {
 
 	@Override
