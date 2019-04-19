@@ -32,6 +32,8 @@ public abstract class InterJobScheduler {
 				ClusterEventQueue.getInstance().enqueueEvent(
 						new StartIterationEvent(Simulation.getSimulationTime(), job));
 				job.notifyResourceAvailable();
+			} else if(job.isWaitingForResources()){
+				job.resetOldRatio();
 			}
 		}
 	}

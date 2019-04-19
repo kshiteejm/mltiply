@@ -32,6 +32,7 @@ public class ThemisInterJobScheduler extends InterJobScheduler {
 			// create helpers and gurobi variables per bid
 			HashMap<GPU, Set<Bid>> bidsPerGPU = new HashMap<GPU, Set<Bid>>();
 			HashMap<Bid, GRBVar> bidVariables = new HashMap<Bid, GRBVar>();
+			HashMap<IntraJobScheduler, Set<Bid>> bidsPerJob = new HashMap<IntraJobScheduler, Set<Bid>>();
 			for (Bid bid: bid_set) {
 				bidVariables.put(bid, solver.addVar(0.0, 1.0, 0.0, GRB.BINARY, "Bid: " + bid.toString()));
 				for (GPU gpu: bid.getGPUList()) {
@@ -43,9 +44,16 @@ public class ThemisInterJobScheduler extends InterJobScheduler {
 						bidsPerGPU.put(gpu, bids);
 					}
 				}
+				if (bidsPerJob.containsKey(bid.getJob())) {
+					bidsPerJob.get(bid.getJob()).add(bid);
+				} else {
+					Set<Bid> bids = new HashSet<Bid>();
+					bids.add(bid);
+					bidsPerJob.put(bid.getJob(), bids);
+				}
 			}
 			solver.update();
-			// create gurobi constraints per gpu
+			// create gurobi constraints per gpu, per job
 			for (GPU gpu: bidsPerGPU.keySet()) {
 				GRBLinExpr packingConstraint = new GRBLinExpr();
 				for (Bid bid: bidsPerGPU.get(gpu)) {
@@ -53,18 +61,33 @@ public class ThemisInterJobScheduler extends InterJobScheduler {
 				}
 				solver.addConstr(packingConstraint, GRB.LESS_EQUAL, 1.0, "");
 			}
+			for (IntraJobScheduler job: bidsPerJob.keySet()) {
+				GRBLinExpr jobMaxParallelConstraint = new GRBLinExpr();
+				for (Bid bid: bidsPerJob.get(job)) {
+					jobMaxParallelConstraint.addTerm(bid.getGPUList().size(), bidVariables.get(bid));
+				}
+				solver.addConstr(jobMaxParallelConstraint, GRB.LESS_EQUAL, 
+						job.getMaxParallelism() - job.getGPUsAvailableForNextIteration().size(),  "");
+			}
 			// create gurobi objective for maximizing product of bid valuations
 			GRBLinExpr valuationObjective = new GRBLinExpr();
 			for (Bid bid: bid_set) {
 				// potential problem in logarithm
-				double logExpectedBenefit = Math.log(bid.getExpectedBenefit());
+				double logExpectedBenefit = -0.01;
+				if (Double.compare(bid.getExpectedBenefit(), 1) < 0) {
+					logExpectedBenefit = Math.log10(bid.getExpectedBenefit());
+				}
+				if (Double.compare(bid.getExpectedBenefit(), 0) == 0) {
+					logExpectedBenefit = -1000;
+				}
 				valuationObjective.addTerm(logExpectedBenefit, bidVariables.get(bid));
 			}
-			solver.setObjective(valuationObjective, GRB.MAXIMIZE);
+			solver.setObjective(valuationObjective, GRB.MINIMIZE);
 			solver.update();
 			// optimize
 			solver.optimize();
-			if (solver.get(GRB.IntAttr.Status) == GRB.Status.OPTIMAL || solver.get(GRB.IntAttr.Status) == GRB.Status.TIME_LIMIT ) {
+			if (solver.get(GRB.IntAttr.Status) == GRB.Status.OPTIMAL) { 
+					// || solver.get(GRB.IntAttr.Status) == GRB.Status.TIME_LIMIT ) {
 				double maxValuation = solver.get(GRB.DoubleAttr.ObjVal);
 				for (Bid bid: bidVariables.keySet()) {
 					GRBVar var = bidVariables.get(bid);
@@ -73,6 +96,8 @@ public class ThemisInterJobScheduler extends InterJobScheduler {
 					}
 				}
 			} else {
+				solver.computeIIS();
+	            solver.write(".quark-unsat.ilp");
 				System.out.println("UNSOLVABLE.");
 			}
 		} catch (GRBException e) {
@@ -145,33 +170,23 @@ public class ThemisInterJobScheduler extends InterJobScheduler {
 					break;
 				}
 			}
-			
-			// Maximize fairness based on bids. For now, going for a greedy approach
-			Collections.sort(bids, new PerGPUBidComparator());
 			List<GPU> remainingGPUSet = new ArrayList<>(gpu_set);
-			for(Bid bid: bids) {
-				List<GPU> assignedGPUs = bid.getGPUList();
-				// Check if all GPUs are available in remaining GPU set
-				boolean allGpusPresent = true;
-				for(GPU gpu : assignedGPUs) {
-					if(!isGpuPresent(gpu, remainingGPUSet)) {
-						allGpusPresent = false;
-					}
+			//System.out.println(gpu_set.toString());
+			List<Bid> winningBids = pickWinningBids(gpu_set, bids);
+			if(winningBids.size() == 0) {
+				System.out.println("Have a problem!");
+				for(Bid bid : bids) {
+					System.out.println("Bid: " + bid);
 				}
-				if(!allGpusPresent) {
-					// This bid cannot be honored
-					continue;
+				for (GPU gpu: gpu_set) {
+					System.out.println("GPU: " + gpu.getLocation());
 				}
-				Set<GPU> gpuSet = new HashSet<GPU>(bid.getJob().getGPUsAvailableForNextIteration());
-				gpuSet.addAll(assignedGPUs);
-				if(gpuSet.size() > bid.getJob().getMaxParallelism()) {
-					// This is an illegal assignment.
-					// It is possible that the job got resources from another bid
-					continue;
-				}
-				bid.getJob().notifyResourceAssignment(assignedGPUs);
-				remainingGPUSet.removeAll(assignedGPUs);
-				for(GPU g: assignedGPUs) {
+			}
+			for(Bid bid : winningBids) {
+				bid.getJob().notifyResourceAssignment(bid.getGPUList());
+				remainingGPUSet.removeAll(bid.getGPUList());
+				//System.out.println(remainingGPUSet.size());
+				for(GPU g: bid.getGPUList()) {
 					g.assignGPU(Cluster.getInstance().getLeaseTime(), bid.getJob());
 				}
 				if(remainingGPUSet.size() == 0) {

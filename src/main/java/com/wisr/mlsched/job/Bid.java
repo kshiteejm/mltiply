@@ -44,4 +44,15 @@ public class Bid {
 	public IntraJobScheduler getJob() {
 		return mJob;
 	}
+	
+	@Override
+	public String toString() {
+		String out = "";
+		for (GPU gpu: mList) {
+			out = out + ":[" + gpu.getLocation().toString() +"]";
+		}
+		out = out + ":" + mExpectedBenefit;
+		out = out + ":" + mJob.getJobId();
+		return out;
+	}
 }

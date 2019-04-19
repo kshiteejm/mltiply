@@ -79,7 +79,7 @@ public class ThemisIntraJobScheduler extends IntraJobScheduler {
 		double expectedJobSpeedUp = potentialNewGPUSet.size() * getPlacementSlowdown(potentialNewGPUSet);
 		double newExpectedRunningTime = (Simulation.getSimulationTime() - mJobStartTime)
 				+ (getmTotalIterationsRemaining() * mTimePerIteration) / expectedJobSpeedUp;
-		double expectedGain = getCurrentEstimate()/newExpectedRunningTime;
+		double expectedGain = newExpectedRunningTime/(getIdealEstimate()*oldRatio);
 		return new Bid(gpusForBid, expectedGain, this);
 	}
 	

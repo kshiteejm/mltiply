@@ -23,7 +23,7 @@
     <dependency>
         <groupId>com.gurobi</groupId>
         <artifactId>gurobi-jar</artifactId>
-        <version>7.0.2</version>
+        <version>8.0.1</version>
     </dependency>
   </dependencies>
   <properties>

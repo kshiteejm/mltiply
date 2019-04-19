@@ -46,6 +46,7 @@ public abstract class IntraJobScheduler {
 	private Set<GPU> mNextIterationExpectedGPUs; // GPUs we expect from current iteration to be used for next iteration
 	protected Set<GPU> mNextIterationGPUs; // GPUs allocated for next iteration
 	private boolean mIsWaiting; // Represents if job is waiting for resources
+	protected double oldRatio; // Old value of Ts/Ti
 	private static Logger sLog; // Instance of logger
 
 	public IntraJobScheduler(JSONObject config) {
@@ -58,6 +59,7 @@ public abstract class IntraJobScheduler {
 		mNextIterationExpectedGPUs = new HashSet<GPU>();
 		mNextIterationGPUs = new HashSet<GPU>();
 		mIsWaiting = true;
+		oldRatio = Double.POSITIVE_INFINITY;
 		mIsLeader = true; // By default, everyone is a leader unless told otherwise
 		JobStatistics.getInstance().recordJobStart(mJobId, Simulation.getSimulationTime());
 		List<GPU> availableResources = getResourcesAvailableInCluster();
@@ -131,6 +133,7 @@ public abstract class IntraJobScheduler {
 		sLog.log(Level.ALL, "End iteration for job " + Integer.toString(mJobId));
 		setmTotalIterationsRemaining(getmTotalIterationsRemaining() - 1);
 		sLog.info("Iterations Remaning: " + Integer.toString(getmTotalIterationsRemaining()));
+		oldRatio = getCurrentEstimate()/getIdealEstimate();
 		if (getmTotalIterationsRemaining() == 0) {
 			// Job is done
 			System.out.println("Job " + Integer.toString(mJobId) + " done");
@@ -164,10 +167,15 @@ public abstract class IntraJobScheduler {
 		}
 		
 		if (mNextIterationGPUs.isEmpty()) {
+			mCurrentIterationGPUs = new HashSet<GPU>();
 			mIsWaiting = true;
 		} else {
 			ClusterEventQueue.getInstance().enqueueEvent(new StartIterationEvent(Simulation.getSimulationTime(), this));
 		}
+	}
+	
+	public void resetOldRatio() {
+		oldRatio = Double.POSITIVE_INFINITY;
 	}
 
 	public double getCurrentEstimate() {
