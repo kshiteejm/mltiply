@@ -3,6 +3,7 @@ package com.wisr.mlsched.globalsched;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
@@ -20,6 +21,65 @@ import com.wisr.mlsched.resources.GPU;
 import gurobi.*;
 
 public class ThemisInterJobScheduler extends InterJobScheduler {
+
+	public List<Bid> pickWinningBids(List<GPU> gpu_set, List<Bid> bid_set) {
+		List<Bid> winners = new ArrayList<Bid>();
+		GRBEnv env;
+		GRBModel solver;
+		try {
+			env = new GRBEnv("themis_gurobi.log");
+			solver = new GRBModel(env);
+			// create helpers and gurobi variables per bid
+			HashMap<GPU, Set<Bid>> bidsPerGPU = new HashMap<GPU, Set<Bid>>();
+			HashMap<Bid, GRBVar> bidVariables = new HashMap<Bid, GRBVar>();
+			for (Bid bid: bid_set) {
+				bidVariables.put(bid, solver.addVar(0.0, 1.0, 0.0, GRB.BINARY, "Bid: " + bid.toString()));
+				for (GPU gpu: bid.getGPUList()) {
+					if (bidsPerGPU.containsKey(gpu)) {
+						bidsPerGPU.get(gpu).add(bid);
+					} else {
+						Set<Bid> bids = new HashSet<Bid>();
+						bids.add(bid);
+						bidsPerGPU.put(gpu, bids);
+					}
+				}
+			}
+			solver.update();
+			// create gurobi constraints per gpu
+			for (GPU gpu: bidsPerGPU.keySet()) {
+				GRBLinExpr packingConstraint = new GRBLinExpr();
+				for (Bid bid: bidsPerGPU.get(gpu)) {
+					packingConstraint.addTerm(1.0, bidVariables.get(bid));
+				}
+				solver.addConstr(packingConstraint, GRB.LESS_EQUAL, 1.0, "");
+			}
+			// create gurobi objective for maximizing product of bid valuations
+			GRBLinExpr valuationObjective = new GRBLinExpr();
+			for (Bid bid: bid_set) {
+				// potential problem in logarithm
+				double logExpectedBenefit = Math.log(bid.getExpectedBenefit());
+				valuationObjective.addTerm(logExpectedBenefit, bidVariables.get(bid));
+			}
+			solver.setObjective(valuationObjective, GRB.MAXIMIZE);
+			solver.update();
+			// optimize
+			solver.optimize();
+			if (solver.get(GRB.IntAttr.Status) == GRB.Status.OPTIMAL || solver.get(GRB.IntAttr.Status) == GRB.Status.TIME_LIMIT ) {
+				double maxValuation = solver.get(GRB.DoubleAttr.ObjVal);
+				for (Bid bid: bidVariables.keySet()) {
+					GRBVar var = bidVariables.get(bid);
+					if (var.get(GRB.DoubleAttr.X) == 1) {
+						winners.add(bid);
+					}
+				}
+			} else {
+				System.out.println("UNSOLVABLE.");
+			}
+		} catch (GRBException e) {
+			e.printStackTrace();
+		}
+		return winners;
+	}
 
 	@Override
 	public void onResourceAvailable(List<GPU> gpu_set) {

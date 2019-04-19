@@ -100,4 +100,23 @@ public class GPU {
     public double getLeaseEnd() {
     	return mLeaseStart + mLeaseDuration;
     }
+
+    public int getGPUId() {
+      return mGpuLocation.getGPUId();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (o == this) {
+        return true;
+      }
+
+      if (!(o instanceof GPU)) {
+        return false;
+      }
+
+      GPU gpu = (GPU) o;
+
+    	return mGpuLocation.compareTo(gpu.getLocation());
+    }
 }
