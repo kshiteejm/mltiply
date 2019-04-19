@@ -73,7 +73,7 @@ public class ThemisInterJobScheduler extends InterJobScheduler {
 			GRBLinExpr valuationObjective = new GRBLinExpr();
 			for (Bid bid: bid_set) {
 				// potential problem in logarithm
-				double logExpectedBenefit = -0.01;
+				double logExpectedBenefit = -1000;
 				if (Double.compare(bid.getExpectedBenefit(), 1) < 0) {
 					logExpectedBenefit = Math.log10(bid.getExpectedBenefit());
 				}
