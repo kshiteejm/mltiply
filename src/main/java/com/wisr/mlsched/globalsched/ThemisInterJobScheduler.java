@@ -28,6 +28,7 @@ public class ThemisInterJobScheduler extends InterJobScheduler {
 		GRBModel solver;
 		try {
 			env = new GRBEnv("themis_gurobi.log");
+			env.set(GRB.IntParam.LogToConsole, 0);
 			solver = new GRBModel(env);
 			// create helpers and gurobi variables per bid
 			HashMap<GPU, Set<Bid>> bidsPerGPU = new HashMap<GPU, Set<Bid>>();
@@ -72,17 +73,18 @@ public class ThemisInterJobScheduler extends InterJobScheduler {
 			// create gurobi objective for maximizing product of bid valuations
 			GRBLinExpr valuationObjective = new GRBLinExpr();
 			for (Bid bid: bid_set) {
-				// potential problem in logarithm
-				double logExpectedBenefit = -1000;
-				if (Double.compare(bid.getExpectedBenefit(), 1) < 0) {
-					logExpectedBenefit = Math.log10(bid.getExpectedBenefit());
-				}
-				if (Double.compare(bid.getExpectedBenefit(), 0) == 0) {
-					logExpectedBenefit = -1000;
-				}
+//				// potential problem in logarithm
+//				double logExpectedBenefit = -1000;
+//				if (Double.compare(bid.getExpectedBenefit(), 1) < 0) {
+//					logExpectedBenefit = Math.log10(bid.getExpectedBenefit());
+//				}
+//				if (Double.compare(bid.getExpectedBenefit(), 0) == 0) {
+//					logExpectedBenefit = -1000;
+//				}
+				double logExpectedBenefit = Math.log(bid.getExpectedBenefit());
 				valuationObjective.addTerm(logExpectedBenefit, bidVariables.get(bid));
 			}
-			solver.setObjective(valuationObjective, GRB.MINIMIZE);
+			solver.setObjective(valuationObjective, GRB.MAXIMIZE);
 			solver.update();
 			// optimize
 			solver.optimize();
@@ -117,7 +119,7 @@ public class ThemisInterJobScheduler extends InterJobScheduler {
 			List<JobFairness> fairnessValues = new ArrayList<JobFairness>();
 			List<IntraJobScheduler> runningJobs = Cluster.getInstance().getRunningJobs();
 			for(IntraJobScheduler job: runningJobs) {
-				fairnessValues.add(new JobFairness(job, job.getCurrentEstimate()/job.getIdealEstimate()));
+				fairnessValues.add(new JobFairness(job, job.getCurrentEstimateForThemis()/job.getIdealEstimate()));
 			}
 			// Sort in descending order of fairness - Most unfair to most fair
 			Collections.sort(fairnessValues, new JobFairnessComparator());

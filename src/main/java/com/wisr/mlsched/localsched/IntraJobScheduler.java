@@ -47,6 +47,8 @@ public abstract class IntraJobScheduler {
 	protected Set<GPU> mNextIterationGPUs; // GPUs allocated for next iteration
 	private boolean mIsWaiting; // Represents if job is waiting for resources
 	protected double oldRatio; // Old value of Ts/Ti
+	protected double themisTs; // Themis Ts
+	private double mTimeSinceLastTsAdjustment; 
 	private static Logger sLog; // Instance of logger
 
 	public IntraJobScheduler(JSONObject config) {
@@ -60,6 +62,7 @@ public abstract class IntraJobScheduler {
 		mNextIterationGPUs = new HashSet<GPU>();
 		mIsWaiting = true;
 		oldRatio = Double.POSITIVE_INFINITY;
+		themisTs = Double.POSITIVE_INFINITY;
 		mIsLeader = true; // By default, everyone is a leader unless told otherwise
 		JobStatistics.getInstance().recordJobStart(mJobId, Simulation.getSimulationTime());
 		List<GPU> availableResources = getResourcesAvailableInCluster();
@@ -92,6 +95,14 @@ public abstract class IntraJobScheduler {
 	 */
 	public void setmTotalIterationsRemaining(int mTotalIterationsRemaining) {
 		this.mTotalIterationsRemaining = mTotalIterationsRemaining;
+	}
+	
+	public double getCurrentEstimateForThemis() {
+		// Do update if we do not have resources
+		if(mCurrentIterationGPUs.size() == 0) {
+			themisTs += (Simulation.getSimulationTime() - mTimeSinceLastTsAdjustment) * mMaxParallelism;
+		}
+		return themisTs;
 	}
 
 	/**
@@ -169,6 +180,7 @@ public abstract class IntraJobScheduler {
 		if (mNextIterationGPUs.isEmpty()) {
 			mCurrentIterationGPUs = new HashSet<GPU>();
 			mIsWaiting = true;
+			mTimeSinceLastTsAdjustment = Simulation.getSimulationTime();
 		} else {
 			ClusterEventQueue.getInstance().enqueueEvent(new StartIterationEvent(Simulation.getSimulationTime(), this));
 		}
@@ -203,6 +215,7 @@ public abstract class IntraJobScheduler {
 	public void notifyResourceAssignment(List<GPU> assignment) {
 		sLog.info("Job " + Integer.toString(mJobId) + " got resources"); 
 		mNextIterationGPUs.addAll(assignment);
+		themisTs = getEstimateAfterAllocation();
 	}
 	
 	public void notifyResourceAvailable() {

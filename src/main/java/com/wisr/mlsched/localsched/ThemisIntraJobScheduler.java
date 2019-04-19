@@ -76,11 +76,21 @@ public class ThemisIntraJobScheduler extends IntraJobScheduler {
 		}
 		Set<GPU> potentialNewGPUSet = new HashSet<GPU>(getGPUsAvailableForNextIteration());
 		potentialNewGPUSet.addAll(gpusForBid);
-		double expectedJobSpeedUp = potentialNewGPUSet.size() * getPlacementSlowdown(potentialNewGPUSet);
-		double newExpectedRunningTime = (Simulation.getSimulationTime() - mJobStartTime)
-				+ (getmTotalIterationsRemaining() * mTimePerIteration) / expectedJobSpeedUp;
-		double expectedGain = newExpectedRunningTime/(getIdealEstimate()*oldRatio);
-		return new Bid(gpusForBid, expectedGain, this);
+		//double oldJobSpeedUp = getGPUsAvailableForNextIteration().size() * 
+				getPlacementSlowdown(getGPUsAvailableForNextIteration());
+		//double expectedJobSpeedUp = potentialNewGPUSet.size() * getPlacementSlowdown(potentialNewGPUSet);
+		//double ratio = expectedJobSpeedUp/oldJobSpeedUp;
+		double expectedJobSpeedUp = gpusForBid.size() * getPlacementSlowdown(potentialNewGPUSet)/
+				getPlacementSlowdown(getGPUsAvailableForNextIteration());
+		if(Double.compare(expectedJobSpeedUp, 1.0) <= 0) {
+			// No point in making this bid
+			return null;
+		}
+		//double newExpectedRunningTime = (Simulation.getSimulationTime() - mJobStartTime)
+		//		+ (getmTotalIterationsRemaining() * mTimePerIteration) / expectedJobSpeedUp;
+		//double expectedGain = newExpectedRunningTime/(getIdealEstimate()*oldRatio);
+		//return new Bid(gpusForBid, expectedGain, this);
+		return new Bid(gpusForBid, expectedJobSpeedUp, this);
 	}
 	
 	private String padLeftZeros(String inputString, int length) {
