@@ -131,6 +131,8 @@ public class ThemisInterJobScheduler extends InterJobScheduler {
 			for(IntraJobScheduler job: runningJobs) {
 				if(jobsToConsider.contains(job.getJobId())) {
 					fairnessValues.add(new JobFairness(job, job.getCurrentEstimateForThemis()/job.getIdealEstimate()));
+					//System.out.println(job.getJobId());
+					//System.out.println(job.getCurrentEstimateForThemis()/job.getIdealEstimate());
 				}
 			}
 			if(fairnessValues.size() == 0) {

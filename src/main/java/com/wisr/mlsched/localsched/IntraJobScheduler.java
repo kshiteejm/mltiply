@@ -48,7 +48,7 @@ public abstract class IntraJobScheduler {
 	private boolean mIsWaiting; // Represents if job is waiting for resources
 	protected double oldRatio; // Old value of Ts/Ti
 	protected double themisTs; // Themis Ts
-	private double mTimeSinceLastTsAdjustment; 
+	private double mTimeLastResourceAssignment; 
 	private static Logger sLog; // Instance of logger
 
 	public IntraJobScheduler(JSONObject config) {
@@ -63,7 +63,7 @@ public abstract class IntraJobScheduler {
 		mIsWaiting = true;
 		oldRatio = Double.POSITIVE_INFINITY;
 		themisTs = Double.POSITIVE_INFINITY;
-		mTimeSinceLastTsAdjustment = Simulation.getSimulationTime();
+		mTimeLastResourceAssignment = Simulation.getSimulationTime()-1;
 		mIsLeader = true; // By default, everyone is a leader unless told otherwise
 		JobStatistics.getInstance().recordJobStart(mJobId, Simulation.getSimulationTime());
 		List<GPU> availableResources = getResourcesAvailableInCluster();
@@ -100,7 +100,14 @@ public abstract class IntraJobScheduler {
 	
 	public double getCurrentEstimateForThemis() {
 		// Do update if we do not have resources
-		return oldRatio;
+		if(mCurrentIterationGPUs.size() == 0) {
+			if(oldRatio == Double.POSITIVE_INFINITY) {
+				return 10000*(Simulation.getSimulationTime() - mTimeLastResourceAssignment);
+			}
+			return themisTs;
+		} else {
+			return getCurrentEstimate();
+		}
 	}
 
 	/**
@@ -143,6 +150,7 @@ public abstract class IntraJobScheduler {
 		setmTotalIterationsRemaining(getmTotalIterationsRemaining() - 1);
 		sLog.info("Iterations Remaning: " + Integer.toString(getmTotalIterationsRemaining()));
 		oldRatio = getCurrentEstimate()/getIdealEstimate();
+		themisTs = getCurrentEstimate();
 		if (getmTotalIterationsRemaining() == 0) {
 			// Job is done
 			System.out.println("Job " + Integer.toString(mJobId) + " done");
@@ -178,7 +186,6 @@ public abstract class IntraJobScheduler {
 		if (mNextIterationGPUs.isEmpty()) {
 			mCurrentIterationGPUs = new HashSet<GPU>();
 			mIsWaiting = true;
-			mTimeSinceLastTsAdjustment = Simulation.getSimulationTime();
 		} else {
 			ClusterEventQueue.getInstance().enqueueEvent(new StartIterationEvent(Simulation.getSimulationTime(), this));
 		}
@@ -213,11 +220,12 @@ public abstract class IntraJobScheduler {
 	public void notifyResourceAssignment(List<GPU> assignment) {
 		sLog.info("Job " + Integer.toString(mJobId) + " got resources"); 
 		mNextIterationGPUs.addAll(assignment);
-		themisTs = getEstimateAfterAllocation();
+		//themisTs = getEstimateAfterAllocation();
 	}
 	
 	public void notifyResourceAvailable() {
 		mIsWaiting = false;
+		mTimeLastResourceAssignment = Simulation.getSimulationTime();
 	}
 	
 	public double getJobSpeedup1() {
