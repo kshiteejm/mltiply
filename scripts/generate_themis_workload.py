@@ -38,9 +38,10 @@ with open("traces/processed_data.csv", "r") as f:
             job_conf["time_per_iteration"] = str(float(model_data["time_per_iteration"])/60)
             job_conf["random_seed"] = str(random.randint(0,99))
             job_conf["max_parallelism"] = str(num_gpus)
-            job_conf["start_time"] = str(start_time)
+            #job_conf["start_time"] = str(start_time)
+            job_conf["start_time"] = "0"
             job_conf["loss_function_type"] = model_data["loss_function_type"] 
             job_conf["total_iterations"] = str(int(running_time/float(job_conf["time_per_iteration"])))
             list_jobs.append(job_conf)
-with open("configuration/jobs/"+"hyperdrive_trace_workload"+".json", "w") as f:
+with open("configuration/jobs/"+"offline_hyperdrive_trace_workload"+".json", "w") as f:
     f.write(json.dumps(list_jobs, indent=2, sort_keys=False))
