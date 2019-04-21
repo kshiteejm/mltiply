@@ -101,7 +101,7 @@ public abstract class IntraJobScheduler {
 	public double getCurrentEstimateForThemis() {
 		// Do update if we do not have resources
 		if(mCurrentIterationGPUs.size() == 0) {
-			return mTotalIterationsRemaining*mTimePerIteration;
+			return (Simulation.getSimulationTime() - mJobStartTime) + mTotalIterationsRemaining*mTimePerIteration;
 		} else {
 			return getCurrentEstimate();
 		}
@@ -298,6 +298,14 @@ public abstract class IntraJobScheduler {
 	 */
 	public int getMaxParallelism() {
 		return mMaxParallelism;
+	}
+	
+	public double getOldBenefit() {
+		double oldSpeedup = getGPUsAvailableForNextIteration().size() * getPlacementSlowdown(getGPUsAvailableForNextIteration());
+		double oldTs = (Simulation.getSimulationTime() - mJobStartTime) + 
+				(mTotalIterationsRemaining*mTimePerIteration)/oldSpeedup;
+		double oldratio = oldTs/getIdealEstimate();
+		return oldratio;
 	}
 
 	public abstract List<Bid> prepareBid(List<GPU> offeredGPUs);

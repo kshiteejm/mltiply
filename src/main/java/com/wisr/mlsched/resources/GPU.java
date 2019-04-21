@@ -33,6 +33,17 @@ public class GPU {
 		sLog.log(Level.ALL, "Created new GPU " + location.getPrettyString());
     }
     
+    @Override
+    public String toString() {
+    	String out = mGpuLocation.getPrettyString();
+    	if(mJobUsingGPU == null) {
+    		out = out + " : unassigned"; 
+    	} else {
+    		out = out + " : " + Integer.toString(mJobUsingGPU.getJobId());
+    	}
+    	return out;
+    }
+    
     /**
      * Assign the GPU to a job for a time specified by lease
      * @param lease_duration_ms
