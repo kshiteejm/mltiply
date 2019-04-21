@@ -77,20 +77,36 @@ public class ThemisIntraJobScheduler extends IntraJobScheduler {
 		Set<GPU> potentialNewGPUSet = new HashSet<GPU>(getGPUsAvailableForNextIteration());
 		potentialNewGPUSet.addAll(gpusForBid);
 		//double oldJobSpeedUp = getGPUsAvailableForNextIteration().size() * 
-				getPlacementSlowdown(getGPUsAvailableForNextIteration());
+			//	getPlacementSlowdown(getGPUsAvailableForNextIteration());
 		//double expectedJobSpeedUp = potentialNewGPUSet.size() * getPlacementSlowdown(potentialNewGPUSet);
 		//double ratio = expectedJobSpeedUp/oldJobSpeedUp;
-		double expectedJobSpeedUp = gpusForBid.size() * getPlacementSlowdown(potentialNewGPUSet)/
-				getPlacementSlowdown(getGPUsAvailableForNextIteration());
-		if(Double.compare(expectedJobSpeedUp, 1.0) <= 0) {
-			// No point in making this bid
+		//double expectedJobSpeedUp = gpusForBid.size() * getPlacementSlowdown(potentialNewGPUSet)/
+			//	getPlacementSlowdown(getGPUsAvailableForNextIteration());
+		//System.out.println(offeredGPUs.size());
+		//System.out.println(expectedJobSpeedUp);
+		//double oldSpeedup = getGPUsAvailableForNextIteration().size()*getPlacementSlowdown(getGPUsAvailableForNextIteration());
+		//double oldTs = (Simulation.getSimulationTime() - mJobStartTime) + 
+		//		(mTotalIterationsRemaining*mTimePerIteration)/oldSpeedup;
+		double newSpeedup = potentialNewGPUSet.size() * getPlacementSlowdown(potentialNewGPUSet);
+		double newTs = (Simulation.getSimulationTime() - mJobStartTime) + 
+				(mTotalIterationsRemaining*mTimePerIteration)/newSpeedup;
+		double ratio = newTs/getIdealEstimate();
+		//double ratio = newTs/oldTs;
+		if(Double.compare(ratio, 1) <= 0) {
+			// no point in making bid
 			return null;
 		}
+		/*if(Double.compare(expectedJobSpeedUp, 1.0) <= 0) {
+			// No point in making this bid
+			return null;
+		}*/
 		//double newExpectedRunningTime = (Simulation.getSimulationTime() - mJobStartTime)
 		//		+ (getmTotalIterationsRemaining() * mTimePerIteration) / expectedJobSpeedUp;
 		//double expectedGain = newExpectedRunningTime/(getIdealEstimate()*oldRatio);
 		//return new Bid(gpusForBid, expectedGain, this);
-		return new Bid(gpusForBid, expectedJobSpeedUp, this);
+		Bid bid = new Bid(gpusForBid, 1/ratio, this);
+		//bid.setNewRatio(newTs/getIdealEstimate());
+		return bid;
 	}
 	
 	private String padLeftZeros(String inputString, int length) {

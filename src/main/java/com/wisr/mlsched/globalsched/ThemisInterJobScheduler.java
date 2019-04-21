@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -30,6 +31,7 @@ public class ThemisInterJobScheduler extends InterJobScheduler {
 			env = new GRBEnv("themis_gurobi.log");
 			env.set(GRB.IntParam.LogToConsole, 0);
 			solver = new GRBModel(env);
+			solver.set(GRB.DoubleParam.TimeLimit, 10.0);
 			// create helpers and gurobi variables per bid
 			HashMap<GPU, Set<Bid>> bidsPerGPU = new HashMap<GPU, Set<Bid>>();
 			HashMap<Bid, GRBVar> bidVariables = new HashMap<Bid, GRBVar>();
@@ -80,16 +82,19 @@ public class ThemisInterJobScheduler extends InterJobScheduler {
 //				}
 //				if (Double.compare(bid.getExpectedBenefit(), 0) == 0) {
 //					logExpectedBenefit = -1000;
-//				}
+//				
 				double logExpectedBenefit = Math.log(bid.getExpectedBenefit());
+				//if (Double.compare(bid.getExpectedBenefit(), 1) > 0) {
+				//	logExpectedBenefit = Math.log(bid.getExpectedBenefit());
+				//}
 				valuationObjective.addTerm(logExpectedBenefit, bidVariables.get(bid));
 			}
-			solver.setObjective(valuationObjective, GRB.MAXIMIZE);
+			solver.setObjective(valuationObjective, GRB.MINIMIZE);
 			solver.update();
 			// optimize
 			solver.optimize();
-			if (solver.get(GRB.IntAttr.Status) == GRB.Status.OPTIMAL) { 
-					// || solver.get(GRB.IntAttr.Status) == GRB.Status.TIME_LIMIT ) {
+			if (solver.get(GRB.IntAttr.Status) == GRB.Status.OPTIMAL
+					|| solver.get(GRB.IntAttr.Status) == GRB.Status.TIME_LIMIT ) {
 				double maxValuation = solver.get(GRB.DoubleAttr.ObjVal);
 				for (Bid bid: bidVariables.keySet()) {
 					GRBVar var = bidVariables.get(bid);
@@ -114,12 +119,22 @@ public class ThemisInterJobScheduler extends InterJobScheduler {
 			// Means no jobs are running, hence nothing to do
 			return;
 		}
+		List<IntraJobScheduler> allJobsInCluster = Cluster.getInstance().getRunningJobs();
+		List<Integer> jobsToConsider = new ArrayList<>();
+		for(IntraJobScheduler job : allJobsInCluster) {
+			jobsToConsider.add(job.getJobId());
+		}
 		gpu_set = gpu_set.stream().filter(g -> !g.isLeased()).collect(Collectors.toList());
 		while(gpu_set.size() > 0) {
 			List<JobFairness> fairnessValues = new ArrayList<JobFairness>();
 			List<IntraJobScheduler> runningJobs = Cluster.getInstance().getRunningJobs();
 			for(IntraJobScheduler job: runningJobs) {
-				fairnessValues.add(new JobFairness(job, job.getCurrentEstimateForThemis()/job.getIdealEstimate()));
+				if(jobsToConsider.contains(job.getJobId())) {
+					fairnessValues.add(new JobFairness(job, job.getCurrentEstimateForThemis()/job.getIdealEstimate()));
+				}
+			}
+			if(fairnessValues.size() == 0) {
+				break;
 			}
 			// Sort in descending order of fairness - Most unfair to most fair
 			Collections.sort(fairnessValues, new JobFairnessComparator());
@@ -159,22 +174,36 @@ public class ThemisInterJobScheduler extends InterJobScheduler {
 			
 			// If no bids, let's see if others not selected have any resources requirements
 			if(bids.size() == 0) {
-				bids = new ArrayList<Bid>();
-				runningJobs = Cluster.getInstance().getRunningJobs();
-				for(IntraJobScheduler job: runningJobs) {
-					List<Bid> bidsFromJob = job.prepareBid(gpu_set);
-					if(bidsFromJob != null && !bidsFromJob.isEmpty()) {
-						bids.addAll(bidsFromJob);
-					}
+				for(JobFairness job : allJobs) {
+					jobsToConsider.remove(new Integer(job.getJob().getJobId()));
 				}
-				// If still no bids, all jobs are running at full capacity
-				if(bids.size() == 0) {
-					break;
-				}
+				continue;
 			}
 			List<GPU> remainingGPUSet = new ArrayList<>(gpu_set);
 			//System.out.println(gpu_set.toString());
-			List<Bid> winningBids = pickWinningBids(gpu_set, bids);
+			// Restrict the number of bids here
+			List<Bid> finalBids = new ArrayList<Bid>();
+			Map<Integer, List<Bid>> resourceNumberToBidMap = new HashMap<Integer, List<Bid>>();
+			for(int i=1;i<=gpu_set.size();i++) {
+				resourceNumberToBidMap.put(i, new ArrayList<Bid>());
+			}
+			// Map all bids into resource map
+			for(Bid bid : bids) {
+				resourceNumberToBidMap.get(bid.getGPUList().size()).add(bid);
+			}
+			
+			// For each resource size, limit number of bids
+			/*for(Integer rno : resourceNumberToBidMap.keySet()) {
+				List<Bid> bidsForRno = resourceNumberToBidMap.get(rno);
+				if(bidsForRno.size() == 0) {
+					continue;
+				}
+				int num_bids_to_consider = Math.max(bidsForRno.size()/rno, 1);
+				Collections.sort(bidsForRno, new PerGPUBidComparator());
+				finalBids.addAll(bidsForRno.subList(0, num_bids_to_consider));
+			}*/
+			
+			List<Bid> winningBids = pickWinningBids(gpu_set, bids);//finalBids);
 			if(winningBids.size() == 0) {
 				System.out.println("Have a problem!");
 				for(Bid bid : bids) {

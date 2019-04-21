@@ -63,6 +63,7 @@ public abstract class IntraJobScheduler {
 		mIsWaiting = true;
 		oldRatio = Double.POSITIVE_INFINITY;
 		themisTs = Double.POSITIVE_INFINITY;
+		mTimeSinceLastTsAdjustment = Simulation.getSimulationTime();
 		mIsLeader = true; // By default, everyone is a leader unless told otherwise
 		JobStatistics.getInstance().recordJobStart(mJobId, Simulation.getSimulationTime());
 		List<GPU> availableResources = getResourcesAvailableInCluster();
@@ -99,10 +100,7 @@ public abstract class IntraJobScheduler {
 	
 	public double getCurrentEstimateForThemis() {
 		// Do update if we do not have resources
-		if(mCurrentIterationGPUs.size() == 0) {
-			themisTs += (Simulation.getSimulationTime() - mTimeSinceLastTsAdjustment) * mMaxParallelism;
-		}
-		return themisTs;
+		return oldRatio;
 	}
 
 	/**
@@ -337,5 +335,13 @@ public abstract class IntraJobScheduler {
 		mLossCurve = LossFunctionFactory.createInstance(ConfigUtils.getAttributeValue(
 				config, "loss_function_type"), getmTotalExpectedIterations(), mRandomSeed);
 		setmTotalIterationsRemaining(getmTotalExpectedIterations());
+		mCrossSlotSlowdown = 1.0;
+		mCrossMachineSlowdown = random(0.6, 0.98);
+		mCrossRackSlowdown = mCrossMachineSlowdown/0.7;
+	}
+	
+	private double random( double min, double max ) {
+	  double diff = max - min;
+	  return min + Math.random( ) * diff;
 	}
 }

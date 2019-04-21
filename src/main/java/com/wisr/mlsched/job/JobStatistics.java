@@ -133,9 +133,9 @@ public class JobStatistics {
 	public void printStats() {
 		printJCT();
 		printMakespan();
-		printFairnessIndex();
-		printLosses();
-		printContentions();
+		//printFairnessIndex();
+		//printLosses();
+		//printContentions();
 		printFinishTimeFairness();
 	}
 	

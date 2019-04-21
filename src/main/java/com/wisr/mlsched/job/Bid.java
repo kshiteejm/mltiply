@@ -51,8 +51,8 @@ public class Bid {
 		for (GPU gpu: mList) {
 			out = out + ":[" + gpu.getLocation().toString() +"]";
 		}
-		out = out + ":" + mExpectedBenefit;
-		out = out + ":" + mJob.getJobId();
+		out = out + "exp:" + mExpectedBenefit;
+		out = out + "jobid:" + mJob.getJobId();
 		return out;
 	}
 }
