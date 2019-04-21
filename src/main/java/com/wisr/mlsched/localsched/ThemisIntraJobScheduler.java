@@ -34,11 +34,17 @@ public class ThemisIntraJobScheduler extends IntraJobScheduler {
 		List<Bid> bids = new ArrayList<Bid>();
 		Queue<String> q = new LinkedList<String>();
 		q.add("1");
+		/*if(Cluster.getInstance().getRunningJobs().size() == 5) {
+			System.out.println("Offered GPUs: " + offeredGPUs.size());
+		}*/
 		while (q.size() > 0) {
 			String s1 = q.peek();
 			q.remove();
 			Bid bid = prepareBidWithGPUs(s1, offeredGPUs);
 			if(bid != null) {
+				/*if(Cluster.getInstance().getRunningJobs().size() == 5) {
+					System.out.println("Debugging Bid :: " + bid.toString());
+				}*/
 				bids.add(bid);
 			}
 			if(getGPUsInString(s1) < mMaxParallelism && s1.length() < offeredGPUs.size()) {
@@ -94,6 +100,7 @@ public class ThemisIntraJobScheduler extends IntraJobScheduler {
 		//double ratio = newTs/oldTs;
 		if(Double.compare(ratio, 1) <= 0) {
 			// no point in making bid
+			//System.out.println("No point in making bid");
 			return null;
 		}
 		/*if(Double.compare(expectedJobSpeedUp, 1.0) <= 0) {
@@ -104,7 +111,22 @@ public class ThemisIntraJobScheduler extends IntraJobScheduler {
 		//		+ (getmTotalIterationsRemaining() * mTimePerIteration) / expectedJobSpeedUp;
 		//double expectedGain = newExpectedRunningTime/(getIdealEstimate()*oldRatio);
 		//return new Bid(gpusForBid, expectedGain, this);
-		Bid bid = new Bid(gpusForBid, 1/ratio, this);
+		
+		double oldSpeedup = getGPUsAvailableForNextIteration().size() * getPlacementSlowdown(getGPUsAvailableForNextIteration());
+		double oldTs = (Simulation.getSimulationTime() - mJobStartTime) + 
+				(mTotalIterationsRemaining*mTimePerIteration)/oldSpeedup;
+		double oldratio = oldTs/getIdealEstimate();
+		if(Double.compare(ratio, oldratio) >= 0 && !Double.isInfinite(oldratio)) {
+			/*System.out.println("Old: " + oldratio);
+			System.out.println("New: " + ratio);
+			System.out.println("NewGPUSetSize: " + Integer.toString(potentialNewGPUSet.size()) + 
+				" Slowdown: " + Double.toString(getPlacementSlowdown(potentialNewGPUSet)));
+			System.out.println("CurrentGPUSetSize: " + Integer.toString(getGPUsAvailableForNextIteration().size()) + 
+				" Slowdown: " + Double.toString(getPlacementSlowdown(getGPUsAvailableForNextIteration())));*/
+			//System.out.println("No point in making bid 2");
+			return null;
+		}
+		Bid bid = new Bid(gpusForBid, ratio, oldratio, this, newSpeedup, oldSpeedup);
 		//bid.setNewRatio(newTs/getIdealEstimate());
 		return bid;
 	}

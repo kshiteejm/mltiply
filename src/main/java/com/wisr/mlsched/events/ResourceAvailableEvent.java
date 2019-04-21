@@ -20,7 +20,7 @@ public class ResourceAvailableEvent extends ClusterEvent {
 	@Override
 	public void handleEvent() {
 		super.handleEvent();
-		Cluster.getInstance().getScheduler().onResourceAvailable(mResources);
+		Cluster.getInstance().getScheduler().onResourceAvailable(Cluster.getInstance().getGPUsInCluster());
 	}
 	
 }

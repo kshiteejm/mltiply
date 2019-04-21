@@ -12,6 +12,9 @@ public class Bid {
 	private List<GPU> mList; // GPU list part of the bid
 	private double mExpectedBenefit; // Expected gain from making the bid
 	private IntraJobScheduler mJob; // Job making this bid
+	private double mOldBenefit;
+	public double mOldPscore;
+	public double mNewPscore;
 	
 	/**
 	 * Constructor
@@ -22,6 +25,21 @@ public class Bid {
 		mList = list;
 		mExpectedBenefit = benefit;
 		mJob = job;
+		mOldBenefit = 0;
+	}
+	
+	public Bid(List<GPU> list, double benefit, double old_benefit, IntraJobScheduler job,
+			double newScore, double oldScore) {
+		mList = list;
+		mExpectedBenefit = benefit;
+		mJob = job;
+		mOldBenefit = old_benefit;
+		mOldPscore = oldScore;
+		mNewPscore = newScore;
+	}
+	
+	public double getOldBenefit() {
+		return mOldBenefit;
 	}
 	
 	/**
@@ -51,8 +69,11 @@ public class Bid {
 		for (GPU gpu: mList) {
 			out = out + ":[" + gpu.getLocation().toString() +"]";
 		}
-		out = out + "exp:" + mExpectedBenefit;
-		out = out + "jobid:" + mJob.getJobId();
+		out = out + " exp:" + mExpectedBenefit;
+		out = out + " old: " + mOldBenefit;
+		out = out + " jobid:" + mJob.getJobId();
+		out = out + " old speedup: " + mOldPscore;
+		out = out + " new speedup: " + mNewPscore;
 		return out;
 	}
 }

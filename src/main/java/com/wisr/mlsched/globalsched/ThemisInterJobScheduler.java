@@ -37,7 +37,7 @@ public class ThemisInterJobScheduler extends InterJobScheduler {
 			HashMap<Bid, GRBVar> bidVariables = new HashMap<Bid, GRBVar>();
 			HashMap<IntraJobScheduler, Set<Bid>> bidsPerJob = new HashMap<IntraJobScheduler, Set<Bid>>();
 			for (Bid bid: bid_set) {
-				bidVariables.put(bid, solver.addVar(0.0, 1.0, 0.0, GRB.BINARY, "Bid: " + bid.toString()));
+				bidVariables.put(bid, solver.addVar(0.0, 1.0, 0.0, GRB.BINARY, ""));
 				for (GPU gpu: bid.getGPUList()) {
 					if (bidsPerGPU.containsKey(gpu)) {
 						bidsPerGPU.get(gpu).add(bid);
@@ -82,12 +82,21 @@ public class ThemisInterJobScheduler extends InterJobScheduler {
 //				}
 //				if (Double.compare(bid.getExpectedBenefit(), 0) == 0) {
 //					logExpectedBenefit = -1000;
-//				
-				double logExpectedBenefit = Math.log(bid.getExpectedBenefit());
+				double logExpectedBenefit = 0.001;
+				if (Double.compare(bid.getExpectedBenefit(), 1) > 0) {
+					logExpectedBenefit = Math.log(bid.getExpectedBenefit()); // log(T_s_new/T_i_new)
+				}
+				double logOldBenefit = 1000;
+				if (!Double.isInfinite(bid.getOldBenefit())) {
+					logOldBenefit = Math.log(bid.getOldBenefit());  // log(T_s_old/T_i_old)	
+				}
+				
 				//if (Double.compare(bid.getExpectedBenefit(), 1) > 0) {
 				//	logExpectedBenefit = Math.log(bid.getExpectedBenefit());
 				//}
 				valuationObjective.addTerm(logExpectedBenefit, bidVariables.get(bid));
+				valuationObjective.addTerm(-logOldBenefit, bidVariables.get(bid));
+				valuationObjective.addConstant(logOldBenefit);
 			}
 			solver.setObjective(valuationObjective, GRB.MINIMIZE);
 			solver.update();
@@ -117,6 +126,7 @@ public class ThemisInterJobScheduler extends InterJobScheduler {
 	public void onResourceAvailable(List<GPU> gpu_set) {
 		if(Cluster.getInstance().getRunningJobs().size() == 0) {
 			// Means no jobs are running, hence nothing to do
+			System.out.println("No jobs");
 			return;
 		}
 		List<IntraJobScheduler> allJobsInCluster = Cluster.getInstance().getRunningJobs();
@@ -125,6 +135,7 @@ public class ThemisInterJobScheduler extends InterJobScheduler {
 			jobsToConsider.add(job.getJobId());
 		}
 		gpu_set = gpu_set.stream().filter(g -> !g.isLeased()).collect(Collectors.toList());
+		System.out.println(gpu_set.size());
 		while(gpu_set.size() > 0) {
 			List<JobFairness> fairnessValues = new ArrayList<JobFairness>();
 			List<IntraJobScheduler> runningJobs = Cluster.getInstance().getRunningJobs();
@@ -136,6 +147,7 @@ public class ThemisInterJobScheduler extends InterJobScheduler {
 				}
 			}
 			if(fairnessValues.size() == 0) {
+				System.out.println("No fairness values");
 				break;
 			}
 			// Sort in descending order of fairness - Most unfair to most fair
@@ -173,9 +185,14 @@ public class ThemisInterJobScheduler extends InterJobScheduler {
 					bids.addAll(bidsFromJob);
 				}
 			}
+
+			/*for(Bid bid : bids) {
+				System.out.println(bid.toString());
+			}*/
 			
 			// If no bids, let's see if others not selected have any resources requirements
 			if(bids.size() == 0) {
+				System.out.println("No bids");
 				for(JobFairness job : allJobs) {
 					jobsToConsider.remove(new Integer(job.getJob().getJobId()));
 				}
@@ -214,6 +231,7 @@ public class ThemisInterJobScheduler extends InterJobScheduler {
 				for (GPU gpu: gpu_set) {
 					System.out.println("GPU: " + gpu.getLocation());
 				}
+				System.exit(0);
 			}
 			for(Bid bid : winningBids) {
 				bid.getJob().notifyResourceAssignment(bid.getGPUList());

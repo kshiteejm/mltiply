@@ -25,6 +25,7 @@ with open("traces/processed_data.csv", "r") as f:
             # New Job Group
             prev_expt_id = expt_id
             job_group_id = job_group_id + 1
+            job_id = job_id + 1
             model_to_use = models[random.randint(0,len(models)-1)]
             print("New job group " + str(job_group_id) + " " + model_to_use)
         with open(model_config_folder + model_to_use + ".json") as json_file:
@@ -37,7 +38,7 @@ with open("traces/processed_data.csv", "r") as f:
             job_conf["cross_rack_slowdown"] = model_data["cross_rack_slowdown"]
             job_conf["time_per_iteration"] = str(float(model_data["time_per_iteration"])/60)
             job_conf["random_seed"] = str(random.randint(0,99))
-            job_conf["max_parallelism"] = str(num_gpus)
+            job_conf["max_parallelism"] = "4"
             #job_conf["start_time"] = str(start_time)
             job_conf["start_time"] = "0"
             job_conf["loss_function_type"] = model_data["loss_function_type"] 

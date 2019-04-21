@@ -101,10 +101,7 @@ public abstract class IntraJobScheduler {
 	public double getCurrentEstimateForThemis() {
 		// Do update if we do not have resources
 		if(mCurrentIterationGPUs.size() == 0) {
-			if(oldRatio == Double.POSITIVE_INFINITY) {
-				return 10000*(Simulation.getSimulationTime() - mTimeLastResourceAssignment);
-			}
-			return themisTs;
+			return mTotalIterationsRemaining*mTimePerIteration;
 		} else {
 			return getCurrentEstimate();
 		}
@@ -132,7 +129,9 @@ public abstract class IntraJobScheduler {
 		assert(mCurrentIterationGPUs.size() > 0);
 		System.out.println("Placement Job " + Integer.toString(mJobId) + ": " 
 				+ "Iteration: " + Integer.toString(mTotalExpectedIterations - mTotalIterationsRemaining)
-				+ " Score: " + Double.toString(getPlacementSlowdown(mCurrentIterationGPUs)));
+				+ " NumGPUs: " + Integer.toString(mCurrentIterationGPUs.size())
+				+ " Score: " + Double.toString(getPlacementSlowdown(mCurrentIterationGPUs))
+				+ " Number_jobs_running: " + Integer.toString(Cluster.getInstance().getRunningJobs().size()));
 		ClusterEventQueue.getInstance().enqueueEvent(
 				new EndIterationEvent(Simulation.getSimulationTime() + mTimePerIteration / getJobSpeedup(), this));
 		Iterator<GPU> gpuIter = mCurrentIterationGPUs.iterator();
@@ -343,9 +342,9 @@ public abstract class IntraJobScheduler {
 		mLossCurve = LossFunctionFactory.createInstance(ConfigUtils.getAttributeValue(
 				config, "loss_function_type"), getmTotalExpectedIterations(), mRandomSeed);
 		setmTotalIterationsRemaining(getmTotalExpectedIterations());
-		mCrossSlotSlowdown = 1.0;
-		mCrossMachineSlowdown = random(0.6, 0.98);
-		mCrossRackSlowdown = mCrossMachineSlowdown/0.7;
+		//mCrossSlotSlowdown = 1.0;
+		//mCrossMachineSlowdown = random(0.6, 0.98);
+		//mCrossRackSlowdown = mCrossMachineSlowdown/0.7;
 	}
 	
 	private double random( double min, double max ) {
