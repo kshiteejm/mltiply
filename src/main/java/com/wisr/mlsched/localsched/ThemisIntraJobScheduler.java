@@ -76,11 +76,6 @@ public class ThemisIntraJobScheduler extends IntraJobScheduler {
 				gpusForBid.add(offeredGPUs.get(i));
 			}
 		}
-		if(gpusForBid.size() == 4) {
-			for(GPU gpu:gpusForBid) {
-				System.out.println(getPlacementSlowdown(new HashSet<>(gpusForBid)));
-			}
-		}
 		if(getGPUsAvailableForNextIteration().size() + gpusForBid.size() > mMaxParallelism) {
 			// No point of making this bid
 			return null;
