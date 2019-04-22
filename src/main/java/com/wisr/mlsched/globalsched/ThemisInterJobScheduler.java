@@ -31,7 +31,7 @@ public class ThemisInterJobScheduler extends InterJobScheduler {
 			env = new GRBEnv("themis_gurobi.log");
 			env.set(GRB.IntParam.LogToConsole, 0);
 			solver = new GRBModel(env);
-			solver.set(GRB.DoubleParam.TimeLimit, 10.0);
+			solver.set(GRB.DoubleParam.TimeLimit, 60.0);
 			// create helpers and gurobi variables per bid
 			HashMap<GPU, Set<Bid>> bidsPerGPU = new HashMap<GPU, Set<Bid>>();
 			HashMap<Bid, GRBVar> bidVariables = new HashMap<Bid, GRBVar>();
