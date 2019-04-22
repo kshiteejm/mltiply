@@ -44,6 +44,13 @@ public class Cluster {
 		sLog.setLevel(Simulation.getLogLevel());
 		// Create GPUs based on configuration
 		mGpusInCluster = new ArrayList<GPU>();
+		mRunningJobs = new ArrayList<IntraJobScheduler>();
+		mConfig = config;
+		mPolicy = config.getPolicy();
+		mLeaseTime = config.getLeaseTime();
+		mFairnessThreshold = config.getFairnessThreshold();
+		mEpsilon = config.getEpsilon();
+		mScheduler = InterJobSchedulerFactory.createInstance(mPolicy);
 		if (config.getUseConfig()) {
 			for (int i = 0; i < config.getRacks(); i++) {
 				for (int j = 0; j < config.getMachinesPerRack(); j++) {
@@ -57,14 +64,7 @@ public class Cluster {
 		} else {
 			initHeterogenousCluster();
 		}
-		mRunningJobs = new ArrayList<IntraJobScheduler>();
-		mConfig = config;
-		mPolicy = config.getPolicy();
-		mLeaseTime = config.getLeaseTime();
-		mFairnessThreshold = config.getFairnessThreshold();
-		mEpsilon = config.getEpsilon();
-		mScheduler = InterJobSchedulerFactory.createInstance(mPolicy);
-		sLog.info("Created cluster with " + Integer.toString(mGpusInCluster.size()) + " GPUs and with " + mPolicy
+		System.out.println("Created cluster with " + Integer.toString(mGpusInCluster.size()) + " GPUs and with " + mPolicy
 				+ " policy");
 	}
 
@@ -189,8 +189,8 @@ public class Cluster {
 	}
 
 	private void initHeterogenousCluster() {
-		sLog.info("Initialzing heterogenous cluster");
-		for (int rack_id = 0; rack_id < 8; rack_id++) {
+		System.out.println("Initialzing heterogenous cluster");
+		for (int rack_id = 0; rack_id < mConfig.getRacks(); rack_id++) {
 			// 6 m/c with 4 GPUs per machine
 			for (int mc = 0; mc < 6; mc++) {
 				for(int slot=0;slot<2;slot++) {
@@ -210,7 +210,6 @@ public class Cluster {
 				mGpusInCluster.add(new GPU(new GPULocation(0, 0, mc, rack_id)));
 			}
 		}
-		System.out.println(mGpusInCluster.size());
 		/*for (int rack_id = 2; rack_id < 4; rack_id++) {
 			// 2 m/c with 4 GPUs per machine
 			for (int mc = 0; mc < 2; mc++) {

@@ -204,7 +204,7 @@ public class ThemisInterJobScheduler extends InterJobScheduler {
 			/*for(Bid bid : bids) {
 				System.out.println(bid.toString());
 			}*/
-			System.out.println(bids.size());
+			//System.out.println(bids.size());
 			
 			// If no bids, let's see if others not selected have any resources requirements
 			if(bids.size() == 0) {
