@@ -58,8 +58,9 @@ public class JobStatistics {
 	 * @param timestamp
 	 */
 	public void recordJobEnd(int jobid, double timestamp, double start_time, double ideal_running_time,
-			boolean isLeader) {
+			boolean isLeader, double gpu_time) {
 		mJobTime.get(jobid).setEndTime(timestamp);
+		mJobTime.get(jobid).setGpuTime(gpu_time);
 		mFinishTimeFairness.add((timestamp-start_time)/ideal_running_time);
 	}
 	
@@ -133,10 +134,19 @@ public class JobStatistics {
 	public void printStats() {
 		printJCT();
 		printMakespan();
+		printGpuTime();
 		//printFairnessIndex();
 		//printLosses();
 		//printContentions();
 		printFinishTimeFairness();
+	}
+	
+	private void printGpuTime() {
+		double total_time = 0.0;
+		for(Integer key : mJobTime.keySet()) {
+			total_time += mJobTime.get(key).getGpuTime();
+		}
+		System.out.println("Total GPU Time: " + total_time);
 	}
 	
 	private void printFinishTimeFairness() {
@@ -222,6 +232,7 @@ public class JobStatistics {
 	private class SingleJobStat {
 		private double mStartTime;
 		private double mEndTime;
+		private double mGpuTime;
 		
 		public SingleJobStat(double start_time) {
 			mStartTime = start_time;
@@ -232,12 +243,20 @@ public class JobStatistics {
 			mEndTime = end_time;
 		}
 		
+		public void setGpuTime(double gpu_time) {
+			mGpuTime = gpu_time;
+		}
+		
 		public double getStartTime() {
 			return mStartTime;
 		}
 		
 		public double getEndTime() {
 			return mEndTime;
+		}
+		
+		public double getGpuTime() {
+			return mGpuTime;
 		}
 		
 		public double getJobTime() {

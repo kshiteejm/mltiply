@@ -50,6 +50,7 @@ public abstract class IntraJobScheduler {
 	protected double themisTs; // Themis Ts
 	private double mTimeLastResourceAssignment; 
 	private static Logger sLog; // Instance of logger
+	private double mGpuTime;
 
 	public IntraJobScheduler(JSONObject config) {
 		initFromConfig(config);
@@ -63,6 +64,7 @@ public abstract class IntraJobScheduler {
 		mIsWaiting = true;
 		oldRatio = Double.POSITIVE_INFINITY;
 		themisTs = Double.POSITIVE_INFINITY;
+		mGpuTime = 0;
 		mTimeLastResourceAssignment = Simulation.getSimulationTime()-1;
 		mIsLeader = true; // By default, everyone is a leader unless told otherwise
 		JobStatistics.getInstance().recordJobStart(mJobId, Simulation.getSimulationTime());
@@ -135,6 +137,7 @@ public abstract class IntraJobScheduler {
 				+ " Number_jobs_running: " + Integer.toString(Cluster.getInstance().getRunningJobs().size()));
 		ClusterEventQueue.getInstance().enqueueEvent(
 				new EndIterationEvent(Simulation.getSimulationTime() + mTimePerIteration / getJobSpeedup(), this));
+		mGpuTime = mGpuTime + (mTimePerIteration/getJobSpeedup())*mCurrentIterationGPUs.size();
 		Iterator<GPU> gpuIter = mCurrentIterationGPUs.iterator();
 		mNextIterationExpectedGPUs = new HashSet<GPU>();
 		while(gpuIter.hasNext()) {
@@ -162,7 +165,7 @@ public abstract class IntraJobScheduler {
 							+ CHECKPOINTING_OVERHEAD_PER_GPU*relinquished_resources.size(), relinquished_resources));
 			Cluster.getInstance().removeJob(this);
 			JobStatistics.getInstance().recordJobEnd(mJobId, Simulation.getSimulationTime(), mJobStartTime,
-					getIdealEstimate(), mIsLeader);
+					getIdealEstimate(), mIsLeader, mGpuTime);
 			return;
 		}
 		// Job has iterations left
