@@ -127,8 +127,9 @@ public abstract class IntraJobScheduler {
 		mNextIterationGPUs = new HashSet<GPU>();
 		mIsWaiting = false;
 		assert(mCurrentIterationGPUs.size() > 0);
-		System.out.println("Placement Job " + Integer.toString(mJobId) + ": " 
-				+ "Iteration: " + Integer.toString(mTotalExpectedIterations - mTotalIterationsRemaining)
+		System.out.println("Placement Job " + Integer.toString(mJobId) + ":" 
+				+ " Time: " + Double.toString(Simulation.getSimulationTime())
+				+ " Iteration: " + Integer.toString(mTotalExpectedIterations - mTotalIterationsRemaining)
 				+ " NumGPUs: " + Integer.toString(mCurrentIterationGPUs.size())
 				+ " Score: " + Double.toString(getPlacementSlowdown(mCurrentIterationGPUs))
 				+ " Number_jobs_running: " + Integer.toString(Cluster.getInstance().getRunningJobs().size()));
@@ -237,6 +238,10 @@ public abstract class IntraJobScheduler {
 	
 	public int getJobId() {
 		return mJobId;
+	}
+	
+	public boolean willParticipateInBid() {
+		return true;
 	}
 	
 	public int getJobGroupId() {

@@ -190,27 +190,28 @@ public class Cluster {
 
 	private void initHeterogenousCluster() {
 		sLog.info("Initialzing heterogenous cluster");
-		for (int rack_id = 0; rack_id < 2; rack_id++) {
-			// 3 m/c with 4 GPUs per machine
-			for (int mc = 0; mc < 3; mc++) {
+		for (int rack_id = 0; rack_id < 8; rack_id++) {
+			// 6 m/c with 4 GPUs per machine
+			for (int mc = 0; mc < 6; mc++) {
 				for(int slot=0;slot<2;slot++) {
 					for(int gpu=0;gpu<2;gpu++) {
 						mGpusInCluster.add(new GPU(new GPULocation(gpu, slot, mc, rack_id)));
 					}
 				}
 			}
-			// 1 m/c with 2 GPUs per machine
-			for (int mc = 3; mc < 4; mc++) {
+			// 3 m/c with 2 GPUs per machine
+			for (int mc = 6; mc < 9; mc++) {
 				for(int gpu=0;gpu<2;gpu++) {
 					mGpusInCluster.add(new GPU(new GPULocation(gpu, 0, mc, rack_id)));
 				}
 			}
-			// 3 m/c with 1 GPU per machine
-			for (int mc = 4; mc < 7; mc++) {
+			// 2 m/c with 1 GPU per machine
+			for (int mc = 9; mc < 11; mc++) {
 				mGpusInCluster.add(new GPU(new GPULocation(0, 0, mc, rack_id)));
 			}
 		}
-		for (int rack_id = 2; rack_id < 4; rack_id++) {
+		System.out.println(mGpusInCluster.size());
+		/*for (int rack_id = 2; rack_id < 4; rack_id++) {
 			// 2 m/c with 4 GPUs per machine
 			for (int mc = 0; mc < 2; mc++) {
 				for(int slot=0;slot<2;slot++) {
@@ -229,6 +230,6 @@ public class Cluster {
 			for (int mc = 4; mc < 7; mc++) {
 				mGpusInCluster.add(new GPU(new GPULocation(0, 0, mc, rack_id)));
 			}
-		}
+		}*/
 	}
 }

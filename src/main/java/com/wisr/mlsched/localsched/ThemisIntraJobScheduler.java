@@ -1,12 +1,18 @@
 package com.wisr.mlsched.localsched;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
+import java.util.Random;
 import java.util.Set;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import com.wisr.mlsched.Simulation;
 import com.wisr.mlsched.job.Bid;
@@ -31,9 +37,13 @@ public class ThemisIntraJobScheduler extends IntraJobScheduler {
 			// Already have enough GPUs. No need to bid
 			return null;
 		}
+		Map<Integer, List<Bid>> gpuBenefit = new HashMap<Integer, List<Bid>>();
 		List<Bid> bids = new ArrayList<Bid>();
 		Queue<String> q = new LinkedList<String>();
+		Collections.shuffle(offeredGPUs, new Random(0));
 		q.add("1");
+		//q.add("0");
+		//q.add(Integer.toString(getJobId()%2));
 		/*if(Cluster.getInstance().getRunningJobs().size() == 5) {
 			System.out.println("Offered GPUs: " + offeredGPUs.size());
 		}*/
@@ -42,15 +52,27 @@ public class ThemisIntraJobScheduler extends IntraJobScheduler {
 			q.remove();
 			Bid bid = prepareBidWithGPUs(s1, offeredGPUs);
 			if(bid != null) {
-				/*if(Cluster.getInstance().getRunningJobs().size() == 5) {
-					System.out.println("Debugging Bid :: " + bid.toString());
-				}*/
-				bids.add(bid);
+				List<Bid> bidsForGPUSize = gpuBenefit.get(getGPUsInString(s1));
+				if(bidsForGPUSize == null) {
+					bidsForGPUSize = new ArrayList<Bid>();
+				}
+				bidsForGPUSize.add(bid);
+				gpuBenefit.put(getGPUsInString(s1), bidsForGPUSize);
 			}
 			if(getGPUsInString(s1) < mMaxParallelism && s1.length() < offeredGPUs.size()) {
 				String s2 = s1;
 				q.add(s1 + "0");
 				q.add(s2 + "1");	
+			}
+		}
+		// Return only the top bids for each GPU size
+		for(Integer gpuSize : gpuBenefit.keySet()) {
+			List<Bid> bidsForGPUSize = gpuBenefit.get(gpuSize);
+			if(bidsForGPUSize != null) {
+				Collections.sort(bidsForGPUSize, new PerGPUBidComparator());
+				double largestPlacementScore = bidsForGPUSize.get(0).mNewPscore;
+				bids.addAll(bidsForGPUSize.stream()
+					    .filter(p -> p.mNewPscore == largestPlacementScore).collect(Collectors.toList()));
 			}
 		}
 		return bids;
@@ -80,55 +102,34 @@ public class ThemisIntraJobScheduler extends IntraJobScheduler {
 			// No point of making this bid
 			return null;
 		}
+		//System.out.println(paddedBitMask);
 		Set<GPU> potentialNewGPUSet = new HashSet<GPU>(getGPUsAvailableForNextIteration());
 		potentialNewGPUSet.addAll(gpusForBid);
-		//double oldJobSpeedUp = getGPUsAvailableForNextIteration().size() * 
-			//	getPlacementSlowdown(getGPUsAvailableForNextIteration());
-		//double expectedJobSpeedUp = potentialNewGPUSet.size() * getPlacementSlowdown(potentialNewGPUSet);
-		//double ratio = expectedJobSpeedUp/oldJobSpeedUp;
-		//double expectedJobSpeedUp = gpusForBid.size() * getPlacementSlowdown(potentialNewGPUSet)/
-			//	getPlacementSlowdown(getGPUsAvailableForNextIteration());
-		//System.out.println(offeredGPUs.size());
-		//System.out.println(expectedJobSpeedUp);
-		//double oldSpeedup = getGPUsAvailableForNextIteration().size()*getPlacementSlowdown(getGPUsAvailableForNextIteration());
-		//double oldTs = (Simulation.getSimulationTime() - mJobStartTime) + 
-		//		(mTotalIterationsRemaining*mTimePerIteration)/oldSpeedup;
+		
 		double newSpeedup = potentialNewGPUSet.size() * getPlacementSlowdown(potentialNewGPUSet);
 		double newTs = (Simulation.getSimulationTime() - mJobStartTime) + 
 				(mTotalIterationsRemaining*mTimePerIteration)/newSpeedup;
 		double ratio = newTs/getIdealEstimate();
-		//double ratio = newTs/oldTs;
 		if(Double.compare(ratio, 1) < 0) {
 			// no point in making bid
-			//System.out.println("No point in making bid");
 			return null;
 		}
-		/*if(Double.compare(expectedJobSpeedUp, 1.0) <= 0) {
-			// No point in making this bid
-			return null;
-		}*/
-		//double newExpectedRunningTime = (Simulation.getSimulationTime() - mJobStartTime)
-		//		+ (getmTotalIterationsRemaining() * mTimePerIteration) / expectedJobSpeedUp;
-		//double expectedGain = newExpectedRunningTime/(getIdealEstimate()*oldRatio);
-		//return new Bid(gpusForBid, expectedGain, this);
+		
 		
 		double oldSpeedup = getGPUsAvailableForNextIteration().size() * getPlacementSlowdown(getGPUsAvailableForNextIteration());
 		double oldTs = (Simulation.getSimulationTime() - mJobStartTime) + 
 				(mTotalIterationsRemaining*mTimePerIteration)/oldSpeedup;
 		double oldratio = oldTs/getIdealEstimate();
 		if(Double.compare(ratio, oldratio) >= 0 && !Double.isInfinite(oldratio)) {
-			/*System.out.println("Old: " + oldratio);
-			System.out.println("New: " + ratio);
-			System.out.println("NewGPUSetSize: " + Integer.toString(potentialNewGPUSet.size()) + 
-				" Slowdown: " + Double.toString(getPlacementSlowdown(potentialNewGPUSet)));
-			System.out.println("CurrentGPUSetSize: " + Integer.toString(getGPUsAvailableForNextIteration().size()) + 
-				" Slowdown: " + Double.toString(getPlacementSlowdown(getGPUsAvailableForNextIteration())));*/
-			//System.out.println("No point in making bid 2");
 			return null;
 		}
 		Bid bid = new Bid(gpusForBid, ratio, oldratio, this, newSpeedup, oldSpeedup);
-		//bid.setNewRatio(newTs/getIdealEstimate());
 		return bid;
+	}
+	
+	@Override
+	public boolean willParticipateInBid() {
+		return getGPUsAvailableForNextIteration().size() < mMaxParallelism;
 	}
 	
 	private String padLeftZeros(String inputString, int length) {
@@ -142,5 +143,15 @@ public class ThemisIntraJobScheduler extends IntraJobScheduler {
 	    sb.append(inputString);
 	 
 	    return sb.toString();
+	}
+	
+	protected class PerGPUBidComparator implements Comparator<Bid> {
+
+		@Override
+		public int compare(Bid bid1, Bid bid2) {
+			int comp = Double.compare(bid1.mNewPscore, bid2.mNewPscore);
+			return -1*comp;
+		}
+		
 	}
 }
