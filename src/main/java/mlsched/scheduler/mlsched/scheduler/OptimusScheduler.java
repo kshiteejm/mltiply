@@ -20,13 +20,15 @@ public class OptimusScheduler extends InterJobScheduler {
 		return timeToCompletion;
 	}
 	
-	//TODO: workerResourceRequirement should be replaced by the requirement of Dominant Resource
+	//TODO: workerResourceRequirement should be replaced by the requirement of Dominant Resource if multiple
+	// resource types are introduced.
 	public double getMarginalGainByAddingWorker(Job j) {
 		return (getTimeToCompletion(j, j.numWorkersShare, j.numParameterServersShare)
 				- getTimeToCompletion(j, j.numWorkersShare + 1, j.numParameterServersShare)) / j.workerResourceRequirement;
 	}
 	
-	//TODO: resource requirement to be replaced by the requirement of the Dominant Resource
+	//TODO: resource requirement to be replaced by the requirement of the Dominant Resource if multiple
+	// resource types are introduced.
 	public double getMarginalGainByAddingPS(Job j) {
 		return (getTimeToCompletion(j, j.numWorkersShare, j.numParameterServersShare)
 				- getTimeToCompletion(j, j.numWorkersShare, j.numParameterServersShare + 1)) / j.parameterServerResourceRequirement;
@@ -91,6 +93,9 @@ public class OptimusScheduler extends InterJobScheduler {
 						totalResources -= j.workerResourceRequirement;
 						j.marginalGain = getMarginalGain(j);
 					} else if (gainByPSAddition > 0 && j.parameterServerResourceRequirement <= totalResources) {
+						j.numParameterServersShare += 1;
+						j.logicalFairShare += j.parameterServerResourceRequirement;
+						totalResources -= j.parameterServerResourceRequirement;
 						j.marginalGain = gainByPSAddition;
 					} else {
 						priorQ.remove(j);
@@ -102,6 +107,9 @@ public class OptimusScheduler extends InterJobScheduler {
 						totalResources -= j.parameterServerResourceRequirement;
 						j.marginalGain = getMarginalGain(j);
 					} else if (gainByWorkerAddition > 0 && j.workerResourceRequirement <= totalResources) {
+						j.numWorkersShare += 1;
+						j.logicalFairShare += j.workerResourceRequirement;
+						totalResources -= j.workerResourceRequirement;
 						j.marginalGain = gainByWorkerAddition;
 					} else {
 						priorQ.remove(j);

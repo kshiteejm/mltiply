@@ -1,6 +1,7 @@
 {
+  "seed": 7,
   "numGPUs": 6,
-  "schedPolicy": "optimus",
+  "schedPolicy": "slaq",
   "jobs": [
     {
       "arrivalTime": 0,

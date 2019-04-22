@@ -64,7 +64,7 @@ public class SLAQ extends InterJobScheduler {
 			Collections.sort(priorQ, new SLAQJobComparator());
 		}
 
-		if (Main.distributeResourcesFlag == false)
+		// if (Main.distributeResourcesFlag == false)
 			Main.eventQueue.add(new DistributeResources(Main.currentTime));
 	}
 }

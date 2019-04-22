@@ -23,5 +23,6 @@ public class Statistics {
 	
 	public ArrayList<Double> iterStartTimes = new ArrayList<>();
 	public ArrayList<Double> iterEndTimes = new ArrayList<>();
+	public ArrayList<Double> lossValues = new ArrayList<>();
 	
 }

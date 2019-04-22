@@ -15,6 +15,7 @@ public class EndInteration extends Event {
 
 		Statistics statObj = Main.jobStats.get(j.jobId);
 		statObj.iterEndTimes.add(Main.currentTime);
+		statObj.lossValues.add(j.lossFunction.getValue(j.currIterationNum+1));
 		Main.jobStats.put(j.jobId, statObj);
 
 		Main.cluster.availableGPUs += j.currIterAllocation;
