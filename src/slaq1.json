@@ -1,0 +1,27 @@
+{
+  "seed": 7,
+  "numGPUs": 10,
+  "schedPolicy": "slaq",
+  "jobs": [
+    {
+      "arrivalTime": 0,
+      "numIterations": 20,
+      "serialIterDuration": 1,
+      "lossFunction": "sublinear",
+      "synchronicity": "synchronous",
+      "workerResourceRequirement": 1,
+      "parameterServerResourceRequirement": 1,
+      "numJobs": 5
+    },
+    {
+      "arrivalTime": 5,
+      "numIterations": 20,
+      "serialIterDuration": 1,
+      "lossFunction": "superlinear",
+      "synchronicity": "synchronous",
+      "workerResourceRequirement": 1,
+      "parameterServerResourceRequirement": 1,
+      "numJobs": 5
+    }
+  ]
+}

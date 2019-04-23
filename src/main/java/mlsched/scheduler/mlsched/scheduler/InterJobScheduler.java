@@ -27,7 +27,7 @@ public class InterJobScheduler {
 		Collections.sort(Main.jobList, new JobComparator());
 
 		for (Job j : Main.jobList) {
-			if (j.jobState == Job.State.WAITING_FOR_RESOURCES) {
+			if (j.jobState == Job.State.WAITING_FOR_RESOURCES && j.logicalFairShare!=0) {
 				if (Main.cluster.availableGPUs >= j.logicalFairShare) {
 										
 					Main.cluster.availableGPUs -= j.logicalFairShare;
@@ -43,6 +43,5 @@ public class InterJobScheduler {
 				}
 			}
 		}
-		System.out.println("----");
 	}
 }

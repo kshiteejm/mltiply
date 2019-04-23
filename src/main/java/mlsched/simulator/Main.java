@@ -118,7 +118,7 @@ public class Main {
 		// because we only distribute resources after everything is released or jobs
 		// have arrived.
 
-		final String Filename = "workload5.json";
+		final String Filename = "slaq1.json";
 
 		Workload.parseWorkload(Filename);
 
@@ -128,6 +128,7 @@ public class Main {
 			eventQueue.add(new SchedulingEpoch(currentTime, schedulingInterval));
 		}
 
+		int count = 0;
 		while (!eventQueue.isEmpty()) {
 			
 			Event e = eventQueue.pollFirst();
@@ -143,6 +144,10 @@ public class Main {
 			}
 
 			e.eventHandler();
+			count++;
+//			if(count>650) {
+//				break;
+//			}
 		}
 
 		System.out.println("\nOVERALL JOB STATS -");

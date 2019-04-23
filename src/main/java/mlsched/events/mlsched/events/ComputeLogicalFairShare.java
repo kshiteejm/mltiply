@@ -6,8 +6,6 @@ public class ComputeLogicalFairShare extends Event {
 	
 	public ComputeLogicalFairShare(double timeStamp) {
 		super(timeStamp);
-		// super(timeStamp, j);
-//		Main.jobStats.put(j.jobId,new Statistics(j.jobId, timeStamp));
 	}
 
 	@Override
