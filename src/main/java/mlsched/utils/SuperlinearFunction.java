@@ -23,8 +23,7 @@ public class SuperlinearFunction implements Function {
   public static SuperlinearFunction getRandomSuperlinearFunction(int numIterations) {
     double tValueBegin = 1.0;
     double tValueEnd = 0.0;
-    Random r = new Random(Main.randSeed);
-    double tU = r.nextDouble();
+    double tU = Main.r.nextDouble();
     double tC = Math.pow(tU, numIterations);
     tC = tC/(tC - 1);
     double tB = -Math.log(1 - tC)/Math.log(tU);

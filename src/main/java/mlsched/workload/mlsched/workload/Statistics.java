@@ -11,9 +11,13 @@ public class Statistics {
 	
 	public void printStats() {
 		System.out.println("JobId=" + jobId + 
-				" Arrival Time=" + jobArrivalTime + 
-				" Start Time=" + jobStartTime + " End Time=" + 
-				jobEndTime);
+				" ArrivalTime=" + jobArrivalTime + 
+				" StartTime=" + jobStartTime + " EndTime=" + 
+				jobEndTime + " NumIters=" + lossValues.size());
+		for(int i=0; i<iterStartTimes.size(); i++) {
+			System.out.println("IterStartTime=" + iterStartTimes.get(i) + 
+					" IterEndTime=" + iterEndTimes.get(i) + " LossValue=" + lossValues.get(i));
+		}
 	}
 	
 	public Integer jobId;

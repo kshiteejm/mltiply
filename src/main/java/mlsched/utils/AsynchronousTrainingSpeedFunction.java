@@ -4,14 +4,13 @@ import java.util.Random;
 
 import mlsched.simulator.Main;
 
-public class SynchronousTrainingSpeedFunction implements TrainingSpeedFunction {
+public class AsynchronousTrainingSpeedFunction implements TrainingSpeedFunction {
 	double a, b, c, d;
-	public SynchronousTrainingSpeedFunction() {
-		Random r = new Random(Main.randSeed);
-		this.a = r.nextDouble();
-		this.b = r.nextDouble();
-		this.c = r.nextDouble();
-		this.d = r.nextDouble();
+	public AsynchronousTrainingSpeedFunction() {
+		this.a = Main.r.nextDouble();
+		this.b = Main.r.nextDouble();
+		this.c = Main.r.nextDouble();
+		this.d = Main.r.nextDouble();
 	}
 	
 	public double getValue(int numParameterServers, int numWorkers) {

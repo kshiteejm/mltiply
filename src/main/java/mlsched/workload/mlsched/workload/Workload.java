@@ -2,6 +2,7 @@ package mlsched.workload;
 
 import java.io.FileReader;
 import java.util.Iterator;
+import java.util.Random;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -26,7 +27,7 @@ public class Workload {
 			
 			Main.randSeed = jo.get("seed") != null ? 
 					 Long.valueOf(jo.get("seed").toString()) : System.currentTimeMillis();
-			
+			Main.r = new Random(Main.randSeed);
 			Main.cluster = new Cluster(Integer.valueOf(jo.get("numGPUs").toString()));
 			
 			String policy = jo.get("schedPolicy").toString();
@@ -74,7 +75,7 @@ public class Workload {
 				for(int i = 0; i < numJobs; i++) {
 					Job j = new Job(jobId, numIter, serialRun, maxParallel, lossFunction, synchronicity);
 					
-					System.out.println("JobID = " + j.jobId + " lossFunction = " + lossFunction);
+					// System.out.println("JobID = " + j.jobId + " lossFunction = " + lossFunction);
 					
 					if (policy.equals("optimus")) {
 						j.workerResourceRequirement = Integer.valueOf(job.get("workerResourceRequirement").toString());

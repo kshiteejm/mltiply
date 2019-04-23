@@ -1,6 +1,6 @@
 {
   "seed": 7,
-  "numGPUs": 20,
+  "numGPUs": 50,
   "schedPolicy": "optimus",
   "jobs": [
     {
@@ -11,17 +11,17 @@
       "synchronicity": "synchronous",
       "workerResourceRequirement": 1,
       "parameterServerResourceRequirement": 1,
-      "numJobs": 3
+      "numJobs": 5
     },
     {
-      "arrivalTime": 5,
+      "arrivalTime": 10,
       "numIterations": 25,
       "serialIterDuration": 1,
-      "lossFunction": "sublinear",
+      "lossFunction": "superlinear",
       "synchronicity": "synchronous",
       "workerResourceRequirement": 1,
       "parameterServerResourceRequirement": 1,
-      "numJobs": 3
+      "numJobs": 5
     }
   ]
 }

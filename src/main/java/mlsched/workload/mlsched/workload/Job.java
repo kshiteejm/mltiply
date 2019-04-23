@@ -2,7 +2,7 @@ package mlsched.workload;
 
 import mlsched.utils.SublinearFunction;
 import mlsched.utils.SuperlinearFunction;
-import mlsched.utils.SynchronousTrainingSpeedFunction;
+import mlsched.utils.AsynchronousTrainingSpeedFunction;
 import mlsched.utils.TrainingSpeedFunction;
 import mlsched.scheduler.IntraJobScheduler;
 import mlsched.utils.Function;
@@ -64,7 +64,7 @@ public class Job {
 			this.lossFunction = SuperlinearFunction.getRandomSuperlinearFunction(numIterations);
 		}
 		if (synchronicity.equals("synchronous")) {
-			this.trainingSpeedFunction = new SynchronousTrainingSpeedFunction();
+			this.trainingSpeedFunction = new AsynchronousTrainingSpeedFunction();
 		} else {
 //			this.trainingSpeedFunction = new AsynchronousTrainingSpeedFunction();
 		}

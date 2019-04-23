@@ -24,9 +24,8 @@ public class SublinearFunction implements Function {
   public static SublinearFunction getRandomSublinearFunction(int numIterations) {
     double tValueBegin = 1.0;
     double tValueEnd = 0.0;
-    Random r = new Random(Main.randSeed);
-    double tA = r.nextDouble();
-    double tB = r.nextDouble();
+    double tA = Main.r.nextDouble();
+    double tB = Main.r.nextDouble();
     double tT = tA*numIterations*numIterations + tB*numIterations;
     double tC = 1/(1 + 1/tT);
     double tD = -1/tT;

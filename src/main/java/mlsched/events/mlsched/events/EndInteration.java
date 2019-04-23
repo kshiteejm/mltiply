@@ -15,7 +15,8 @@ public class EndInteration extends Event {
 
 		Statistics statObj = Main.jobStats.get(j.jobId);
 		statObj.iterEndTimes.add(Main.currentTime);
-		statObj.lossValues.add(j.lossFunction.getValue(j.currIterationNum+1));
+		double lossValue = j.lossFunction.getValue(j.currIterationNum);
+		statObj.lossValues.add(lossValue);
 		Main.jobStats.put(j.jobId, statObj);
 
 		Main.cluster.availableGPUs += j.currIterAllocation;
@@ -28,7 +29,7 @@ public class EndInteration extends Event {
 			// at the end of the iteration and wait for next epoch to trigger
 
 			
-			if (j.currIterationNum < j.numIterations) {
+			if (j.currIterationNum < j.numIterations && lossValue > 0) {
 				j.jobState = Job.State.WAITING_FOR_RESOURCES;
 				Main.eventQueue.add(new DistributeResources(Main.currentTime));
 				// Main.interJobScheduler.distributeResources();
@@ -37,7 +38,7 @@ public class EndInteration extends Event {
 			}
 		} else {
 			// The epoch number has not changed
-			if (j.currIterationNum < j.numIterations) {
+			if (j.currIterationNum < j.numIterations && lossValue > 0) {
 				
 				if (!Main.epochScheduling) {
 					// In case of not SLAQ, put it to waiting and recompute LFS

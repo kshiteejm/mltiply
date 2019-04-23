@@ -3,6 +3,7 @@ package mlsched.simulator;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
 import java.util.Scanner;
 import java.util.TreeSet;
 
@@ -42,8 +43,9 @@ public class Main {
 
 	public static long randSeed;
 
-	public static final boolean DEBUG = true;
-
+	public static final boolean DEBUG = false;
+	public static Random r;
+	
 	public static Integer eventPriority(Event e) {
 		// Ordering of events - ET > EI > JC > JA > SA > CL > DR > RA > SI > everything
 		// else we might have missed
@@ -118,12 +120,12 @@ public class Main {
 		// because we only distribute resources after everything is released or jobs
 		// have arrived.
 
-		final String Filename = "slaq1.json";
+		final String Filename = "batched_overlap.json";
 
 		Workload.parseWorkload(Filename);
 
 		System.out.println("THE SEED IS: " + Main.randSeed);
-
+		
 		if (epochScheduling) {
 			eventQueue.add(new SchedulingEpoch(currentTime, schedulingInterval));
 		}
@@ -139,7 +141,7 @@ public class Main {
 
 			// Enqueue next epoch event in the eventQueue only if we have
 			// Some events left to be processed.
-			if ((e instanceof SchedulingEpoch) && (!jobList.isEmpty())) {
+			if ((e instanceof SchedulingEpoch) && (!eventQueue.isEmpty())) {
 				eventQueue.add(new SchedulingEpoch(currentTime + schedulingInterval, schedulingInterval));
 			}
 
@@ -155,6 +157,7 @@ public class Main {
 			jobStats.get(key).printStats();
 		}
 
+		
 //		testOutput("output1");
 	}
 }
