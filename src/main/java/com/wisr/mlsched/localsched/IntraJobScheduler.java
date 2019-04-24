@@ -74,6 +74,15 @@ public abstract class IntraJobScheduler {
 					.enqueueEvent(new ResourceAvailableEvent(Simulation.getSimulationTime(), availableResources));
 		}
 	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (!(o instanceof IntraJobScheduler)) {
+			return false;
+		}
+		IntraJobScheduler job = (IntraJobScheduler) o;
+		return (mJobId == job.mJobId) && (mJobGroupId == job.mJobGroupId);
+	}
 	
 	/**
 	 * Set the role of job and number of iterations it needs to run.

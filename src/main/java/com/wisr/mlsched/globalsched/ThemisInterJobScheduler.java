@@ -27,6 +27,7 @@ public class ThemisInterJobScheduler extends InterJobScheduler {
 		List<Bid> winners = new ArrayList<Bid>();
 		GRBEnv env;
 		GRBModel solver;
+		double maxValuation = 1.0;
 		try {
 			env = new GRBEnv("themis_gurobi.log");
 			env.set(GRB.IntParam.LogToConsole, 0);
@@ -119,7 +120,140 @@ public class ThemisInterJobScheduler extends InterJobScheduler {
 			solver.optimize();
 			if (solver.get(GRB.IntAttr.Status) == GRB.Status.OPTIMAL
 					|| solver.get(GRB.IntAttr.Status) == GRB.Status.TIME_LIMIT ) {
-				double maxValuation = solver.get(GRB.DoubleAttr.ObjVal);
+				maxValuation = solver.get(GRB.DoubleAttr.ObjVal);
+				Map<IntraJobScheduler, Double> jobWinningValuation = new HashMap<IntraJobScheduler, Double>();
+				for (Bid bid: bidVariables.keySet()) {
+					GRBVar var = bidVariables.get(bid);
+					if (var.get(GRB.DoubleAttr.X) == 1) {
+						winners.add(bid);
+						if (jobWinningValuation.containsKey(bid.getJob())) {
+							double value = jobWinningValuation.get(bid.getJob());
+							value = value * bid.getExpectedBenefit();
+							jobWinningValuation.put(bid.getJob(), value);
+						} else {
+							jobWinningValuation.put(bid.getJob(), bid.getExpectedBenefit());
+						}
+					}
+				}
+				for (IntraJobScheduler job: jobVariables.keySet()) {
+					double maxValuationAbsentJob = pickWinningBidsTruthTelling(gpu_set, bid_set, job);
+					double maxValuationPFJob = maxValuation/jobWinningValuation.get(job);
+					double hiddenPayment = 1 - maxValuationPFJob/maxValuationAbsentJob;
+					System.out.println("Hidden Payment: " + hiddenPayment);
+				}
+			} else {
+				solver.computeIIS();
+	            solver.write(".quark-unsat.ilp");
+				System.out.println("UNSOLVABLE.");
+			}
+		} catch (GRBException e) {
+			e.printStackTrace();
+		}
+		return winners;
+	}
+
+	public double pickWinningBidsTruthTelling(List<GPU> gpu_set, List<Bid> bid_set, IntraJobScheduler jobEx) {
+		List<Bid> winners = new ArrayList<Bid>();
+		GRBEnv env;
+		GRBModel solver;
+		double maxValuation = 1.0;
+		try {
+			env = new GRBEnv("themis_gurobi.log");
+			env.set(GRB.IntParam.LogToConsole, 0);
+			solver = new GRBModel(env);
+			solver.set(GRB.DoubleParam.TimeLimit, 300.0);
+			// create helpers and gurobi variables per bid
+			HashMap<GPU, Set<Bid>> bidsPerGPU = new HashMap<GPU, Set<Bid>>();
+			HashMap<Bid, GRBVar> bidVariables = new HashMap<Bid, GRBVar>();
+			HashMap<IntraJobScheduler, GRBVar> jobVariables = new HashMap<IntraJobScheduler, GRBVar>();
+			HashMap<IntraJobScheduler, Set<Bid>> bidsPerJob = new HashMap<IntraJobScheduler, Set<Bid>>();
+			for (Bid bid: bid_set) {
+				if (bid.getJob() == jobEx) {
+					continue;
+				}
+				bidVariables.put(bid, solver.addVar(0.0, 1.0, 0.0, GRB.BINARY, ""));
+				for (GPU gpu: bid.getGPUList()) {
+					if (bidsPerGPU.containsKey(gpu)) {
+						bidsPerGPU.get(gpu).add(bid);
+					} else {
+						Set<Bid> bids = new HashSet<Bid>();
+						bids.add(bid);
+						bidsPerGPU.put(gpu, bids);
+					}
+				}
+				if (bidsPerJob.containsKey(bid.getJob())) {
+					bidsPerJob.get(bid.getJob()).add(bid);
+				} else {
+					Set<Bid> bids = new HashSet<Bid>();
+					bids.add(bid);
+					bidsPerJob.put(bid.getJob(), bids);
+					jobVariables.put(bid.getJob(), solver.addVar(0.0, 1.0, 0.0, GRB.BINARY, ""));
+				}
+			}
+			solver.update();
+			// create gurobi constraints per gpu, per job
+			for (GPU gpu: bidsPerGPU.keySet()) {
+				GRBLinExpr packingConstraint = new GRBLinExpr();
+				for (Bid bid: bidsPerGPU.get(gpu)) {
+					packingConstraint.addTerm(1.0, bidVariables.get(bid));
+				}
+				solver.addConstr(packingConstraint, GRB.LESS_EQUAL, 1.0, "");
+			}
+			for (IntraJobScheduler job: bidsPerJob.keySet()) {
+				GRBLinExpr jobMaxParallelConstraint = new GRBLinExpr();
+				for (Bid bid: bidsPerJob.get(job)) {
+					jobMaxParallelConstraint.addTerm(bid.getGPUList().size(), bidVariables.get(bid));
+				}
+				solver.addConstr(jobMaxParallelConstraint, GRB.LESS_EQUAL, 
+						job.getMaxParallelism() - job.getGPUsAvailableForNextIteration().size(),  "");
+				GRBLinExpr jobOneBidOnlyConstraint = new GRBLinExpr();
+				for (Bid bid: bidsPerJob.get(job)) {
+					jobOneBidOnlyConstraint.addTerm(1.0, bidVariables.get(bid));
+				}
+				solver.addConstr(jobOneBidOnlyConstraint, GRB.EQUAL, jobVariables.get(job), "");
+			}
+			// create gurobi objective for maximizing product of bid valuations
+			GRBLinExpr valuationObjective = new GRBLinExpr();
+			for (Bid bid: bid_set) {
+//				// potential problem in logarithm
+//				double logExpectedBenefit = -1000;
+//				if (Double.compare(bid.getExpectedBenefit(), 1) < 0) {
+//					logExpectedBenefit = Math.log10(bid.getExpectedBenefit());
+//				}
+//				if (Double.compare(bid.getExpectedBenefit(), 0) == 0) {
+//					logExpectedBenefit = -1000;
+				double logExpectedBenefit = 0.001;
+				if (Double.compare(bid.getExpectedBenefit(), 1) > 0) {
+					logExpectedBenefit = Math.log(bid.getExpectedBenefit()); // log(T_s_new/T_i_new)
+				}
+//				double logOldBenefit = 1000;
+//				if (!Double.isInfinite(bid.getOldBenefit())) {
+//					logOldBenefit = Math.log(bid.getOldBenefit());  // log(T_s_old/T_i_old)	
+//				}
+				
+				//if (Double.compare(bid.getExpectedBenefit(), 1) > 0) {
+				//	logExpectedBenefit = Math.log(bid.getExpectedBenefit());
+				//}
+				valuationObjective.addTerm(logExpectedBenefit, bidVariables.get(bid));
+//				valuationObjective.addTerm(-logOldBenefit, bidVariables.get(bid));
+//				valuationObjective.addConstant(logOldBenefit);
+			}
+			for (IntraJobScheduler job: bidsPerJob.keySet()) {
+				double logOldBenefit = 1000;
+				if (!Double.isInfinite(job.getOldBenefit())) {
+					logOldBenefit = Math.log(job.getOldBenefit());  // log(T_s_old/T_i_old)	
+				}
+				valuationObjective.addTerm(-logOldBenefit, jobVariables.get(job));
+				valuationObjective.addConstant(logOldBenefit);
+			}
+			solver.setObjective(valuationObjective, GRB.MINIMIZE);
+			solver.update();
+			// optimize
+			solver.optimize();
+			if (solver.get(GRB.IntAttr.Status) == GRB.Status.OPTIMAL
+					|| solver.get(GRB.IntAttr.Status) == GRB.Status.TIME_LIMIT ) {
+				maxValuation = solver.get(GRB.DoubleAttr.ObjVal);
+				System.out.println("Objective Value without Job " + jobEx.getJobId() + " " + maxValuation);
 				for (Bid bid: bidVariables.keySet()) {
 					GRBVar var = bidVariables.get(bid);
 					if (var.get(GRB.DoubleAttr.X) == 1) {
@@ -134,7 +268,7 @@ public class ThemisInterJobScheduler extends InterJobScheduler {
 		} catch (GRBException e) {
 			e.printStackTrace();
 		}
-		return winners;
+		return maxValuation;
 	}
 
 	@Override
