@@ -120,7 +120,7 @@ public class Main {
 		// because we only distribute resources after everything is released or jobs
 		// have arrived.
 
-		final String Filename = "batched_overlap.json";
+		final String Filename = "slaq_pareto.json";
 
 		Workload.parseWorkload(Filename);
 
@@ -156,7 +156,7 @@ public class Main {
 		for (Integer key : jobStats.keySet()) {
 			jobStats.get(key).printStats();
 		}
-
+		System.out.println("\nDONE");
 		
 //		testOutput("output1");
 	}

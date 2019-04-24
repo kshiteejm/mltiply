@@ -29,7 +29,7 @@ public class EndInteration extends Event {
 			// at the end of the iteration and wait for next epoch to trigger
 
 			
-			if (j.currIterationNum < j.numIterations && lossValue > 0) {
+			if (j.currIterationNum < j.numIterations && lossValue > 1E-4) {
 				j.jobState = Job.State.WAITING_FOR_RESOURCES;
 				Main.eventQueue.add(new DistributeResources(Main.currentTime));
 				// Main.interJobScheduler.distributeResources();
@@ -38,7 +38,7 @@ public class EndInteration extends Event {
 			}
 		} else {
 			// The epoch number has not changed
-			if (j.currIterationNum < j.numIterations && lossValue > 0) {
+			if (j.currIterationNum < j.numIterations && lossValue > 1E-4) {
 				
 				if (!Main.epochScheduling) {
 					// In case of not SLAQ, put it to waiting and recompute LFS

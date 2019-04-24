@@ -1,0 +1,407 @@
+{
+	"jobs": [
+		{
+			"numIterations": 10,
+			"parameterServerResourceRequirement": 1,
+			"serialIterDuration": 1.0,
+			"numJobs": 1,
+			"synchronicity": "synchronous",
+			"arrivalTime": 40,
+			"lossFunction": "sublinear",
+			"workerResourceRequirement": 1
+		},
+		{
+			"numIterations": 10,
+			"parameterServerResourceRequirement": 1,
+			"serialIterDuration": 1.0,
+			"numJobs": 1,
+			"synchronicity": "synchronous",
+			"arrivalTime": 55,
+			"lossFunction": "superlinear",
+			"workerResourceRequirement": 1
+		},
+		{
+			"numIterations": 10,
+			"parameterServerResourceRequirement": 1,
+			"serialIterDuration": 1.0,
+			"numJobs": 1,
+			"synchronicity": "synchronous",
+			"arrivalTime": 51,
+			"lossFunction": "sublinear",
+			"workerResourceRequirement": 1
+		},
+		{
+			"numIterations": 10,
+			"parameterServerResourceRequirement": 1,
+			"serialIterDuration": 1.0,
+			"numJobs": 1,
+			"synchronicity": "synchronous",
+			"arrivalTime": 45,
+			"lossFunction": "sublinear",
+			"workerResourceRequirement": 1
+		},
+		{
+			"numIterations": 10,
+			"parameterServerResourceRequirement": 1,
+			"serialIterDuration": 1.0,
+			"numJobs": 1,
+			"synchronicity": "synchronous",
+			"arrivalTime": 33,
+			"lossFunction": "sublinear",
+			"workerResourceRequirement": 1
+		},
+		{
+			"numIterations": 10,
+			"parameterServerResourceRequirement": 1,
+			"serialIterDuration": 1.0,
+			"numJobs": 1,
+			"synchronicity": "synchronous",
+			"arrivalTime": 48,
+			"lossFunction": "sublinear",
+			"workerResourceRequirement": 1
+		},
+		{
+			"numIterations": 10,
+			"parameterServerResourceRequirement": 1,
+			"serialIterDuration": 1.0,
+			"numJobs": 1,
+			"synchronicity": "synchronous",
+			"arrivalTime": 45,
+			"lossFunction": "superlinear",
+			"workerResourceRequirement": 1
+		},
+		{
+			"numIterations": 10,
+			"parameterServerResourceRequirement": 1,
+			"serialIterDuration": 1.0,
+			"numJobs": 1,
+			"synchronicity": "synchronous",
+			"arrivalTime": 48,
+			"lossFunction": "superlinear",
+			"workerResourceRequirement": 1
+		},
+		{
+			"numIterations": 10,
+			"parameterServerResourceRequirement": 1,
+			"serialIterDuration": 1.0,
+			"numJobs": 1,
+			"synchronicity": "synchronous",
+			"arrivalTime": 51,
+			"lossFunction": "superlinear",
+			"workerResourceRequirement": 1
+		},
+		{
+			"numIterations": 10,
+			"parameterServerResourceRequirement": 1,
+			"serialIterDuration": 1.0,
+			"numJobs": 1,
+			"synchronicity": "synchronous",
+			"arrivalTime": 42,
+			"lossFunction": "superlinear",
+			"workerResourceRequirement": 1
+		},
+		{
+			"numIterations": 10,
+			"parameterServerResourceRequirement": 1,
+			"serialIterDuration": 1.0,
+			"numJobs": 1,
+			"synchronicity": "synchronous",
+			"arrivalTime": 45,
+			"lossFunction": "sublinear",
+			"workerResourceRequirement": 1
+		},
+		{
+			"numIterations": 10,
+			"parameterServerResourceRequirement": 1,
+			"serialIterDuration": 1.0,
+			"numJobs": 1,
+			"synchronicity": "synchronous",
+			"arrivalTime": 54,
+			"lossFunction": "superlinear",
+			"workerResourceRequirement": 1
+		},
+		{
+			"numIterations": 10,
+			"parameterServerResourceRequirement": 1,
+			"serialIterDuration": 1.0,
+			"numJobs": 1,
+			"synchronicity": "synchronous",
+			"arrivalTime": 57,
+			"lossFunction": "sublinear",
+			"workerResourceRequirement": 1
+		},
+		{
+			"numIterations": 10,
+			"parameterServerResourceRequirement": 1,
+			"serialIterDuration": 1.0,
+			"numJobs": 1,
+			"synchronicity": "synchronous",
+			"arrivalTime": 55,
+			"lossFunction": "sublinear",
+			"workerResourceRequirement": 1
+		},
+		{
+			"numIterations": 10,
+			"parameterServerResourceRequirement": 1,
+			"serialIterDuration": 1.0,
+			"numJobs": 1,
+			"synchronicity": "synchronous",
+			"arrivalTime": 53,
+			"lossFunction": "sublinear",
+			"workerResourceRequirement": 1
+		},
+		{
+			"numIterations": 10,
+			"parameterServerResourceRequirement": 1,
+			"serialIterDuration": 1.0,
+			"numJobs": 1,
+			"synchronicity": "synchronous",
+			"arrivalTime": 49,
+			"lossFunction": "superlinear",
+			"workerResourceRequirement": 1
+		},
+		{
+			"numIterations": 10,
+			"parameterServerResourceRequirement": 1,
+			"serialIterDuration": 1.0,
+			"numJobs": 1,
+			"synchronicity": "synchronous",
+			"arrivalTime": 46,
+			"lossFunction": "superlinear",
+			"workerResourceRequirement": 1
+		},
+		{
+			"numIterations": 10,
+			"parameterServerResourceRequirement": 1,
+			"serialIterDuration": 1.0,
+			"numJobs": 1,
+			"synchronicity": "synchronous",
+			"arrivalTime": 58,
+			"lossFunction": "superlinear",
+			"workerResourceRequirement": 1
+		},
+		{
+			"numIterations": 10,
+			"parameterServerResourceRequirement": 1,
+			"serialIterDuration": 1.0,
+			"numJobs": 1,
+			"synchronicity": "synchronous",
+			"arrivalTime": 57,
+			"lossFunction": "sublinear",
+			"workerResourceRequirement": 1
+		},
+		{
+			"numIterations": 10,
+			"parameterServerResourceRequirement": 1,
+			"serialIterDuration": 1.0,
+			"numJobs": 1,
+			"synchronicity": "synchronous",
+			"arrivalTime": 62,
+			"lossFunction": "superlinear",
+			"workerResourceRequirement": 1
+		},
+		{
+			"numIterations": 10,
+			"parameterServerResourceRequirement": 1,
+			"serialIterDuration": 1.0,
+			"numJobs": 1,
+			"synchronicity": "synchronous",
+			"arrivalTime": 46,
+			"lossFunction": "superlinear",
+			"workerResourceRequirement": 1
+		},
+		{
+			"numIterations": 10,
+			"parameterServerResourceRequirement": 1,
+			"serialIterDuration": 1.0,
+			"numJobs": 1,
+			"synchronicity": "synchronous",
+			"arrivalTime": 49,
+			"lossFunction": "superlinear",
+			"workerResourceRequirement": 1
+		},
+		{
+			"numIterations": 10,
+			"parameterServerResourceRequirement": 1,
+			"serialIterDuration": 1.0,
+			"numJobs": 1,
+			"synchronicity": "synchronous",
+			"arrivalTime": 49,
+			"lossFunction": "superlinear",
+			"workerResourceRequirement": 1
+		},
+		{
+			"numIterations": 10,
+			"parameterServerResourceRequirement": 1,
+			"serialIterDuration": 1.0,
+			"numJobs": 1,
+			"synchronicity": "synchronous",
+			"arrivalTime": 56,
+			"lossFunction": "sublinear",
+			"workerResourceRequirement": 1
+		},
+		{
+			"numIterations": 10,
+			"parameterServerResourceRequirement": 1,
+			"serialIterDuration": 1.0,
+			"numJobs": 1,
+			"synchronicity": "synchronous",
+			"arrivalTime": 47,
+			"lossFunction": "superlinear",
+			"workerResourceRequirement": 1
+		},
+		{
+			"numIterations": 10,
+			"parameterServerResourceRequirement": 1,
+			"serialIterDuration": 1.0,
+			"numJobs": 1,
+			"synchronicity": "synchronous",
+			"arrivalTime": 65,
+			"lossFunction": "superlinear",
+			"workerResourceRequirement": 1
+		},
+		{
+			"numIterations": 10,
+			"parameterServerResourceRequirement": 1,
+			"serialIterDuration": 1.0,
+			"numJobs": 1,
+			"synchronicity": "synchronous",
+			"arrivalTime": 53,
+			"lossFunction": "sublinear",
+			"workerResourceRequirement": 1
+		},
+		{
+			"numIterations": 10,
+			"parameterServerResourceRequirement": 1,
+			"serialIterDuration": 1.0,
+			"numJobs": 1,
+			"synchronicity": "synchronous",
+			"arrivalTime": 46,
+			"lossFunction": "superlinear",
+			"workerResourceRequirement": 1
+		},
+		{
+			"numIterations": 10,
+			"parameterServerResourceRequirement": 1,
+			"serialIterDuration": 1.0,
+			"numJobs": 1,
+			"synchronicity": "synchronous",
+			"arrivalTime": 50,
+			"lossFunction": "superlinear",
+			"workerResourceRequirement": 1
+		},
+		{
+			"numIterations": 10,
+			"parameterServerResourceRequirement": 1,
+			"serialIterDuration": 1.0,
+			"numJobs": 1,
+			"synchronicity": "synchronous",
+			"arrivalTime": 45,
+			"lossFunction": "sublinear",
+			"workerResourceRequirement": 1
+		},
+		{
+			"numIterations": 10,
+			"parameterServerResourceRequirement": 1,
+			"serialIterDuration": 1.0,
+			"numJobs": 1,
+			"synchronicity": "synchronous",
+			"arrivalTime": 60,
+			"lossFunction": "sublinear",
+			"workerResourceRequirement": 1
+		},
+		{
+			"numIterations": 10,
+			"parameterServerResourceRequirement": 1,
+			"serialIterDuration": 1.0,
+			"numJobs": 1,
+			"synchronicity": "synchronous",
+			"arrivalTime": 56,
+			"lossFunction": "sublinear",
+			"workerResourceRequirement": 1
+		},
+		{
+			"numIterations": 10,
+			"parameterServerResourceRequirement": 1,
+			"serialIterDuration": 1.0,
+			"numJobs": 1,
+			"synchronicity": "synchronous",
+			"arrivalTime": 51,
+			"lossFunction": "superlinear",
+			"workerResourceRequirement": 1
+		},
+		{
+			"numIterations": 10,
+			"parameterServerResourceRequirement": 1,
+			"serialIterDuration": 1.0,
+			"numJobs": 1,
+			"synchronicity": "synchronous",
+			"arrivalTime": 52,
+			"lossFunction": "superlinear",
+			"workerResourceRequirement": 1
+		},
+		{
+			"numIterations": 10,
+			"parameterServerResourceRequirement": 1,
+			"serialIterDuration": 1.0,
+			"numJobs": 1,
+			"synchronicity": "synchronous",
+			"arrivalTime": 56,
+			"lossFunction": "sublinear",
+			"workerResourceRequirement": 1
+		},
+		{
+			"numIterations": 10,
+			"parameterServerResourceRequirement": 1,
+			"serialIterDuration": 1.0,
+			"numJobs": 1,
+			"synchronicity": "synchronous",
+			"arrivalTime": 58,
+			"lossFunction": "sublinear",
+			"workerResourceRequirement": 1
+		},
+		{
+			"numIterations": 10,
+			"parameterServerResourceRequirement": 1,
+			"serialIterDuration": 1.0,
+			"numJobs": 1,
+			"synchronicity": "synchronous",
+			"arrivalTime": 51,
+			"lossFunction": "superlinear",
+			"workerResourceRequirement": 1
+		},
+		{
+			"numIterations": 10,
+			"parameterServerResourceRequirement": 1,
+			"serialIterDuration": 1.0,
+			"numJobs": 1,
+			"synchronicity": "synchronous",
+			"arrivalTime": 38,
+			"lossFunction": "superlinear",
+			"workerResourceRequirement": 1
+		},
+		{
+			"numIterations": 10,
+			"parameterServerResourceRequirement": 1,
+			"serialIterDuration": 1.0,
+			"numJobs": 1,
+			"synchronicity": "synchronous",
+			"arrivalTime": 41,
+			"lossFunction": "superlinear",
+			"workerResourceRequirement": 1
+		},
+		{
+			"numIterations": 10,
+			"parameterServerResourceRequirement": 1,
+			"serialIterDuration": 1.0,
+			"numJobs": 1,
+			"synchronicity": "synchronous",
+			"arrivalTime": 57,
+			"lossFunction": "superlinear",
+			"workerResourceRequirement": 1
+		}
+	],
+	"numGPUs": 80,
+	"seed": 7,
+	"schedPolicy": "slaq"
+}

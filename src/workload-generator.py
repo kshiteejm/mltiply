@@ -29,7 +29,7 @@ parser.add_argument('-t', '--total', type=int,
 	help='total number of job groups')
 
 parser.add_argument('-j', '--jobspg', type=int,
-	default='5',
+	default='1',
 	help='jobs per job group')
 
 parser.add_argument('-o', '--out', type=str,
@@ -49,7 +49,7 @@ parser.add_argument('-n', '--iter', type=int,
 	help='total iterations for one job')
 
 parser.add_argument('-d', '--dur', type=float,
-	default='20',
+	default='1',
 	help='serial iteration duration for one job')
 
 parser.add_argument('-w', '--worker', type=int,
