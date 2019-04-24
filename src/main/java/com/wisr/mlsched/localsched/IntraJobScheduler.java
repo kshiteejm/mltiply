@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,7 +32,7 @@ public abstract class IntraJobScheduler {
 	protected int mTotalExpectedIterations; // Total number of iterations job is expected to run
 	protected double mTimePerIteration; // Amount of time for a single iteration of job on 1 GPU
 	protected int mMaxParallelism; // Represents max GPUs job can request
-	private int mRandomSeed; // Random seed for loss curve
+	protected int mRandomSeed; // Random seed for loss curve
 	private LossFunction mLossCurve; // Representation of loss curve
 	private double mCrossSlotSlowdown; // Slowdown due to network b/w GPUs across slots
 	private double mCrossMachineSlowdown; // Slowdown due to network b/w GPUs across machines
@@ -51,6 +52,8 @@ public abstract class IntraJobScheduler {
 	private double mTimeLastResourceAssignment; 
 	private static Logger sLog; // Instance of logger
 	private double mGpuTime;
+	protected int mErrorPercent;
+	protected Random mErrorRandom;
 
 	public IntraJobScheduler(JSONObject config) {
 		initFromConfig(config);
@@ -65,6 +68,8 @@ public abstract class IntraJobScheduler {
 		oldRatio = Double.POSITIVE_INFINITY;
 		themisTs = Double.POSITIVE_INFINITY;
 		mGpuTime = 0;
+		mErrorPercent = 5;
+		mErrorRandom = new Random(mRandomSeed);
 		mTimeLastResourceAssignment = Simulation.getSimulationTime()-1;
 		mIsLeader = true; // By default, everyone is a leader unless told otherwise
 		JobStatistics.getInstance().recordJobStart(mJobId, Simulation.getSimulationTime());
@@ -102,11 +107,15 @@ public abstract class IntraJobScheduler {
 	
 	public double getCurrentEstimateForThemis() {
 		// Do update if we do not have resources
+		double value;
 		if(mCurrentIterationGPUs.size() == 0) {
-			return (Simulation.getSimulationTime() - mJobStartTime) + mTotalIterationsRemaining*mTimePerIteration;
+			value = (Simulation.getSimulationTime() - mJobStartTime) + mTotalIterationsRemaining*mTimePerIteration;
 		} else {
-			return getCurrentEstimate();
+			value = getCurrentEstimate();
 		}
+		double error_percent = mErrorRandom.nextInt(2*mErrorPercent) - mErrorPercent;
+		double absolute_error = value*error_percent/100;
+		return value + absolute_error;
 	}
 
 	/**

@@ -114,7 +114,11 @@ public class ThemisIntraJobScheduler extends IntraJobScheduler {
 			// no point in making bid
 			return null;
 		}
-		
+		double error_percent = mErrorRandom.nextInt(2*mErrorPercent) - mErrorPercent;
+		double absolute_error = ratio*error_percent/100;
+		//System.out.println("Old Val: " + ratio);
+		ratio = ratio+absolute_error;
+		//System.out.println("New Val: " + ratio);
 		
 		double oldSpeedup = getGPUsAvailableForNextIteration().size() * getPlacementSlowdown(getGPUsAvailableForNextIteration());
 		double oldTs = (Simulation.getSimulationTime() - mJobStartTime) + 
