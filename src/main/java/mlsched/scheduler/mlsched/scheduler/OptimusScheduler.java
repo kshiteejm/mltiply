@@ -68,9 +68,10 @@ public class OptimusScheduler extends InterJobScheduler {
 			}
 			
 			j.marginalGain = getMarginalGain(j);
-			if (j.marginalGain > 0) { // if marginalGain < 0, no need to allocate more resources
-				priorQ.add(j);
-			}
+			priorQ.add(j);
+//			if (j.marginalGain > 0) { // if marginalGain < 0, no need to allocate more resources
+//				priorQ.add(j);
+//			}
 		}
 
 		Collections.sort(priorQ, new OptimusJobComparator());
@@ -79,9 +80,9 @@ public class OptimusScheduler extends InterJobScheduler {
 			
 			double marginalGain = getMarginalGain(j);
 			
-			if (marginalGain < 0) {
-				priorQ.remove(j);
-			} else {
+//			if (marginalGain < 0) {
+//				priorQ.remove(j);
+//			} else {
 				double gainByWorkerAddition = getMarginalGainByAddingWorker(j);
 				double gainByPSAddition = getMarginalGainByAddingPS(j);
 				
@@ -116,7 +117,7 @@ public class OptimusScheduler extends InterJobScheduler {
 					}
 				}
 				Collections.sort(priorQ, new OptimusJobComparator());
-			}
+			//}
 		}
 
 //		if (Main.distributeResourcesFlag == false)

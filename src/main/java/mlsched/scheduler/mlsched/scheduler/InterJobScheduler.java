@@ -43,5 +43,6 @@ public class InterJobScheduler {
 				}
 			}
 		}
+		// System.out.println("Remaining: " + Main.cluster.availableGPUs);
 	}
 }
