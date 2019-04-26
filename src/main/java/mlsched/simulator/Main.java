@@ -120,7 +120,7 @@ public class Main {
 		// because we only distribute resources after everything is released or jobs
 		// have arrived.
 
-		final String Filename = "optimus_uniform.json";
+		final String Filename = "optimus_normal.json";
 
 		Workload.parseWorkload(Filename);
 

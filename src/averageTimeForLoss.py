@@ -1,4 +1,15 @@
 import sys
+import math
+import numpy as np
+import matplotlib.pyplot as plt
+
+from scipy.optimize import curve_fit
+
+def func(x, a, b, c):
+	return a * pow(b,x) + c
+
+# def func(x, a, b):
+# 	return a*x + b
 
 ipFile = str(sys.argv[1])
 
@@ -48,12 +59,31 @@ with open(ipFile, 'r') as f:
 		else:
 			break
 
+xdata = np.arange(75.0, 95.0, 0.1)
+yDataList = [0.0 for x in xdata]
 
 for key, value in jobDict.iteritems():
 	jobStartTime = value['startTime']
+	
 	lossValueList = value['lossValueList']
-	initialLoss = lossValueList[0]
+	initialLoss = 1.0
 
 	lossValueReductionList = [(((initialLoss - x) / initialLoss) * 100) for x in lossValueList]
+
+	endTimeList = value['endTimeList']
+	timeTakenList = [(x - jobStartTime) for x in endTimeList]
+
+	popt, pcov = curve_fit(func, lossValueReductionList, timeTakenList, maxfev=1000000)
+
 	
-	print lossValueReductionList
+	ydata = []
+	for x in xdata:
+		ydata.append(func(x, *popt))
+
+	if not math.isnan(ydata[0]):
+		yDataList = [(yDataList[i] + ydata[i]) for i in range(len(ydata))]
+
+ydata = np.divide(yDataList, len(jobDict))
+
+plt.plot(xdata, ydata)
+plt.show()
