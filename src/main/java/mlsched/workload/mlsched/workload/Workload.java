@@ -39,7 +39,7 @@ public class Workload {
 					
 				case "slaq": Main.interJobScheduler = new SLAQ(true);
 					Main.schedulingInterval = jo.get("schedulingInterval") != null ? 
-							 Double.valueOf(jo.get("schedulingInterval").toString()) : 2;
+							 Double.valueOf(jo.get("schedulingInterval").toString()) : 5;
 					break;
 				
 				case "optimus": Main.interJobScheduler = new OptimusScheduler(false);
