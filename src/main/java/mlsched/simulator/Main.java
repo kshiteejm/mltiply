@@ -120,7 +120,7 @@ public class Main {
 		// because we only distribute resources after everything is released or jobs
 		// have arrived.
 
-		final String Filename = "slaq_normal.json";
+		final String Filename = "contention.json";
 
 		Workload.parseWorkload(Filename);
 

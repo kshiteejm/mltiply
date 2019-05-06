@@ -1,0 +1,47 @@
+{
+  "seed": 7,
+  "numGPUs": 10,
+  "schedPolicy": "equal",
+  "jobs": [
+    {
+      "arrivalTime": 0,
+      "numIterations": 50,
+      "serialIterDuration": 1,
+      "lossFunction": "sublinear",
+      "synchronicity": "synchronous",
+      "workerResourceRequirement": 1,
+      "parameterServerResourceRequirement": 1,
+      "numJobs": 2
+    },
+    {
+      "arrivalTime": 2,
+      "numIterations": 50,
+      "serialIterDuration": 1,
+      "lossFunction": "superlinear",
+      "synchronicity": "synchronous",
+      "workerResourceRequirement": 1,
+      "parameterServerResourceRequirement": 1,
+      "numJobs": 2
+    },
+    {
+      "arrivalTime": 4,
+      "numIterations": 50,
+      "serialIterDuration": 1,
+      "lossFunction": "superlinear",
+      "synchronicity": "synchronous",
+      "workerResourceRequirement": 1,
+      "parameterServerResourceRequirement": 1,
+      "numJobs": 2
+    },
+    {
+      "arrivalTime": 5,
+      "numIterations": 50,
+      "serialIterDuration": 1,
+      "lossFunction": "superlinear",
+      "synchronicity": "synchronous",
+      "workerResourceRequirement": 1,
+      "parameterServerResourceRequirement": 1,
+      "numJobs": 2
+    }
+  ]
+}
