@@ -18,6 +18,8 @@ public class InterJobSchedulerFactory {
 				return new SLAQInterJobScheduler();
 			case "Tiresias":
 				return new TiresiasInterJobScheduler();
+			case "SJF":
+				return new SJFInterJobScheduler();
 		}
 		sLog.severe("Policy not defined");
 		return null;

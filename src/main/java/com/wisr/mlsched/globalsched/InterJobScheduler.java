@@ -33,7 +33,7 @@ public abstract class InterJobScheduler {
 						new StartIterationEvent(Simulation.getSimulationTime(), job));
 				job.notifyResourceAvailable();
 			} else if(job.isWaitingForResources()) {
-				job.resetOldRatio();
+				//job.resetOldRatio(); // do not reset, instead we do prioritization based on time_waiting*old_Ts/Ti
 			}
 		}
 	}

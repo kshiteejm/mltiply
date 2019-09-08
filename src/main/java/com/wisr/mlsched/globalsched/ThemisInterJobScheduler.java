@@ -201,11 +201,6 @@ public class ThemisInterJobScheduler extends InterJobScheduler {
 
 			Collections.sort(bids, new PerGPUBidComparator());
 			
-			/*for(Bid bid : bids) {
-				System.out.println(bid.toString());
-			}*/
-			//System.out.println(bids.size());
-			
 			// If no bids, let's see if others not selected have any resources requirements
 			if(bids.size() == 0) {
 				System.out.println("No bids");

@@ -103,7 +103,8 @@ public abstract class IntraJobScheduler {
 	public double getCurrentEstimateForThemis() {
 		// Do update if we do not have resources
 		if(mCurrentIterationGPUs.size() == 0) {
-			return (Simulation.getSimulationTime() - mJobStartTime) + mTotalIterationsRemaining*mTimePerIteration;
+			//return (Simulation.getSimulationTime() - mJobStartTime) + mTotalIterationsRemaining*mTimePerIteration;
+			return oldRatio*mTimeLastResourceAssignment;
 		} else {
 			return getCurrentEstimate();
 		}
@@ -170,6 +171,7 @@ public abstract class IntraJobScheduler {
 		}
 		// Job has iterations left
 		List<GPU> expiredResources = new ArrayList<GPU>();
+		double leastLeaseEndTime = Double.MAX_VALUE;
 		Iterator<GPU> currentGPUIterator = mCurrentIterationGPUs.iterator();
 		while (currentGPUIterator.hasNext()) {
 			GPU gpu = currentGPUIterator.next();
@@ -178,8 +180,20 @@ public abstract class IntraJobScheduler {
 				gpu.markLeaseEnd();
 			} else {
 				mNextIterationGPUs.add(gpu);
+				if(gpu.getLeaseEnd() < leastLeaseEndTime) {
+					leastLeaseEndTime = gpu.getLeaseEnd();
+				}
 			}
 		}
+		
+		// check if this iteration can finish within the least lease end time
+		double timeForIteration = mTimePerIteration*getPlacementSlowdown(mCurrentIterationGPUs)/mCurrentIterationGPUs.size();
+		if(Simulation.getSimulationTime() + timeForIteration < leastLeaseEndTime) {
+		    // at one GPU's lease expires before the next iteration is complete - release all GPUs if this is the case
+			expiredResources.addAll(mNextIterationGPUs);
+			mNextIterationGPUs = new HashSet<GPU>();
+		}
+		
 		if(!expiredResources.isEmpty()) {
 			ClusterEventQueue.getInstance()
 			.enqueueEvent(new ResourceAvailableEvent(Simulation.getSimulationTime() +
@@ -189,13 +203,14 @@ public abstract class IntraJobScheduler {
 		if (mNextIterationGPUs.isEmpty()) {
 			mCurrentIterationGPUs = new HashSet<GPU>();
 			mIsWaiting = true;
+			mTimeLastResourceAssignment = Simulation.getSimulationTime();
 		} else {
 			ClusterEventQueue.getInstance().enqueueEvent(new StartIterationEvent(Simulation.getSimulationTime(), this));
 		}
 	}
 	
-	public void resetOldRatio() {
-		oldRatio = Double.POSITIVE_INFINITY;
+	public void resetOldRatio() { // short-circuit this API
+		//oldRatio = Double.POSITIVE_INFINITY;
 	}
 
 	public double getCurrentEstimate() {

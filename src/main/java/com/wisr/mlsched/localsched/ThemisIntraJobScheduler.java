@@ -9,7 +9,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-import java.util.Random;
 import java.util.Set;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -40,13 +39,9 @@ public class ThemisIntraJobScheduler extends IntraJobScheduler {
 		Map<Integer, List<Bid>> gpuBenefit = new HashMap<Integer, List<Bid>>();
 		List<Bid> bids = new ArrayList<Bid>();
 		Queue<String> q = new LinkedList<String>();
-		Collections.shuffle(offeredGPUs, new Random(0));
 		q.add("1");
-		//q.add("0");
-		//q.add(Integer.toString(getJobId()%2));
-		/*if(Cluster.getInstance().getRunningJobs().size() == 5) {
-			System.out.println("Offered GPUs: " + offeredGPUs.size());
-		}*/
+		q.add("0");
+		
 		while (q.size() > 0) {
 			String s1 = q.peek();
 			q.remove();
@@ -65,6 +60,7 @@ public class ThemisIntraJobScheduler extends IntraJobScheduler {
 				q.add(s2 + "1");	
 			}
 		}
+		
 		// Return only the top bids for each GPU size
 		for(Integer gpuSize : gpuBenefit.keySet()) {
 			List<Bid> bidsForGPUSize = gpuBenefit.get(gpuSize);

@@ -20,6 +20,8 @@ public class IntraJobSchedulerFactory {
 				return new SLAQIntraJobScheduler(workload_config);
 			case "Tiresias":
 				return new TiresiasIntraJobScheduler(workload_config);
+			case "SJF":
+				return new SJFIntraJobScheduler(workload_config);
 		}
 		sLog.severe("Policy not defined");
 		return null;
