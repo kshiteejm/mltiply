@@ -54,10 +54,10 @@ public class ThemisIntraJobScheduler extends IntraJobScheduler {
 				bidsForGPUSize.add(bid);
 				gpuBenefit.put(getGPUsInString(s1), bidsForGPUSize);
 			}
-			if(getGPUsInString(s1) < mMaxParallelism && s1.length() < offeredGPUs.size()) {
+			if(s1.length() < offeredGPUs.size()) {
 				String s2 = s1;
-				q.add(s1 + "0");
-				q.add(s2 + "1");	
+				q.add(s2 + "1");
+				q.add(s2 + "0");	
 			}
 		}
 		
@@ -71,6 +71,8 @@ public class ThemisIntraJobScheduler extends IntraJobScheduler {
 					    .filter(p -> p.mNewPscore == largestPlacementScore).collect(Collectors.toList()));
 			}
 		}
+		//System.out.println("Job " + Integer.toString(getJobId()) + " : " + bids);
+		//System.out.println("");
 		return bids;
 	}
 	
@@ -94,6 +96,11 @@ public class ThemisIntraJobScheduler extends IntraJobScheduler {
 				gpusForBid.add(offeredGPUs.get(i));
 			}
 		}
+		//System.out.println(paddedBitMask);
+		if(gpusForBid.size() == 0) {
+			// string with all 0s
+			return null;
+		}
 		if(getGPUsAvailableForNextIteration().size() + gpusForBid.size() > mMaxParallelism) {
 			// No point of making this bid
 			return null;
@@ -103,11 +110,14 @@ public class ThemisIntraJobScheduler extends IntraJobScheduler {
 		potentialNewGPUSet.addAll(gpusForBid);
 		
 		double newSpeedup = potentialNewGPUSet.size() * getPlacementSlowdown(potentialNewGPUSet);
-		double newTs = (Simulation.getSimulationTime() - mJobStartTime) + 
+		double newTs = //(Simulation.getSimulationTime() - mJobStartTime) + 
 				(mTotalIterationsRemaining*mTimePerIteration)/newSpeedup;
 		double ratio = newTs/getIdealEstimate();
-		if(Double.compare(ratio, 1) < 0) {
+		/*if(Double.compare(ratio, 1) < 0) {
 			// no point in making bid
+			return null;
+		}*/
+		if(Double.compare(newSpeedup, 1) < 0) {
 			return null;
 		}
 		
@@ -119,7 +129,7 @@ public class ThemisIntraJobScheduler extends IntraJobScheduler {
 		if(Double.compare(ratio, oldratio) >= 0 && !Double.isInfinite(oldratio)) {
 			return null;
 		}
-		Bid bid = new Bid(gpusForBid, ratio, oldratio, this, newSpeedup, oldSpeedup);
+		Bid bid = new Bid(gpusForBid, newSpeedup, oldratio, this, newSpeedup, oldSpeedup);
 		return bid;
 	}
 	

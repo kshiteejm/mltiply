@@ -67,7 +67,7 @@ public class Bid {
 	public String toString() {
 		String out = "";
 		for (GPU gpu: mList) {
-			out = out + ":[" + gpu.getLocation().toString() +"]";
+			out = out + ":[" + gpu.getLocation().getPrettyString() +"]";
 		}
 		out = out + " exp:" + mExpectedBenefit;
 		out = out + " old: " + mOldBenefit;

@@ -89,9 +89,13 @@ public class ThemisInterJobScheduler extends InterJobScheduler {
 //				}
 //				if (Double.compare(bid.getExpectedBenefit(), 0) == 0) {
 //					logExpectedBenefit = -1000;
-				double logExpectedBenefit = 0.001;
-				if (Double.compare(bid.getExpectedBenefit(), 1) > 0) {
-					logExpectedBenefit = Math.log(bid.getExpectedBenefit()); // log(T_s_new/T_i_new)
+				//double logExpectedBenefit = 0.00000001;
+				//if (Double.compare(bid.getExpectedBenefit(), 1) > 0) {
+					//logExpectedBenefit = Math.log(bid.getExpectedBenefit()); // log(T_s_new/T_i_new)
+				//}
+				double logExpectedBenefit = 0.00001;
+				if(Double.compare(bid.getExpectedBenefit(),1) > 0) {
+					logExpectedBenefit = Math.log(bid.getExpectedBenefit());
 				}
 //				double logOldBenefit = 1000;
 //				if (!Double.isInfinite(bid.getOldBenefit())) {
@@ -105,15 +109,16 @@ public class ThemisInterJobScheduler extends InterJobScheduler {
 //				valuationObjective.addTerm(-logOldBenefit, bidVariables.get(bid));
 //				valuationObjective.addConstant(logOldBenefit);
 			}
-			for (IntraJobScheduler job: bidsPerJob.keySet()) {
+			/*for (IntraJobScheduler job: bidsPerJob.keySet()) {
 				double logOldBenefit = 1000;
 				if (!Double.isInfinite(job.getOldBenefit())) {
 					logOldBenefit = Math.log(job.getOldBenefit());  // log(T_s_old/T_i_old)	
 				}
 				valuationObjective.addTerm(-logOldBenefit, jobVariables.get(job));
 				valuationObjective.addConstant(logOldBenefit);
-			}
-			solver.setObjective(valuationObjective, GRB.MINIMIZE);
+			}*/
+			//solver.setObjective(valuationObjective, GRB.MINIMIZE);
+			solver.setObjective(valuationObjective, GRB.MAXIMIZE);
 			solver.update();
 			// optimize
 			solver.optimize();
@@ -155,7 +160,9 @@ public class ThemisInterJobScheduler extends InterJobScheduler {
 			List<IntraJobScheduler> runningJobs = Cluster.getInstance().getRunningJobs();
 			for(IntraJobScheduler job: runningJobs) {
 				if(jobsToConsider.contains(job.getJobId()) && job.willParticipateInBid()) {
-					fairnessValues.add(new JobFairness(job, job.getCurrentEstimateForThemis()/job.getIdealEstimate()));
+					fairnessValues.add(new JobFairness(job, job.getCurrentEstimateForThemis()));
+					System.out.println("Job: " + job.getJobId() + " Fairness: " + 
+					    Double.toString(job.getCurrentEstimateForThemis()));
 				}
 			}
 			if(fairnessValues.size() == 0) {
@@ -200,6 +207,7 @@ public class ThemisInterJobScheduler extends InterJobScheduler {
 			}
 
 			Collections.sort(bids, new PerGPUBidComparator());
+			//System.out.println(bids);
 			
 			// If no bids, let's see if others not selected have any resources requirements
 			if(bids.size() == 0) {
@@ -212,13 +220,14 @@ public class ThemisInterJobScheduler extends InterJobScheduler {
 			List<GPU> remainingGPUSet = new ArrayList<>(gpu_set);
 			
 			List<Bid> winningBids = pickWinningBids(gpu_set, bids);//finalBids);
+			//System.out.println(winningBids);
 			if(winningBids.size() == 0) {
 				System.out.println("Have a problem!");
 				for(Bid bid : bids) {
 					System.out.println("Bid: " + bid);
 				}
 				for (GPU gpu: gpu_set) {
-					System.out.println("GPU: " + gpu.getLocation());
+					System.out.println("GPU: " + gpu.getLocation().getPrettyString());
 				}
 				System.exit(0);
 			}

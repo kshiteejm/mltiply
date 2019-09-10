@@ -37,7 +37,7 @@ public abstract class IntraJobScheduler {
 	private double mCrossMachineSlowdown; // Slowdown due to network b/w GPUs across machines
 	private double mCrossRackSlowdown; // Slowdown due to network b/w GPUs across slots
 
-	private final double CHECKPOINTING_OVERHEAD_PER_GPU = 0.1; // 6 seconds overhead
+	private final double CHECKPOINTING_OVERHEAD_PER_GPU = 0.0; // 6 seconds overhead
 	
 	// State management for job
 	private boolean mIsLeader; // Whether this job is the leader in it's job group
@@ -100,13 +100,21 @@ public abstract class IntraJobScheduler {
 		this.mTotalIterationsRemaining = mTotalIterationsRemaining;
 	}
 	
+	public double getLastResourceAssignment() {
+		return mTimeLastResourceAssignment;
+	}
+	
 	public double getCurrentEstimateForThemis() {
 		// Do update if we do not have resources
 		if(mCurrentIterationGPUs.size() == 0) {
 			//return (Simulation.getSimulationTime() - mJobStartTime) + mTotalIterationsRemaining*mTimePerIteration;
-			return oldRatio*mTimeLastResourceAssignment;
+			//System.out.println("Job " + Integer.toString(mJobId) + " : " + Double.toString(oldRatio) + " " + 
+			 //   Double.toString(mTimeLastResourceAssignment));
+			return oldRatio*(Simulation.getSimulationTime() - mTimeLastResourceAssignment + 1);
 		} else {
-			return getCurrentEstimate();
+			//System.out.println("Current iteration GPUs = " + Integer.toString(mCurrentIterationGPUs.size()));
+			//System.out.println(getCurrentEstimate());
+			return getCurrentEstimate()/getIdealEstimate();
 		}
 	}
 
@@ -130,12 +138,12 @@ public abstract class IntraJobScheduler {
 		mNextIterationGPUs = new HashSet<GPU>();
 		mIsWaiting = false;
 		assert(mCurrentIterationGPUs.size() > 0);
-		System.out.println("Placement Job " + Integer.toString(mJobId) + ":" 
+		/*System.out.println("Placement Job " + Integer.toString(mJobId) + ":" 
 				+ " Time: " + Double.toString(Simulation.getSimulationTime())
 				+ " Iteration: " + Integer.toString(mTotalExpectedIterations - mTotalIterationsRemaining)
 				+ " NumGPUs: " + Integer.toString(mCurrentIterationGPUs.size())
 				+ " Score: " + Double.toString(getPlacementSlowdown(mCurrentIterationGPUs))
-				+ " Number_jobs_running: " + Integer.toString(Cluster.getInstance().getRunningJobs().size()));
+				+ " Number_jobs_running: " + Integer.toString(Cluster.getInstance().getRunningJobs().size()));*/
 		ClusterEventQueue.getInstance().enqueueEvent(
 				new EndIterationEvent(Simulation.getSimulationTime() + mTimePerIteration / getJobSpeedup(), this));
 		mGpuTime = mGpuTime + (mTimePerIteration/getJobSpeedup())*mCurrentIterationGPUs.size();
@@ -153,6 +161,8 @@ public abstract class IntraJobScheduler {
 		sLog.log(Level.ALL, "End iteration for job " + Integer.toString(mJobId));
 		setmTotalIterationsRemaining(getmTotalIterationsRemaining() - 1);
 		sLog.info("Iterations Remaning: " + Integer.toString(getmTotalIterationsRemaining()));
+		System.out.println("End iteration for job " + Integer.toString(mJobId) + " remaining iterations=" 
+			    + Integer.toString(getmTotalIterationsRemaining()) + " Time:" + Simulation.getSimulationTime());
 		oldRatio = getCurrentEstimate()/getIdealEstimate();
 		themisTs = getCurrentEstimate();
 		if (getmTotalIterationsRemaining() == 0) {
@@ -171,8 +181,8 @@ public abstract class IntraJobScheduler {
 		}
 		// Job has iterations left
 		List<GPU> expiredResources = new ArrayList<GPU>();
-		double leastLeaseEndTime = Double.MAX_VALUE;
 		Iterator<GPU> currentGPUIterator = mCurrentIterationGPUs.iterator();
+		mNextIterationExpectedGPUs = new HashSet<GPU>();
 		while (currentGPUIterator.hasNext()) {
 			GPU gpu = currentGPUIterator.next();
 			if (gpu.hasLeaseExpired()) {
@@ -180,18 +190,30 @@ public abstract class IntraJobScheduler {
 				gpu.markLeaseEnd();
 			} else {
 				mNextIterationGPUs.add(gpu);
-				if(gpu.getLeaseEnd() < leastLeaseEndTime) {
-					leastLeaseEndTime = gpu.getLeaseEnd();
-				}
+				mNextIterationExpectedGPUs.add(gpu);
 			}
 		}
 		
 		// check if this iteration can finish within the least lease end time
-		double timeForIteration = mTimePerIteration*getPlacementSlowdown(mCurrentIterationGPUs)/mCurrentIterationGPUs.size();
-		if(Simulation.getSimulationTime() + timeForIteration < leastLeaseEndTime) {
-		    // at one GPU's lease expires before the next iteration is complete - release all GPUs if this is the case
-			expiredResources.addAll(mNextIterationGPUs);
-			mNextIterationGPUs = new HashSet<GPU>();
+		while(true) {
+			boolean converged = true;
+			double timeForIteration = mTimePerIteration*getPlacementSlowdown(mNextIterationGPUs)/mNextIterationGPUs.size();
+			Iterator<GPU> it = mNextIterationGPUs.iterator();
+			while(it.hasNext()) {
+				GPU gpu = it.next();
+				if(Simulation.getSimulationTime() + timeForIteration > gpu.getLeaseEnd()) {
+					// cannot use this GPU anymore
+					//System.out.println("Cannot use this GPU anymore " + Integer.toString(mJobId));
+					mNextIterationExpectedGPUs.remove(gpu);
+					expiredResources.add(gpu);
+					gpu.markLeaseEnd();
+					it.remove();
+					converged = false;
+				}
+			}
+			if(converged) {
+				break;	
+			}
 		}
 		
 		if(!expiredResources.isEmpty()) {
@@ -237,6 +259,7 @@ public abstract class IntraJobScheduler {
 
 	public void notifyResourceAssignment(List<GPU> assignment) {
 		sLog.info("Job " + Integer.toString(mJobId) + " got resources"); 
+		System.out.println("Job " + Integer.toString(mJobId) + " got resources " + assignment);
 		mNextIterationGPUs.addAll(assignment);
 		//themisTs = getEstimateAfterAllocation();
 	}
@@ -328,6 +351,7 @@ public abstract class IntraJobScheduler {
 		double oldTs = (Simulation.getSimulationTime() - mJobStartTime) + 
 				(mTotalIterationsRemaining*mTimePerIteration)/oldSpeedup;
 		double oldratio = oldTs/getIdealEstimate();
+		System.out.println("Job " + mJobId + " ");
 		return oldratio;
 	}
 

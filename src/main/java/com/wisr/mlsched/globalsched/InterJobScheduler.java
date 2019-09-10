@@ -84,6 +84,10 @@ public abstract class InterJobScheduler {
 				return bid1.getJob().getGPUsAvailableForNextIteration().size() -
 						bid2.getJob().getGPUsAvailableForNextIteration().size();
 			}
+			comp = Double.compare(bid1.getJob().getLastResourceAssignment(), bid2.getJob().getLastResourceAssignment());
+			if(comp != 0) {
+				return comp;
+			}
 			return bid1.getJob().getJobId() - bid2.getJob().getJobId();
 		}
 		
