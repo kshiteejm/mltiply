@@ -3,6 +3,8 @@ package com.wisr.mlsched.job;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import com.wisr.mlsched.ClusterEventQueue;
 import com.wisr.mlsched.Simulation;
@@ -19,6 +21,8 @@ public class JobStatistics {
 	private List<LossValue> mLossValues; // List of cumulative loss values measured over time
 	private List<Double> mFinishTimeFairness; // List of Ts/Ti for leader jobs
 	private List<ContentionValue> mContention; // List of contention numbers over time
+	private TreeMap<Double,Integer> mGPUContention; // Map of contention over time
+	private static int lastContention = 0;
 	
 	/**
 	 * Private constructor to enforce singleton
@@ -29,6 +33,7 @@ public class JobStatistics {
 		mLossValues = new ArrayList<LossValue>();
 		mFinishTimeFairness = new ArrayList<Double>();
 		mContention = new ArrayList<ContentionValue>();
+		mGPUContention = new TreeMap<Double, Integer>();
 		ClusterEventQueue.getInstance().enqueueEvent(new 
 				JobStatisticEvent(Simulation.getSimulationTime() + 1));
 	}
@@ -48,8 +53,13 @@ public class JobStatistics {
 	 * @param jobid
 	 * @param timestamp
 	 */
-	public void recordJobStart(int jobid, double timestamp) {
+	public void recordJobStart(int jobid, double timestamp, int gpu_demand) {
 		mJobTime.put(jobid, new SingleJobStat(timestamp));
+		if(mGPUContention.get(timestamp) == null) {
+			mGPUContention.put(timestamp, 0);
+		}
+		lastContention += gpu_demand;
+		mGPUContention.put(timestamp, lastContention);
 	}
 	
 	/**
@@ -58,10 +68,47 @@ public class JobStatistics {
 	 * @param timestamp
 	 */
 	public void recordJobEnd(int jobid, double timestamp, double start_time, double ideal_running_time,
-			boolean isLeader, double gpu_time) {
+			boolean isLeader, double gpu_time, int gpu_demand) {
+		if(mGPUContention.get(timestamp) == null) {
+			mGPUContention.put(timestamp, 0);
+		}
+		lastContention -= gpu_demand;
+		mGPUContention.put(timestamp, lastContention);
 		mJobTime.get(jobid).setEndTime(timestamp);
 		mJobTime.get(jobid).setGpuTime(gpu_time);
-		mFinishTimeFairness.add((timestamp-start_time)/ideal_running_time);
+		mFinishTimeFairness.add((timestamp-start_time)/(ideal_running_time*avg_contention_for_job(jobid)));
+	}
+	
+	private double avg_contention_for_job(int jobid) {
+		double numerator = 0.0;
+		double denominator = 0.0;
+		double startTime = mJobTime.get(jobid).getStartTime();
+		double endTime = mJobTime.get(jobid).getEndTime();
+		
+		double t1 = -1;
+		double t2 = -1;
+		boolean started = false;
+		
+		//System.out.println(mGPUContention);
+		
+		for(Double time : mGPUContention.keySet()) {
+			if (Double.compare(time, startTime) < 0) {
+				// no op
+			}
+		    else if(Double.compare(time, startTime) == 0) { // started
+				t1 = startTime;
+			} else if(Double.compare(time, endTime) == 0) { // ended
+				numerator += mGPUContention.get(t1)*(time-t1);
+				denominator += time-t1;
+				break;
+			} else { // middle
+				numerator += mGPUContention.get(t1)*(time-t1);
+				denominator += time-t1;
+				t1=time;
+			}
+		}
+		//System.out.println("Job id " + Integer.toString(jobid) + " con:" + Double.toString(numerator/denominator));
+		return numerator/denominator;
 	}
 	
 	public void recordJobStatistics() {
@@ -144,6 +191,7 @@ public class JobStatistics {
 	private void printGpuTime() {
 		double total_time = 0.0;
 		for(Integer key : mJobTime.keySet()) {
+			System.out.println("GPU Time Job " + Integer.toString(key) + ": " + Double.toString(mJobTime.get(key).getGpuTime()));
 			total_time += mJobTime.get(key).getGpuTime();
 		}
 		System.out.println("Total GPU Time: " + total_time);

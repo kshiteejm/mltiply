@@ -67,7 +67,7 @@ public abstract class IntraJobScheduler {
 		mGpuTime = 0;
 		mTimeLastResourceAssignment = Simulation.getSimulationTime()-1;
 		mIsLeader = true; // By default, everyone is a leader unless told otherwise
-		JobStatistics.getInstance().recordJobStart(mJobId, Simulation.getSimulationTime());
+		JobStatistics.getInstance().recordJobStart(mJobId, Simulation.getSimulationTime(), mMaxParallelism);
 		List<GPU> availableResources = getResourcesAvailableInCluster();
 		if (!availableResources.isEmpty()) {
 			ClusterEventQueue.getInstance()
@@ -176,7 +176,7 @@ public abstract class IntraJobScheduler {
 							+ CHECKPOINTING_OVERHEAD_PER_GPU*relinquished_resources.size(), relinquished_resources));
 			Cluster.getInstance().removeJob(this);
 			JobStatistics.getInstance().recordJobEnd(mJobId, Simulation.getSimulationTime(), mJobStartTime,
-					getIdealEstimate(), mIsLeader, mGpuTime);
+					getIdealEstimate(), mIsLeader, mGpuTime, mMaxParallelism);
 			return;
 		}
 		// Job has iterations left
