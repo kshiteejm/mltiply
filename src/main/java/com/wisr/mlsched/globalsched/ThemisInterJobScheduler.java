@@ -154,6 +154,7 @@ public class ThemisInterJobScheduler extends InterJobScheduler {
 		List<Bid> winners = new ArrayList<Bid>();
 		GRBEnv env;
 		GRBModel solver;
+		double maxValuation = 0.0;
 		try {
 			env = new GRBEnv("themis_gurobi_tt.log");
 			env.set(GRB.IntParam.LogToConsole, 0);
@@ -257,7 +258,7 @@ public class ThemisInterJobScheduler extends InterJobScheduler {
 			solver.optimize();
 			if (solver.get(GRB.IntAttr.Status) == GRB.Status.OPTIMAL
 					|| solver.get(GRB.IntAttr.Status) == GRB.Status.TIME_LIMIT ) {
-				double maxValuation = solver.get(GRB.DoubleAttr.ObjVal);
+				maxValuation = solver.get(GRB.DoubleAttr.ObjVal);
 				for (Bid bid: bidVariables.keySet()) {
 					GRBVar var = bidVariables.get(bid);
 					if (var.get(GRB.DoubleAttr.X) == 1) {
