@@ -122,9 +122,10 @@ public class ThemisInterJobScheduler extends InterJobScheduler {
 			solver.update();
 			// optimize
 			solver.optimize();
+			double maxValuation =  0.0;
 			if (solver.get(GRB.IntAttr.Status) == GRB.Status.OPTIMAL
 					|| solver.get(GRB.IntAttr.Status) == GRB.Status.TIME_LIMIT ) {
-				double maxValuation = solver.get(GRB.DoubleAttr.ObjVal);
+				maxValuation = solver.get(GRB.DoubleAttr.ObjVal);
 				for (Bid bid: bidVariables.keySet()) {
 					GRBVar var = bidVariables.get(bid);
 					if (var.get(GRB.DoubleAttr.X) == 1) {
