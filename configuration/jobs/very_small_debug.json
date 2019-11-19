@@ -1,0 +1,93 @@
+[
+  {
+    "time_per_iteration": "7.6875", 
+    "random_seed": "98", 
+    "job_id": "1", 
+    "max_parallelism": "4", 
+    "start_time": "0", 
+    "loss_function_type": "sublinear", 
+    "cross_rack_slowdown": "0.6", 
+    "cross_machine_slowdown": "0.7", 
+    "job_group_id": "1", 
+    "total_iterations": "1280", 
+    "cross_slot_slowdown": "0.8"
+  }, 
+  {
+    "time_per_iteration": "0.232348111658", 
+    "random_seed": "1", 
+    "job_id": "2", 
+    "max_parallelism": "4", 
+    "start_time": "0", 
+    "loss_function_type": "sublinear", 
+    "cross_rack_slowdown": "0.6", 
+    "cross_machine_slowdown": "0.7", 
+    "job_group_id": "1", 
+    "total_iterations": "1218", 
+    "cross_slot_slowdown": "0.8"
+  }, 
+  {
+    "time_per_iteration": "0.232250300842", 
+    "random_seed": "58", 
+    "job_id": "3", 
+    "max_parallelism": "4", 
+    "start_time": "0", 
+    "loss_function_type": "sublinear", 
+    "cross_rack_slowdown": "0.6", 
+    "cross_machine_slowdown": "0.7", 
+    "job_group_id": "1", 
+    "total_iterations": "831", 
+    "cross_slot_slowdown": "0.8"
+  }, 
+  {
+    "time_per_iteration": "22.4", 
+    "random_seed": "53", 
+    "job_id": "4", 
+    "max_parallelism": "4", 
+    "start_time": "0", 
+    "loss_function_type": "sublinear", 
+    "cross_rack_slowdown": "0.6", 
+    "cross_machine_slowdown": "0.7", 
+    "job_group_id": "1", 
+    "total_iterations": "1240", 
+    "cross_slot_slowdown": "0.8"
+  }, 
+  {
+    "time_per_iteration": "1.88906859481", 
+    "random_seed": "45", 
+    "job_id": "5", 
+    "max_parallelism": "4", 
+    "start_time": "0", 
+    "loss_function_type": "sublinear", 
+    "cross_rack_slowdown": "0.6", 
+    "cross_machine_slowdown": "0.7", 
+    "job_group_id": "1", 
+    "total_iterations": "10511", 
+    "cross_slot_slowdown": "0.8"
+  }, 
+  {
+    "time_per_iteration": "0.232522796353", 
+    "random_seed": "6", 
+    "job_id": "6", 
+    "max_parallelism": "4", 
+    "start_time": "0", 
+    "loss_function_type": "sublinear", 
+    "cross_rack_slowdown": "0.6", 
+    "cross_machine_slowdown": "0.7", 
+    "job_group_id": "1", 
+    "total_iterations": "658", 
+    "cross_slot_slowdown": "0.8"
+  }, 
+  {
+    "time_per_iteration": "3.83520599251", 
+    "random_seed": "71", 
+    "job_id": "7", 
+    "max_parallelism": "4", 
+    "start_time": "0", 
+    "loss_function_type": "sublinear", 
+    "cross_rack_slowdown": "0.6", 
+    "cross_machine_slowdown": "0.7", 
+    "job_group_id": "1", 
+    "total_iterations": "267", 
+    "cross_slot_slowdown": "0.8"
+  }
+] 
