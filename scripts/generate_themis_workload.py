@@ -10,13 +10,14 @@ job_group_id = 0
 job_id = 1
 
 list_jobs = []
-with open("traces/processed_data.csv", "r") as f:
+with open("traces/philly_hyperdrive_workload.csv", "r") as f:
     reader = csv.reader(f, delimiter=",")
+    start_time = -100
     next(reader)
     for line in reader:
-        expt_id = int(line[1])
-        start_time = int(line[2])
-        running_time = int(line[3])
+        expt_id = int(line[0])
+        #start_time = int(line[2])
+        running_time = float(line[3])
         num_gpus = int(line[4])
         if expt_id == prev_expt_id:
             # Continue in same job group
@@ -27,6 +28,7 @@ with open("traces/processed_data.csv", "r") as f:
             job_group_id = job_group_id + 1
             job_id = job_id + 1
             model_to_use = models[random.randint(0,len(models)-1)]
+            start_time += 100
             print("New job group " + str(job_group_id) + " " + model_to_use)
         with open(model_config_folder + model_to_use + ".json") as json_file:
             model_data = json.load(json_file)
@@ -38,11 +40,11 @@ with open("traces/processed_data.csv", "r") as f:
             job_conf["cross_rack_slowdown"] = model_data["cross_rack_slowdown"]
             job_conf["time_per_iteration"] = str(float(model_data["time_per_iteration"])/60)
             job_conf["random_seed"] = str(random.randint(0,99))
-            job_conf["max_parallelism"] = "4"
+            job_conf["max_parallelism"] = str(num_gpus)
             #job_conf["start_time"] = str(start_time)
-            job_conf["start_time"] = "0"
+            job_conf["start_time"] = str(start_time)
             job_conf["loss_function_type"] = model_data["loss_function_type"] 
             job_conf["total_iterations"] = str(int(running_time/float(job_conf["time_per_iteration"])))
             list_jobs.append(job_conf)
-with open("configuration/jobs/"+"offline_hyperdrive_trace_workload"+".json", "w") as f:
+with open("configuration/jobs/"+"nsdi_philly_hyperdrive"+".json", "w") as f:
     f.write(json.dumps(list_jobs, indent=2, sort_keys=False))

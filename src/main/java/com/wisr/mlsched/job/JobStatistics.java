@@ -59,7 +59,11 @@ public class JobStatistics {
 			mGPUContention.put(timestamp, 0);
 		}
 		lastContention += gpu_demand;
-		mGPUContention.put(timestamp, lastContention);
+		if(lastContention <= Cluster.getInstance().getGPUsInCluster().size()) {
+			mGPUContention.put(timestamp, 1);	
+		} else {
+			mGPUContention.put(timestamp, lastContention/Cluster.getInstance().getGPUsInCluster().size());
+		}
 	}
 	
 	/**
@@ -72,7 +76,11 @@ public class JobStatistics {
 		if(mGPUContention.get(timestamp) == null) {
 			mGPUContention.put(timestamp, 0);
 		}
-		lastContention -= gpu_demand;
+		if(lastContention <= Cluster.getInstance().getGPUsInCluster().size()) {
+			mGPUContention.put(timestamp, 1);	
+		} else {
+			mGPUContention.put(timestamp, lastContention/Cluster.getInstance().getGPUsInCluster().size());
+		}
 		mGPUContention.put(timestamp, lastContention);
 		mJobTime.get(jobid).setEndTime(timestamp);
 		mJobTime.get(jobid).setGpuTime(gpu_time);

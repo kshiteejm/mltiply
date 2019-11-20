@@ -37,10 +37,16 @@ public class ThemisIntraJobScheduler extends IntraJobScheduler {
 			return null;
 		}
 		Map<Integer, List<Bid>> gpuBenefit = new HashMap<Integer, List<Bid>>();
+		Map<Integer, Double> maxGPUBenefit = new HashMap<Integer, Double>();
+		for(int i=1;i<=offeredGPUs.size();i++) {
+			maxGPUBenefit.put(i, 0.0);
+		}
 		List<Bid> bids = new ArrayList<Bid>();
 		Queue<String> q = new LinkedList<String>();
 		q.add("1");
 		q.add("0");
+		
+		System.out.println("Here1");
 		
 		while (q.size() > 0) {
 			String s1 = q.peek();
@@ -52,14 +58,23 @@ public class ThemisIntraJobScheduler extends IntraJobScheduler {
 					bidsForGPUSize = new ArrayList<Bid>();
 				}
 				bidsForGPUSize.add(bid);
-				gpuBenefit.put(getGPUsInString(s1), bidsForGPUSize);
+				if(bid.getExpectedBenefit() < maxGPUBenefit.get(bid.getGPUList().size())) {
+					// can skip further enumeration
+					//System.out.println(s1);
+					continue;
+				} else {
+					gpuBenefit.put(getGPUsInString(s1), bidsForGPUSize);
+				}
 			}
 			if(s1.length() < offeredGPUs.size()) {
 				String s2 = s1;
-				q.add(s2 + "1");
-				q.add(s2 + "0");	
+				q.add(s1 + "0");
+				if(getGPUsInString(s1) + getGPUsAvailableForNextIteration().size() < mMaxParallelism) {
+					q.add(s2 + "1");	
+				}	
 			}
 		}
+		System.out.println("Here2");
 		
 		// Return only the top bids for each GPU size
 		for(Integer gpuSize : gpuBenefit.keySet()) {
