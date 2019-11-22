@@ -28,6 +28,7 @@ public class ThemisInterJobScheduler extends InterJobScheduler {
 		GRBEnv env;
 		GRBModel solver;
 		try {
+			System.out.println("Picking Winning Bids");
 			env = new GRBEnv("themis_gurobi.log");
 			env.set(GRB.IntParam.LogToConsole, 0);
 			solver = new GRBModel(env);
@@ -121,6 +122,7 @@ public class ThemisInterJobScheduler extends InterJobScheduler {
 			solver.setObjective(valuationObjective, GRB.MAXIMIZE);
 			solver.update();
 			// optimize
+			System.out.println("Beginning to Solve...");
 			solver.optimize();
 			double maxValuation =  0.0;
 			if (solver.get(GRB.IntAttr.Status) == GRB.Status.OPTIMAL
@@ -133,12 +135,12 @@ public class ThemisInterJobScheduler extends InterJobScheduler {
 					}
 				}
 
-				for (IntraJobScheduler job: jobVariables.keySet()) {
-					double maxValuationAbsentJob = pickWinningBidsTruthTelling(gpu_set, bid_set, job);
-					// double maxValuationPFJob = maxValuation/jobWinningValuation.get(job);
-					double hiddenPayment = 1 - maxValuation/maxValuationAbsentJob;
-					System.out.println("Hidden Payment: " + hiddenPayment);
-				}
+				// for (IntraJobScheduler job: jobVariables.keySet()) {
+				// 	double maxValuationAbsentJob = pickWinningBidsTruthTelling(gpu_set, bid_set, job);
+				// 	// double maxValuationPFJob = maxValuation/jobWinningValuation.get(job);
+				// 	double hiddenPayment = 1 - maxValuation/maxValuationAbsentJob;
+				// 	System.out.println("Hidden Payment: " + hiddenPayment);
+				// }
 			} else {
 				solver.computeIIS();
 	            solver.write(".quark-unsat.ilp");
@@ -276,6 +278,32 @@ public class ThemisInterJobScheduler extends InterJobScheduler {
 		return maxValuation;
 	}
 
+	private void admissionControl() {
+		double maxRho = 0.0;
+		double minStartTimeQueuedJob = Double.MAX_VALUE;
+		IntraJobScheduler minJob = null;
+		List<IntraJobScheduler> allJobsInCluster = Cluster.getInstance().getRunningJobs();
+	    // implementing FIFO
+		for(IntraJobScheduler job: allJobsInCluster) {
+			if (job.isQueued()) {
+				double jobStartTime = job.getmJobStartTime();
+				if (jobStartTime < minStartTimeQueuedJob) {
+					minJob = job;
+					minStartTimeQueuedJob = jobStartTime;
+				}
+			} else {
+				double jobRho = job.getCurrentEstimateForThemis();
+				if (jobRho > maxRho) {
+					maxRho = jobRho;
+				}
+			}
+		}
+		// implementing Admission Control Threshold
+		if (maxRho < 1.5) {
+			minJob.dequeue(Simulation.getSimulationTime());
+		}
+	}
+
 	@Override
 	public void onResourceAvailable(List<GPU> gpu_set) {
 		if(Cluster.getInstance().getRunningJobs().size() == 0) {
@@ -283,9 +311,15 @@ public class ThemisInterJobScheduler extends InterJobScheduler {
 			System.out.println("No jobs");
 			return;
 		}
+		if (Simulation.isAdmissionControlEnabled()) {
+			admissionControl();
+		}
 		List<IntraJobScheduler> allJobsInCluster = Cluster.getInstance().getRunningJobs();
 		List<Integer> jobsToConsider = new ArrayList<>();
 		for(IntraJobScheduler job : allJobsInCluster) {
+			if (Simulation.isAdmissionControlEnabled() && job.isQueued()) {
+				continue;
+			} 
 			jobsToConsider.add(job.getJobId());
 		}
 		gpu_set = gpu_set.stream().filter(g -> !g.isLeased()).collect(Collectors.toList());
@@ -333,7 +367,7 @@ public class ThemisInterJobScheduler extends InterJobScheduler {
 			// Get bids from above jobs
 			List<Bid> bids = new ArrayList<Bid>();
 			for(JobFairness job: allJobs) {
-				//System.out.println("Bid from job: " + job.getJob().getJobId());
+				System.out.println("Bid from job: " + job.getJob().getJobId());
 				List<Bid> bidsFromJob = job.getJob().prepareBid(gpu_set);
 				if(bidsFromJob != null && !bidsFromJob.isEmpty()) {
 					bids.addAll(bidsFromJob);

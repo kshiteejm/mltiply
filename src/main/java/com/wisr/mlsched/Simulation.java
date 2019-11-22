@@ -15,6 +15,7 @@ public class Simulation {
 	
 	private static double mTime;
 	private static final Level mLogLevel = Level.OFF;
+	private static boolean admissionControl = false;
 	
 	public static void main(String args[]) {
 		String cluster_config_file = args[0];
@@ -57,5 +58,9 @@ public class Simulation {
 	
 	public static Level getLogLevel() {
 		return mLogLevel;
+	}
+
+	public static boolean isAdmissionControlEnabled() {
+		return admissionControl;
 	}
 }

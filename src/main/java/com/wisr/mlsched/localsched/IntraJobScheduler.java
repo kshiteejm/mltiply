@@ -51,6 +51,8 @@ public abstract class IntraJobScheduler {
 	private double mTimeLastResourceAssignment; 
 	private static Logger sLog; // Instance of logger
 	private double mGpuTime;
+	private double queueDelay; // State to maintain with admission control
+	private boolean mIsQueued; // Every job starts with getting queued 
 
 	public IntraJobScheduler(JSONObject config) {
 		initFromConfig(config);
@@ -73,6 +75,8 @@ public abstract class IntraJobScheduler {
 			ClusterEventQueue.getInstance()
 					.enqueueEvent(new ResourceAvailableEvent(Simulation.getSimulationTime(), availableResources));
 		}
+		queueDelay = 0;
+		mIsQueued = true;
 	}
 	
 	/**
@@ -102,6 +106,10 @@ public abstract class IntraJobScheduler {
 	
 	public double getLastResourceAssignment() {
 		return mTimeLastResourceAssignment;
+	}
+
+	public double getmJobStartTime() {
+		return mJobStartTime;
 	}
 	
 	public double getCurrentEstimateForThemis() {
@@ -176,7 +184,7 @@ public abstract class IntraJobScheduler {
 							+ CHECKPOINTING_OVERHEAD_PER_GPU*relinquished_resources.size(), relinquished_resources));
 			Cluster.getInstance().removeJob(this);
 			JobStatistics.getInstance().recordJobEnd(mJobId, Simulation.getSimulationTime(), mJobStartTime,
-					getIdealEstimate(), mIsLeader, mGpuTime, mMaxParallelism);
+					getIdealEstimate(), mIsLeader, mGpuTime, mMaxParallelism, queueDelay);
 			return;
 		}
 		// Job has iterations left
@@ -321,6 +329,20 @@ public abstract class IntraJobScheduler {
 			}
 		}
 		return 1.0;
+	}
+
+	public double getQueueDelay() {
+		return queueDelay;
+	}
+
+	public boolean isQueued() {
+		return mIsQueued;
+	}
+
+	public void dequeue(double time) {
+		mIsQueued = false;
+		queueDelay = time - mJobStartTime;
+		mJobStartTime = mJobStartTime + time;
 	}
 	
 	public boolean isWaitingForResources() {

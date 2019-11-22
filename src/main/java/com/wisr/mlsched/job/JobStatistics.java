@@ -72,7 +72,7 @@ public class JobStatistics {
 	 * @param timestamp
 	 */
 	public void recordJobEnd(int jobid, double timestamp, double start_time, double ideal_running_time,
-			boolean isLeader, double gpu_time, int gpu_demand) {
+			boolean isLeader, double gpu_time, int gpu_demand, double queue_delay) {
 		if(mGPUContention.get(timestamp) == null) {
 			mGPUContention.put(timestamp, 0);
 		}
@@ -82,8 +82,10 @@ public class JobStatistics {
 			mGPUContention.put(timestamp, lastContention/Cluster.getInstance().getGPUsInCluster().size());
 		}
 		mGPUContention.put(timestamp, lastContention);
+		mJobTime.get(jobid).setStartTime(start_time);
 		mJobTime.get(jobid).setEndTime(timestamp);
 		mJobTime.get(jobid).setGpuTime(gpu_time);
+		mJobTime.get(jobid).setQueueDelay(queue_delay);
 		mFinishTimeFairness.add((timestamp-start_time)/(ideal_running_time*avg_contention_for_job(jobid)));
 	}
 	
@@ -194,6 +196,15 @@ public class JobStatistics {
 		//printLosses();
 		//printContentions();
 		printFinishTimeFairness();
+		if (Simulation.isAdmissionControlEnabled()) {
+			printQueueDelay();
+		}
+	}
+
+	private void printQueueDelay() {
+		for(Integer key : mJobTime.keySet()) {
+			System.out.println("Queue Delay Job " + Integer.toString(key) + ": " + Double.toString(mJobTime.get(key).getQueueDelay()));
+		}	
 	}
 	
 	private void printGpuTime() {
@@ -289,14 +300,27 @@ public class JobStatistics {
 		private double mStartTime;
 		private double mEndTime;
 		private double mGpuTime;
+		private double mQueueDelay;
 		
 		public SingleJobStat(double start_time) {
 			mStartTime = start_time;
 			mEndTime = -1; // indicates not set
 		}
+
+		public void setStartTime(double start_time) {
+			mStartTime = start_time;
+		}
 		
 		public void setEndTime(double end_time) {
 			mEndTime = end_time;
+		}
+
+		public void setQueueDelay(double queue_delay) {
+			mQueueDelay = queue_delay;
+		}
+
+		public double getQueueDelay() {
+			return mQueueDelay;
 		}
 		
 		public void setGpuTime(double gpu_time) {
